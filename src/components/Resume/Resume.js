@@ -308,7 +308,7 @@ const Resume = forwardRef((props, ref) => {
                   </b>
                 </h4>
               </div>
-              <div className={`${styles.paddingLeft} pb-3`}>
+              <div className={`${styles.profiledetails} pb-3`}>
                 {info.basicInfo?.detail?.profile}
               </div>
               {columns[1].map((item) => sectionDiv[item])}

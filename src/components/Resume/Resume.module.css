@@ -47,6 +47,11 @@
 
 .paddingLeft {
   padding-left: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.profiledetails {
+  padding-left: 1.5rem;
   font-size: 0.875rem;
 }
 
@@ -101,6 +106,7 @@
 .section .sectionTitle {
   font-size: 1.25rem;
   font-weight: bold;
+  padding-top: 2rem;
   width: 50%;
 }
 
