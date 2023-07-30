@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import styles from "./Body.module.css";
 import { ArrowDown } from "react-feather";
 import Editor from "../Editor/Editor";
@@ -11,20 +17,32 @@ export const EXTERNAL = "EXTERNAL";
 const Body = () => {
   const InternalProfile = { title: INTERNAL, color: "#35549c" };
   const ExternalProfile = { title: EXTERNAL, color: "#062e38" };
-
   //to print resume.
-  const resumeRef = useRef();
-
   //to show resume profile and bgcolor.
   const [profile, setProfile] = useState(InternalProfile);
 
-  const sections = {
-    basicInfo: "Basic Info",
-    project: "Projects",
-    education: "Education",
-    skills: "Skills",
-    workExp: "Experience",
-  };
+  const [showExperince, setShowExperience] = useState(false);
+
+  const resumeRef = useRef();
+
+  const sections = useMemo(() => {
+    if (showExperince) {
+      return {
+        basicInfo: "Basic Info",
+        project: "Projects",
+        education: "Education",
+        skills: "Skills",
+        workExp: "Experience",
+      };
+    } else {
+      return {
+        basicInfo: "Basic Info",
+        project: "Projects",
+        education: "Education",
+        skills: "Skills",
+      };
+    }
+  }, [showExperince]);
 
   const resumeState = {
     [sections.basicInfo]: {
@@ -34,11 +52,6 @@ const Body = () => {
         profile:
           "Passionate and dedicated software developer with 3+ years of experience looking for an opportunity where I can apply my skills and knowledge to enhance user experience, build scalable products and contribute to organization's success.",
       },
-    },
-    [sections.workExp]: {
-      id: sections.workExp,
-      sectionTitle: sections.workExp,
-      details: [],
     },
     [sections.project]: {
       id: sections.project,
@@ -63,11 +76,40 @@ const Body = () => {
   const handleRadioButton = (event) => {
     if (event.target.value === InternalProfile.title) {
       setProfile(InternalProfile);
-      setResumeInformation(resumeState);
     } else if (event.target.value === ExternalProfile.title) {
       setProfile(ExternalProfile);
-      setResumeInformation(resumeState);
     }
+  };
+
+  const ShowExperience = useCallback(
+    (event) => {
+      if (event.target.checked) {
+        sections.workExp = "Experience";
+        setResumeInformation((prev) => ({
+          ...prev,
+          [sections.workExp]: {
+            id: sections.workExp,
+            sectionTitle: sections.workExp,
+            details: [],
+          },
+        }));
+      } else {
+        delete sections.workExp;
+        delete resumeInformation.workExp;
+        setResumeInformation(resumeInformation);
+      }
+      setShowExperience(event.target.checked);
+    },
+
+    [showExperince]
+  );
+
+  // const fontColor = '"Times New Roman", Times, serif"';
+  const font = {
+    family: "serif",
+    source: "",
+    weight: "bold",
+    style: "italic",
   };
 
   return (
@@ -82,16 +124,33 @@ const Body = () => {
               name="profile"
               defaultChecked
               onChange={(e) => handleRadioButton(e)}
+              id="internal-profile"
             />
-            <label>{InternalProfile.title} PROFILE </label>
+            <label htmlFor="internal-profile">
+              {InternalProfile.title} PROFILE
+            </label>
 
             <input
               type="radio"
               value={ExternalProfile.title}
               name="profile"
               onChange={(e) => handleRadioButton(e)}
+              id="external-profile"
             />
-            <label> {ExternalProfile.title} PROFILE </label>
+            <label htmlFor="external-profile">
+              {ExternalProfile.title} PROFILE
+            </label>
+          </div>
+          <div className={styles.row}>
+            <input
+              type="checkbox"
+              value={showExperince}
+              onChange={(event) => ShowExperience(event)}
+              id="show-experience"
+            />
+            <label htmlFor="show-experience">
+              Do You Want to include Work Experience ?
+            </label>
           </div>
         </div>
 
@@ -112,6 +171,8 @@ const Body = () => {
           information={resumeInformation}
           setInformation={setResumeInformation}
           profile={profile}
+          showExperince={showExperince}
+          ShowExperience={ShowExperience}
         />
         <Resume
           ref={resumeRef}
@@ -119,6 +180,7 @@ const Body = () => {
           information={resumeInformation}
           activeColor={profile.color}
           profile={profile.title}
+          showExperince={showExperince}
         />
       </div>
     </div>

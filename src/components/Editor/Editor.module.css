@@ -128,7 +128,9 @@
 }
 
 .body button:active {
-  transform: translateY(2px);
+  transform: translateX(4px);
+  background-color: #96c2dc;
+  transition: 0.5s all;
 }
 
 .pointsContainer {

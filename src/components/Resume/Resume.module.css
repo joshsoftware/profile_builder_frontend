@@ -32,13 +32,13 @@
 }
 
 .header .heading {
-  font-size: 2.5rem;
+  font-size: 3rem;
   font-weight: 500;
   padding-top: 1rem;
   padding-left: 2rem;
   margin-bottom: 0rem;
   text-transform: capitalize;
-  color: #e2f49c;
+  color: #e7c799;
 }
 
 .profileHeader {
@@ -57,10 +57,10 @@
 
 .header .subHeading {
   color: var(--color);
-  font-weight: 500;
-  font-size: 1.5rem;
+  font-weight: 300;
+  font-size: 1.25rem;
   padding-left: 2rem;
-  color: #e2f49c;
+  color: #e7c799;
 }
 
 .header .links {
@@ -119,13 +119,36 @@
   display: flex;
   flex-direction: column;
 }
+
+.section .leftSection {
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-align: right;
+}
+
+.skillSection .skillsContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+}
+
 .section .content .item {
   border-bottom: 1px dotted lightgray;
-  padding-top: 1rem;
+  padding: 0.5rem 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
   /* font-weight: bold; */
+  font-size: 1000;
+}
+
+.content .educationItem {
+  border-bottom: 1px dotted lightgray;
+  padding: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  text-align: right;
   font-size: 1000;
 }
 .section .content .item:last-child {
@@ -133,27 +156,25 @@
 }
 
 .content .title {
-  font-size: 1.25rem;
-  line-height: 1.3rem;
+  font-size: 1rem;
+  font-weight: bold;
 }
 
 .content .subtitle {
   font-size: 0.875rem;
 }
 
+.content .subtitleHeading {
+  font-weight: bold;
+  font-size: 0.875rem;
+}
 .underline {
   text-decoration-line: underline;
 }
 
 .separator-line {
-  border-right: 3px solid #030302;
+  border-right: 2px solid #030302;
   height: auto;
-}
-
-.content .subTitle {
-  font-weight: bold;
-  color: var(--color);
-  font-size: 1rem;
 }
 
 .content .overview {
@@ -178,6 +199,11 @@
   gap: 0 10px;
   align-items: center;
   font-size: 0.875rem;
+}
+
+.content .passingDate {
+  font-size: 0.875rem;
+  text-align: right;
   letter-spacing: 3;
 }
 
@@ -188,8 +214,24 @@
 
 .content .points,
 .numbered {
-  padding-left: 18px;
   font-size: 0.875rem;
+  padding: 0.75rem 0 0 1rem;
+  text-align: right;
+  list-style-type: none;
+}
+
+.content .projectPoints {
+  font-size: 0.875rem;
+  padding: 0.25rem 0 0 1rem;
+}
+
+.point {
+  padding-top: 0.25rem;
+}
+
+.middleSeparatorLine {
+  border-right: 3px solid #b3b381;
+  height: auto;
 }
 
 .separate {

@@ -6,7 +6,14 @@ import InputControl from "../InputControl/InputControl";
 import { PlusCircle, X } from "react-feather";
 import TextAreaControl from "../InputControl/TextAreaControl";
 
-const Editor = ({ sections, information, setInformation, profile }) => {
+const Editor = ({
+  sections,
+  information,
+  setInformation,
+  profile,
+  showExperince,
+  ShowExperience,
+}) => {
   //State to choose tabs between different by default shows first tab.
   const [activeSectionKey, setActiveSectionKey] = useState(
     Object.keys(sections)[0]
@@ -18,6 +25,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     profile: "",
     points: "",
     educationTitle: "",
+    college: "",
   });
 
   //To hold current tab informations.
@@ -76,7 +84,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       educationTitle: activeInfo?.details
         ? activeInfo.details[0]?.title || ""
         : activeInfo?.detail?.title || "",
-      // college: activeInfo?.details ? activeInfo.details[0]?.college || "" : "",
+      college: activeInfo?.details ? activeInfo.details[0]?.college || "" : "",
 
       startDate: activeInfo?.details
         ? activeInfo.details[0]?.startDate || ""
@@ -116,6 +124,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       endDate: activeInfo.details[activeDetailIndex]?.endDate || "",
       points: activeInfo.details[activeDetailIndex]?.points || [],
       educationTitle: activeInfo.details[activeDetailIndex]?.title || "",
+      college: activeInfo.details[activeDetailIndex]?.college || "",
     });
   }, [activeDetailIndex]);
 
@@ -139,6 +148,20 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const isFieldInValid = (value) => {
     if (value.trim() === "") {
       return true;
+    } else return false;
+  };
+
+  const checkField = (value, key) => {
+    if (value.trim() === "") {
+      setErrorMessage((prev) => ({
+        ...prev,
+        key: "Please Enter Name",
+      }));
+    } else {
+      setErrorMessage((prev) => ({
+        ...prev,
+        key: "",
+      }));
     }
   };
 
@@ -149,18 +172,42 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           label="Full Name"
           placeholder="Enter your full name"
           value={values.name}
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, name: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                name: "Please Enter Name",
+              }));
+              setValues((prev) => ({ ...prev, name: event.target.value }));
+            } else {
+              setValues((prev) => ({ ...prev, name: event.target.value }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                name: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.name}
         />
         <InputControl
           label="Designation"
           value={values.title}
-          placeholder="Enter Job Position eg. Frontend developer"
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, title: event.target.value }))
-          }
+          placeholder="Ex.Frontend Engineer,PowerBI Engineer"
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                title: "Please Enter Designation",
+              }));
+              setValues((prev) => ({ ...prev, title: event.target.value }));
+            } else {
+              setValues((prev) => ({ ...prev, title: event.target.value }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                title: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.title}
         />
       </div>
@@ -170,9 +217,21 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           value={values.profile}
           placeholder="Enter Profile Details"
           rows="4"
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, profile: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                profile: "Please Enter Profile Details",
+              }));
+              setValues((prev) => ({ ...prev, profile: event.target.value }));
+            } else {
+              setValues((prev) => ({ ...prev, profile: event.target.value }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                profile: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.profile}
         />
       </div>
@@ -181,10 +240,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   const workExpBody = (
     <div className={styles.detail}>
-      <div className={styles.warning}>
-        Work Experience Field Only for External Profile,Ignore if you're
-        creating Internal Profile...
-      </div>
       <div className={styles.row}>
         <InputControl
           label="Designation"
@@ -310,6 +365,29 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           required
         />
       </div>
+      <InputControl
+        label="University Name"
+        value={values.college}
+        placeholder="Enter name of your college/school"
+        onChange={(event) =>
+          setValues((prev) => ({ ...prev, college: event.target.value }))
+        }
+        errorMessage={errorMessage.college}
+        required
+      />
+      <div className="col-6">
+        <InputControl
+          label="Pass Out Date"
+          type="date"
+          placeholder="Enter end date of this education"
+          value={values.endDate}
+          onChange={(event) =>
+            setValues((prev) => ({ ...prev, endDate: event.target.value }))
+          }
+          errorMessage={errorMessage.endDate}
+          required
+        />
+      </div>
     </div>
   );
 
@@ -351,11 +429,21 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             ...prev,
             name: "Please Enter Name",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            name: "",
+          }));
         }
         if (isFieldInValid(values.title)) {
           setErrorMessage((prev) => ({
             ...prev,
             title: "Designation Can't be blank",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            title: "",
           }));
         }
         if (isFieldInValid(values.profile)) {
@@ -363,7 +451,15 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             ...prev,
             profile: "Profile Can't be blank",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            profile: "",
+          }));
         }
+
+        if (values.name === "" || values.title === "" || values.profile === "")
+          return;
 
         const tempDetail = {
           name: values.name,
@@ -413,8 +509,10 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           role: values?.role,
         };
 
+        console.log("TempDetails", information?.sections?.workExp?.details);
+
         //finding out details then updating particular details index values.
-        const tempDetails = [...information[sections.workExp]?.details];
+        const tempDetails = [...information[sections.workExp].details];
         tempDetails[activeDetailIndex] = tempDetail;
 
         setInformation((prev) => ({
@@ -457,6 +555,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           points: filteredPoints,
           technology: values.technology,
         };
+
+        console.log("Projects", information[sections.project]?.details);
         const tempDetails = [...information[sections.project]?.details];
         tempDetails[activeDetailIndex] = tempDetail;
 
@@ -479,6 +579,9 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }
         const tempDetail = {
           educationTitle: values?.educationTitle,
+          college: values?.college,
+          startDate: values?.startDate,
+          endDate: values?.endDate,
         };
         const tempDetails = [...information[sections.education]?.details];
         tempDetails[activeDetailIndex] = tempDetail;
@@ -574,9 +677,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             key={key}
             //Update activesectionkey and applies styles.active class to active
             //section key.
-            onClick={(e) => {
-              e.preventDefault();
-              // handleSubmission();
+            onClick={() => {
               setActiveSectionKey(key);
             }}
           >

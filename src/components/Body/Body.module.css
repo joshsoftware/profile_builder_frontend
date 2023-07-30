@@ -25,10 +25,19 @@
   column-gap: 0.5rem;
 }
 
+.row {
+  padding-left: 2rem;
+  color: red;
+}
+
+.row label {
+  padding-left: 0.5rem;
+}
+
 .colors {
   display: flex;
   gap: 20px;
-  padding: 0 30px;
+  padding: 0 3rem;
 }
 
 .colors .color {

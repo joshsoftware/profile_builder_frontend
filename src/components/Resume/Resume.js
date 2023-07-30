@@ -15,10 +15,14 @@ import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
-  const information = props.information;
-  const sections = props.sections;
-  const profile = props.profile;
+  const { showExperince, information, sections, profile } = props;
+  // const information = props.information;
+  // const sections = props.sections;
+  // const profile = props.profile;
   const containerRef = useRef();
+
+  // console.log("Sections", sections);
+  console.log("Information", information);
 
   //which divides an resume into two sections and at mounting tqo section contains which fields are populated.
   const [columns, setColumns] = useState([[], []]);
@@ -51,6 +55,15 @@ const Resume = forwardRef((props, ref) => {
     } else return `${givenDate}/${givenMonth}/${givenYear}`;
   };
 
+  const getPassingYear = (value) => {
+    if (!value) return "";
+    const date = new Date(value);
+
+    const givenYear = date.getFullYear();
+
+    return givenYear;
+  };
+
   //Different section of tabs for Drag and Drop functionality.
   const sectionDiv = {
     [sections.workExp]: (
@@ -77,8 +90,8 @@ const Resume = forwardRef((props, ref) => {
 
               {item?.companyName ? (
                 <div className={styles.date}>
-                  <span className={styles.subTitle}>{item.companyName}</span>
-                  <Calendar /> {getFormattedDate(item?.startDate)}-
+                  <span className={styles.subtitle}>{item.companyName}</span>
+                  | <Calendar /> {getFormattedDate(item?.startDate)} -{" "}
                   {getFormattedDate(item?.endDate)}
                 </div>
               ) : (
@@ -139,7 +152,7 @@ const Resume = forwardRef((props, ref) => {
                   <h6>
                     <b>Roles and Responsibility :</b>{" "}
                   </h6>
-                  <ul className={styles.points}>
+                  <ul className={styles.projectPoints}>
                     {item.points?.map((elem, index) => (
                       <li className={styles.point} key={elem + index}>
                         {elem}
@@ -173,16 +186,29 @@ const Resume = forwardRef((props, ref) => {
           info.education?.sectionTitle ? "" : styles.hidden
         } pt-3`}
       >
-        <div className={`${styles.sectionTitle} pt-2 ${styles.separate}`}>
+        <div className={styles.separate}></div>
+        <div className={`${styles.leftSection} pt-2`}>
           {info.education?.sectionTitle}
         </div>
         <div className={styles.content}>
           {info?.education?.details?.map((item) => (
-            <div className={styles.item}>
+            <div className={styles.educationItem}>
               {item.educationTitle ? (
-                <p className={styles.subtitle}>{item.educationTitle}</p>
+                <p className={styles.subtitleHeading}>{item.educationTitle}</p>
               ) : (
                 <span />
+              )}
+              {item.college ? (
+                <p className={styles.subtitle}>{item.college}</p>
+              ) : (
+                <span />
+              )}
+              {item.startDate && item.endDate ? (
+                <div className={styles.passingDate}>
+                  Passing Year : {getPassingYear(item.endDate)}
+                </div>
+              ) : (
+                ""
               )}
             </div>
           ))}
@@ -199,7 +225,7 @@ const Resume = forwardRef((props, ref) => {
           info.skills?.sectionTitle ? "" : styles.hidden
         }`}
       >
-        <div className={styles.sectionTitle}>{info.skills?.sectionTitle}</div>
+        <div className={styles.leftSection}>{info.skills?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.skills?.points?.length > 0 ? (
             <ul className={styles.numbered}>
@@ -249,7 +275,7 @@ const Resume = forwardRef((props, ref) => {
 
   //At component mount which section of resume contains which tab details.
   useEffect(() => {
-    if (profile === INTERNAL) {
+    if (!showExperince) {
       setColumns([[sections.skills, sections.education], [sections.project]]);
     } else {
       setColumns([
@@ -257,7 +283,7 @@ const Resume = forwardRef((props, ref) => {
         [sections.workExp, sections.project],
       ]);
     }
-  }, [profile]);
+  }, [profile, information]);
 
   useEffect(() => {
     //This sideeffect will be called when source.i.e. Drag is happening.
@@ -274,9 +300,14 @@ const Resume = forwardRef((props, ref) => {
     container.style.setProperty("--color", props.activeColor);
   }, [props.activeColor]);
 
+  const getPageMargins = () => {
+    return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
+  };
+
   return (
     // Passing to be print content ref to reacttopdf component.
     <div ref={ref}>
+      <style>{getPageMargins()}</style>
       {/* No we have to change color of text so we are taking container ref.
       to do so we have to modify --color property in styles. */}
       <div ref={containerRef} className={styles.container}>
@@ -293,11 +324,8 @@ const Resume = forwardRef((props, ref) => {
         </div>
 
         <div className="container">
-          <div class="row pr-5">
-            <div
-              className="col-4 pb-5"
-              style={{ borderRight: "4px solid #b5b529", height: "auto" }}
-            >
+          <div class="row pr-2">
+            <div className={`col-4 pb-5 ${styles.middleSeparatorLine}`}>
               {columns[0].map((item) => sectionDiv[item])}
             </div>
             <div className="col-8 mr-5">
