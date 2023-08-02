@@ -1,19 +1,14 @@
 import React, { isValidElement, useEffect, useState } from "react";
 
 import styles from "./Editor.module.css";
+import style from "../InputControl/InputControl.module.css";
 import InputControl from "../InputControl/InputControl";
 
 import { PlusCircle, X } from "react-feather";
 import TextAreaControl from "../InputControl/TextAreaControl";
+import { isFieldInValid } from "../../helpers";
 
-const Editor = ({
-  sections,
-  information,
-  setInformation,
-  profile,
-  showExperince,
-  ShowExperience,
-}) => {
+const Editor = ({ sections, information, setInformation, profile }) => {
   //State to choose tabs between different by default shows first tab.
   const [activeSectionKey, setActiveSectionKey] = useState(
     Object.keys(sections)[0]
@@ -90,6 +85,9 @@ const Editor = ({
         ? activeInfo.details[0]?.startDate || ""
         : "",
       endDate: activeInfo?.details ? activeInfo.details[0]?.endDate || "" : "",
+      passOutDate: activeInfo?.details
+        ? activeInfo.details[0]?.passOutDate || ""
+        : "",
       points: activeInfo?.details
         ? activeInfo.details[0]?.points
           ? [...activeInfo.details[0]?.points]
@@ -122,6 +120,7 @@ const Editor = ({
       technology: activeInfo.details[activeDetailIndex]?.technology || "",
       startDate: activeInfo.details[activeDetailIndex]?.startDate || "",
       endDate: activeInfo.details[activeDetailIndex]?.endDate || "",
+      passOutDate: activeInfo.details[activeDetailIndex]?.passOutDate || "",
       points: activeInfo.details[activeDetailIndex]?.points || [],
       educationTitle: activeInfo.details[activeDetailIndex]?.title || "",
       college: activeInfo.details[activeDetailIndex]?.college || "",
@@ -145,32 +144,13 @@ const Editor = ({
     setValues((prev) => ({ ...prev, points: deletePoints }));
   };
 
-  const isFieldInValid = (value) => {
-    if (value.trim() === "") {
-      return true;
-    } else return false;
-  };
-
-  const checkField = (value, key) => {
-    if (value.trim() === "") {
-      setErrorMessage((prev) => ({
-        ...prev,
-        key: "Please Enter Name",
-      }));
-    } else {
-      setErrorMessage((prev) => ({
-        ...prev,
-        key: "",
-      }));
-    }
-  };
-
   const basicInfoBody = (
     <div className={styles.detail}>
       <div className={styles.row}>
         <InputControl
           label="Full Name"
-          placeholder="Enter your full name"
+          isCompulsory={true}
+          placeholder="Enter Your Full Name"
           value={values.name}
           onChange={(event) => {
             if (event.target.value.trim() === "") {
@@ -179,18 +159,21 @@ const Editor = ({
                 name: "Please Enter Name",
               }));
               setValues((prev) => ({ ...prev, name: event.target.value }));
+              // handleSubmission();
             } else {
               setValues((prev) => ({ ...prev, name: event.target.value }));
               setErrorMessage((prev) => ({
                 ...prev,
                 name: "",
               }));
+              handleSubmission();
             }
           }}
           errorMessage={errorMessage.name}
         />
         <InputControl
           label="Designation"
+          isCompulsory={true}
           value={values.title}
           placeholder="Ex.Frontend Engineer,PowerBI Engineer"
           onChange={(event) => {
@@ -211,9 +194,10 @@ const Editor = ({
           errorMessage={errorMessage.title}
         />
       </div>
-      <div>
+      <div className={styles.row}>
         <TextAreaControl
           label="Profile Details"
+          isCompulsory={true}
           value={values.profile}
           placeholder="Enter Profile Details"
           rows="4"
@@ -243,46 +227,119 @@ const Editor = ({
       <div className={styles.row}>
         <InputControl
           label="Designation"
-          placeholder="Enter Role eg. Frontend developer"
+          isCompulsory={true}
+          placeholder="Enter Role Ex. Frontend Developer"
           value={values.role}
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, role: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                role: "Please Enter Project Name",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                role: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                role: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                role: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.role}
-          required
         />
         <InputControl
           label="Organization Name"
-          placeholder="Enter company name ex. Amazon"
+          isCompulsory={true}
+          placeholder="Enter Company Name Ex. Amazon"
           value={values.companyName}
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, companyName: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                companyName: "Please Enter Company Name",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                companyName: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                companyName: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                companyName: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.companyName}
           required
         />
       </div>
-
       <div className={styles.row}>
         <InputControl
           label="Employment Start Date"
+          isCompulsory={true}
           type="date"
-          placeholder="Enter start date of work"
+          placeholder="Enter Start Date of Employment"
           value={values.startDate}
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, startDate: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                startDate: "Please Enter Start Date",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                startDate: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                startDate: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                startDate: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.startDate}
-          required
         />
         <InputControl
           label="Employment End Date"
+          isCompulsory={true}
           type="date"
-          placeholder="Enter end date of work"
+          placeholder="Enter End Date of Employment"
           value={values.endDate}
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, endDate: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                endDate: "Please Enter End Date",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                endDate: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                endDate: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                endDate: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.endDate}
           required
         />
@@ -295,29 +352,75 @@ const Editor = ({
       <div className={styles.row}>
         <InputControl
           label="Project Name"
+          isCompulsory={true}
           value={values.projectName}
           placeholder="Enter Project Name"
-          onChange={(event) =>
-            setValues((prev) => ({ ...prev, projectName: event.target.value }))
-          }
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                projectName: "Please Enter Project Name",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                projectName: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                projectName: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                projectName: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.projectName}
         />
       </div>
       <TextAreaControl
         label="Project Overview"
+        isCompulsory={true}
         value={values.overview}
-        placeholder="Enter basic overview of project"
+        placeholder="Enter Basic Overview of Project"
         rows="3"
-        onChange={(event) =>
-          setValues((prev) => ({ ...prev, overview: event.target.value }))
-        }
+        onChange={(event) => {
+          if (event.target.value.trim() === "") {
+            setErrorMessage((prev) => ({
+              ...prev,
+              overview: "Please Enter Overview of Project",
+            }));
+            setValues((prev) => ({
+              ...prev,
+              overview: event.target.value,
+            }));
+          } else {
+            setValues((prev) => ({
+              ...prev,
+              overview: event.target.value,
+            }));
+            setErrorMessage((prev) => ({
+              ...prev,
+              overview: "",
+            }));
+          }
+        }}
         errorMessage={errorMessage.overview}
       />
       <div className={styles.column}>
-        <label>Enter Roles And Responsibility</label>
+        <label>
+          Enter Roles And Responsibility{" "}
+          <span className={style.compulsory}>*</span>
+        </label>
         <button onClick={() => handleAdd()}>
           <PlusCircle />
         </button>
+        {values?.points?.length == 0 ? (
+          <div className={styles.warning}>Enter Roles And Responsibilities</div>
+        ) : (
+          <span></span>
+        )}
 
         {values?.points?.map((data, index) => (
           <div className={styles.pointsContainer}>
@@ -338,11 +441,30 @@ const Editor = ({
       </div>
       <InputControl
         label="Project Technology"
+        isCompulsory={true}
         value={values.technology}
         placeholder="Technology Used"
-        onChange={(event) =>
-          setValues((prev) => ({ ...prev, technology: event.target.value }))
-        }
+        onChange={(event) => {
+          if (event.target.value.trim() === "") {
+            setErrorMessage((prev) => ({
+              ...prev,
+              technology: "Please Enter Technology Used In Project",
+            }));
+            setValues((prev) => ({
+              ...prev,
+              technology: event.target.value,
+            }));
+          } else {
+            setValues((prev) => ({
+              ...prev,
+              technology: event.target.value,
+            }));
+            setErrorMessage((prev) => ({
+              ...prev,
+              technology: "",
+            }));
+          }
+        }}
         errorMessage={errorMessage.technology}
       />
     </div>
@@ -352,40 +474,57 @@ const Editor = ({
     <div className={styles.detail}>
       <div className={styles.row}>
         <InputControl
-          label="Masters/Degree/Diploma"
+          label="Education (Masters/Degree/Diploma)"
+          isCompulsory={true}
           value={values.educationTitle}
-          placeholder="Enter title ex. B-tech"
-          onChange={(event) =>
-            setValues((prev) => ({
-              ...prev,
-              educationTitle: event.target.value,
-            }))
-          }
+          placeholder="For Ex. MCA,BTECH"
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                educationTitle: "Please Enter Masters/Degree/Diploma",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                educationTitle: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                educationTitle: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                educationTitle: "",
+              }));
+            }
+          }}
           errorMessage={errorMessage.educationTitle}
-          required
         />
       </div>
       <InputControl
         label="University Name"
         value={values.college}
-        placeholder="Enter name of your college/school"
+        placeholder="Enter name of your University/Board"
         onChange={(event) =>
-          setValues((prev) => ({ ...prev, college: event.target.value }))
+          setValues((prev) => ({
+            ...prev,
+            college: event.target.value,
+          }))
         }
-        errorMessage={errorMessage.college}
-        required
       />
       <div className="col-6">
         <InputControl
           label="Pass Out Date"
           type="date"
           placeholder="Enter end date of this education"
-          value={values.endDate}
+          value={values.passOutDate}
           onChange={(event) =>
-            setValues((prev) => ({ ...prev, endDate: event.target.value }))
+            setValues((prev) => ({
+              ...prev,
+              passOutDate: event.target.value,
+            }))
           }
-          errorMessage={errorMessage.endDate}
-          required
         />
       </div>
     </div>
@@ -394,11 +533,17 @@ const Editor = ({
   const skillsBody = (
     <div className={styles.detail}>
       <div className={styles.column}>
-        <label>Add Skills</label>
+        <label>
+          Add Skills <span className={style.compulsory}>*</span>
+        </label>
         <button onClick={() => handleAdd()}>
           <PlusCircle />
         </button>
-
+        {values?.points?.length == 0 ? (
+          <div className={styles.warning}>Enter Skills</div>
+        ) : (
+          <span></span>
+        )}
         {values?.points?.map((data, index) => (
           <div className={styles.pointsContainer}>
             <InputControl
@@ -421,7 +566,6 @@ const Editor = ({
 
   //we are updating information passed from Body component.
   const handleSubmission = () => {
-    console.log(values);
     switch (sections[activeSectionKey]) {
       case sections.basicInfo: {
         if (isFieldInValid(values.name)) {
@@ -483,11 +627,21 @@ const Editor = ({
             ...prev,
             startDate: "Please Enter Start Date",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            startDate: "",
+          }));
         }
         if (isFieldInValid(values.endDate)) {
           setErrorMessage((prev) => ({
             ...prev,
             endDate: "Please Enter End Date",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            endDate: "",
           }));
         }
         if (isFieldInValid(values.companyName)) {
@@ -495,13 +649,32 @@ const Editor = ({
             ...prev,
             companyName: "Please Enter Company Name",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            companyName: "",
+          }));
         }
         if (isFieldInValid(values.role)) {
           setErrorMessage((prev) => ({
             ...prev,
             role: "Please Mention Designation",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            role: "",
+          }));
         }
+
+        if (
+          values.role === "" ||
+          values.companyName === "" ||
+          values.startDate === "" ||
+          values.endDate === ""
+        )
+          return;
+
         const tempDetail = {
           startDate: values?.startDate,
           endDate: values?.endDate,
@@ -531,11 +704,21 @@ const Editor = ({
             ...prev,
             projectName: "Please Enter Project Name",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            projectName: "",
+          }));
         }
         if (isFieldInValid(values.overview)) {
           setErrorMessage((prev) => ({
             ...prev,
             overview: "Please Enter Project Overview",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            overview: "",
           }));
         }
         if (isFieldInValid(values.technology)) {
@@ -543,7 +726,20 @@ const Editor = ({
             ...prev,
             technology: "Please Enter Project Technology",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            technology: "",
+          }));
         }
+
+        if (
+          values.projectName === "" ||
+          values.overview === "" ||
+          values.technology === "" ||
+          values.points.length === 0
+        )
+          return;
 
         const filteredPoints = values.points.filter(
           (item) => item.length !== 0
@@ -556,7 +752,6 @@ const Editor = ({
           technology: values.technology,
         };
 
-        console.log("Projects", information[sections.project]?.details);
         const tempDetails = [...information[sections.project]?.details];
         tempDetails[activeDetailIndex] = tempDetail;
 
@@ -571,17 +766,22 @@ const Editor = ({
         break;
       }
       case sections.education: {
-        if (isValidElement(values.educationTitle)) {
+        if (isFieldInValid(values.educationTitle)) {
           setErrorMessage((prev) => ({
             ...prev,
             educationTitle: "Please Enter Education Details",
           }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            educationTitle: "",
+          }));
         }
+
         const tempDetail = {
           educationTitle: values?.educationTitle,
           college: values?.college,
-          startDate: values?.startDate,
-          endDate: values?.endDate,
+          passOutDate: values?.passOutDate,
         };
         const tempDetails = [...information[sections.education]?.details];
         tempDetails[activeDetailIndex] = tempDetail;
@@ -597,6 +797,8 @@ const Editor = ({
         break;
       }
       case sections.skills: {
+        if (values.points.length === 0) return;
+
         const filteredPoints = values.points.filter(
           (item) => item.length !== 0
         );
@@ -678,6 +880,7 @@ const Editor = ({
             //Update activesectionkey and applies styles.active class to active
             //section key.
             onClick={() => {
+              handleSubmission();
               setActiveSectionKey(key);
             }}
           >
@@ -720,7 +923,11 @@ const Editor = ({
         </div>
 
         {generateBody()}
-        <button className={styles.button} onClick={handleSubmission}>
+        <button
+          type="button"
+          class="btn btn-primary"
+          onClick={handleSubmission}
+        >
           Save
         </button>
       </div>

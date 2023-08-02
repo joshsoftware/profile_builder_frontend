@@ -1,12 +1,12 @@
 import React from "react";
 import styles from "./InputControl.module.css";
 
-const TextAreaControl = ({ label, errorMessage, ...props }) => {
+const TextAreaControl = ({ label, errorMessage, isCompulsory, ...props }) => {
   return (
     <div className="mb-3">
       {label && (
         <label htmlFor="exampleFormControlTextarea1" className="form-label">
-          {label}
+          {label} {isCompulsory && <span className={styles.compulsory}>*</span>}
         </label>
       )}
       <textarea

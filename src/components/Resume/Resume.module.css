@@ -1,8 +1,8 @@
 .container {
   --color: #35549c;
-  /* background-color: var(--color); */
   min-width: 700px;
   max-width: 850px;
+  font-family: "Times New Roman, serif";
   margin: 0 auto;
   flex: 1.2;
   height: fit-content;
@@ -106,7 +106,7 @@
 .section .sectionTitle {
   font-size: 1.25rem;
   font-weight: bold;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   width: 50%;
 }
 

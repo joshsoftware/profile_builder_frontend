@@ -15,20 +15,16 @@ import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
-  const { showExperince, information, sections, profile } = props;
+  const { showExperince, information, sections, profile, activeColor } = props;
   // const information = props.information;
   // const sections = props.sections;
   // const profile = props.profile;
   const containerRef = useRef();
 
-  // console.log("Sections", sections);
   console.log("Information", information);
 
   //which divides an resume into two sections and at mounting tqo section contains which fields are populated.
   const [columns, setColumns] = useState([[], []]);
-  //Drag and drop based on source and destination Id.
-  const [source, setSource] = useState("");
-  const [target, setTarget] = useState("");
 
   const info = {
     basicInfo: information[sections.basicInfo],
@@ -56,6 +52,7 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getPassingYear = (value) => {
+    console.log("In Passout Year Function...", value);
     if (!value) return "";
     const date = new Date(value);
 
@@ -69,12 +66,7 @@ const Resume = forwardRef((props, ref) => {
     [sections.workExp]: (
       <div
         key={"workexp"}
-        draggable
-        //This event handler will execute when drag in targeted on enclosed div.
-        onDragOver={() => setTarget(info.workExp?.id)}
-        //This event handler will execute when dropped on enclosed div.
-        onDragEnd={() => setSource(info.workExp?.id)}
-        className={`${styles.section} pb-4 ${
+        className={`${styles.section} pb-2 ${
           info.workExp?.sectionTitle ? "" : styles.hidden
         } `}
       >
@@ -117,9 +109,6 @@ const Resume = forwardRef((props, ref) => {
     [sections.project]: (
       <div
         key={"project"}
-        draggable
-        onDragOver={() => setTarget(info.project?.id)}
-        onDragEnd={() => setSource(info.project?.id)}
         className={`${styles.section} pb-3 ${
           info.project?.sectionTitle ? "" : styles.hidden
         }`}
@@ -179,9 +168,6 @@ const Resume = forwardRef((props, ref) => {
     [sections.education]: (
       <div
         key={"education"}
-        draggable
-        onDragOver={() => setTarget(info.education?.id)}
-        onDragEnd={() => setSource(info.education?.id)}
         className={`${styles.section} ${
           info.education?.sectionTitle ? "" : styles.hidden
         } pt-3`}
@@ -203,9 +189,9 @@ const Resume = forwardRef((props, ref) => {
               ) : (
                 <span />
               )}
-              {item.startDate && item.endDate ? (
+              {item.passOutDate ? (
                 <div className={styles.passingDate}>
-                  Passing Year : {getPassingYear(item.endDate)}
+                  Passing Year : {getPassingYear(item.passOutDate)}
                 </div>
               ) : (
                 ""
@@ -218,9 +204,6 @@ const Resume = forwardRef((props, ref) => {
     [sections.skills]: (
       <div
         key={"skills"}
-        draggable
-        onDragOver={() => setTarget(info.skills?.id)}
-        onDragEnd={() => setSource(info.skills?.id)}
         className={`${styles.section} ${
           info.skills?.sectionTitle ? "" : styles.hidden
         }`}
@@ -243,36 +226,6 @@ const Resume = forwardRef((props, ref) => {
     ),
   };
 
-  const swapSourceTarget = (source, target) => {
-    if (!source || !target) return;
-    const tempColumns = [[...columns[0]], [...columns[1]]];
-
-    //finding Source Index.
-    let sourceRowIndex = tempColumns[0].findIndex((item) => item === source);
-    let sourceColumnIndex = 0;
-    //if source index not in column 0.
-    if (sourceRowIndex < 0) {
-      sourceColumnIndex = 1;
-      sourceRowIndex = tempColumns[1].findIndex((item) => item === source);
-    }
-
-    let targetRowIndex = tempColumns[0].findIndex((item) => item === target);
-    let targetColumnIndex = 0;
-    if (targetRowIndex < 0) {
-      targetColumnIndex = 1;
-      targetRowIndex = tempColumns[1].findIndex((item) => item === target);
-    }
-
-    //finding source and thens tore it in temp variable.
-    const tempSource = tempColumns[sourceColumnIndex][sourceRowIndex];
-    //replacing source index with target index.
-    tempColumns[sourceColumnIndex][sourceRowIndex] =
-      tempColumns[targetColumnIndex][targetRowIndex];
-    //replacing target index with source index stored in temp variable.
-    tempColumns[targetColumnIndex][targetRowIndex] = tempSource;
-    setColumns(tempColumns);
-  };
-
   //At component mount which section of resume contains which tab details.
   useEffect(() => {
     if (!showExperince) {
@@ -285,20 +238,15 @@ const Resume = forwardRef((props, ref) => {
     }
   }, [profile, information]);
 
-  useEffect(() => {
-    //This sideeffect will be called when source.i.e. Drag is happening.
-    swapSourceTarget(source, target);
-  }, [source]);
-
   //Whenever active colour changes from Body component then this effect
   // will be called.
   useEffect(() => {
     //to get that container div in which --color property to be changed.
     const container = containerRef.current;
-    if (!props.activeColor || !container) return;
+    if (!activeColor || !container) return;
 
-    container.style.setProperty("--color", props.activeColor);
-  }, [props.activeColor]);
+    container.style.setProperty("--color", activeColor);
+  }, [activeColor]);
 
   const getPageMargins = () => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;

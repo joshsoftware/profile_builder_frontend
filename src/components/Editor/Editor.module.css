@@ -1,7 +1,7 @@
 .container {
-  min-width: 800px;
-  min-height: 450px;
-  max-width: 1000px;
+  min-height: 600px;
+  min-width: 700px;
+  max-width: 850px;
   display: flex;
   flex-direction: column;
   gap: 30px;
@@ -28,7 +28,7 @@
 }
 
 .header .section {
-  padding: 15px 35px;
+  padding: 15px 25px;
   border-bottom: 2px solid transparent;
   font-weight: 500;
   font-size: 1rem;
@@ -139,7 +139,8 @@
 }
 
 .input {
-  width: 300%;
+  /* padding: 0.5rem 450px 0.5rem 0.5rem; */
+  width: 260%;
 }
 
 .warning {

@@ -9,7 +9,8 @@
 
 .heading {
   font-weight: 500;
-  font-size: 2.1rem;
+  font-size: 2rem;
+  text-decoration-line: underline;
 }
 
 .toolbar {
@@ -25,8 +26,9 @@
   column-gap: 0.5rem;
 }
 
-.row {
-  padding-left: 2rem;
+.checkExperince {
+  display: flex;
+  gap: 0 0.5rem;
   color: red;
 }
 
@@ -36,6 +38,7 @@
 
 .colors {
   display: flex;
+  flex-direction: column;
   gap: 20px;
   padding: 0 3rem;
 }
@@ -74,6 +77,6 @@
 .main {
   display: flex;
   flex-direction: column;
-  gap: 30px;
+  gap: 20px;
   width: 100%;
 }

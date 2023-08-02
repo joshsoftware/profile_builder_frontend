@@ -18,13 +18,17 @@ const Body = () => {
   const InternalProfile = { title: INTERNAL, color: "#35549c" };
   const ExternalProfile = { title: EXTERNAL, color: "#062e38" };
   //to print resume.
+
   //to show resume profile and bgcolor.
   const [profile, setProfile] = useState(InternalProfile);
 
+  //Checkbox state to handle experience.
   const [showExperince, setShowExperience] = useState(false);
 
+  //to hold resume ref to print resume.
   const resumeRef = useRef();
 
+  //Based on state toggle we hav to dynamically changes section tabs.
   const sections = useMemo(() => {
     if (showExperince) {
       return {
@@ -44,13 +48,14 @@ const Body = () => {
     }
   }, [showExperince]);
 
+  //Defining each tabs information.
   const resumeState = {
     [sections.basicInfo]: {
       id: sections.basicInfo,
       sectionTitle: sections.basicInfo,
       detail: {
         profile:
-          "Passionate and dedicated software developer with 3+ years of experience looking for an opportunity where I can apply my skills and knowledge to enhance user experience, build scalable products and contribute to organization's success.",
+          "Passionate and Dedicated Software Developer With 3+ Years of Experience Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.",
       },
     },
     [sections.project]: {
@@ -70,7 +75,7 @@ const Body = () => {
     },
   };
 
-  //contains resume information.
+  //contains resume information and providing all tabs resume details.
   const [resumeInformation, setResumeInformation] = useState(resumeState);
 
   const handleRadioButton = (event) => {
@@ -104,14 +109,6 @@ const Body = () => {
     [showExperince]
   );
 
-  // const fontColor = '"Times New Roman", Times, serif"';
-  const font = {
-    family: "serif",
-    source: "",
-    weight: "bold",
-    style: "italic",
-  };
-
   return (
     <div className={styles.container}>
       <p className={styles.heading}>Profile Builder</p>
@@ -141,7 +138,7 @@ const Body = () => {
               {ExternalProfile.title} PROFILE
             </label>
           </div>
-          <div className={styles.row}>
+          <div className={styles.checkExperince}>
             <input
               type="checkbox"
               value={showExperince}
@@ -157,7 +154,7 @@ const Body = () => {
         <ReactToPrint
           trigger={() => {
             return (
-              <button>
+              <button type="button" class="btn btn-primary">
                 Download <ArrowDown />
               </button>
             );
@@ -171,8 +168,6 @@ const Body = () => {
           information={resumeInformation}
           setInformation={setResumeInformation}
           profile={profile}
-          showExperince={showExperince}
-          ShowExperience={ShowExperience}
         />
         <Resume
           ref={resumeRef}

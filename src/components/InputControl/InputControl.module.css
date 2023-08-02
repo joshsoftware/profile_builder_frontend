@@ -29,3 +29,8 @@ input:focus {
 .errorMessage {
   color: red;
 }
+
+.compulsory {
+  color: red;
+  padding-left: 0.25rem;
+}
