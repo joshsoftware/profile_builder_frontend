@@ -7,6 +7,8 @@ import InputControl from "../InputControl/InputControl";
 import { PlusCircle, X } from "react-feather";
 import TextAreaControl from "../InputControl/TextAreaControl";
 import { isFieldInValid } from "../../helpers";
+import SelectControl from "../InputControl/SelectControl";
+import { genderOptions } from "../../utils/helpers";
 
 const Editor = ({ sections, information, setInformation, profile }) => {
   //State to choose tabs between different by default shows first tab.
@@ -14,6 +16,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     Object.keys(sections)[0]
   );
 
+  //To handle error message state.
   const [errorMessage, setErrorMessage] = useState({
     name: "",
     title: "",
@@ -21,6 +24,12 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     points: "",
     educationTitle: "",
     college: "",
+    experienceInYear: "",
+    workedProjectTech: "",
+    gender: "",
+    projectStartDate: "",
+    projectEndDate: "",
+    projectDuration: "",
   });
 
   //To hold current tab informations.
@@ -41,9 +50,15 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const [values, setValues] = useState({
     name: activeInformation?.detail?.name || "",
     title: activeInformation?.detail?.title || "",
+    gender: activeInformation?.detail?.gender || "",
+    experienceInYear: activeInformation?.detail?.experienceInYear || "",
     profile: activeInformation?.detail?.profile || "",
     points: activeInformation?.details?.points || [],
     educationTitle: activeInformation?.details?.educationTitle || "",
+    workedProjectTech: activeInformation?.details?.workedProjectTech || "",
+    projectStartDate: activeInformation?.details?.projectStartDate || "",
+    projectEndDate: activeInformation?.details?.projectEndDate || "",
+    projectDuration: activeInformation?.details?.projectDuration || "",
   });
 
   useEffect(() => {
@@ -59,6 +74,9 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     setValues({
       name: activeInfo?.detail?.name || "",
       title: activeInfo?.detail?.title || "",
+      experienceInYear: activeInfo?.detail?.experienceInYear || "",
+      gender: activeInfo?.detail?.gender || "",
+
       profile: activeInfo?.detail?.profile || "",
 
       role: activeInfo?.details ? activeInfo.details[0]?.role || "" : "",
@@ -74,6 +92,19 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         : "",
       technology: activeInfo?.details
         ? activeInfo.details[0]?.technology || ""
+        : "",
+      workedProjectTech: activeInfo?.details
+        ? activeInfo.details[0]?.workedProjectTech || ""
+        : "",
+
+      projectStartDate: activeInfo?.details
+        ? activeInfo.details[0]?.projectStartDate || ""
+        : "",
+      projectEndDate: activeInfo?.details
+        ? activeInfo.details[0]?.projectEndDate || ""
+        : "",
+      projectDuration: activeInfo?.details
+        ? activeInfo.details[0]?.projectDuration || ""
         : "",
 
       educationTitle: activeInfo?.details
@@ -112,11 +143,24 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     setValues({
       name: activeInfo.details[activeDetailIndex]?.name || "",
       title: activeInfo.details[activeDetailIndex]?.title || "",
+      experienceInYear:
+        activeInfo.details[activeDetailIndex]?.experienceInYear || "",
+      gender: activeInfo.details[activeDetailIndex]?.gender || "",
       profile: activeInfo.details[activeDetailIndex]?.profile || "",
       role: activeInfo.details[activeDetailIndex]?.role || "",
       overview: activeInfo.details[activeDetailIndex]?.overview || "",
       companyName: activeInfo.details[activeDetailIndex]?.companyName || "",
       projectName: activeInfo.details[activeDetailIndex]?.projectName || "",
+      workedProjectTech:
+        activeInfo.details[activeDetailIndex]?.workedProjectTech || "",
+
+      projectStartDate:
+        activeInfo.details[activeDetailIndex]?.projectStartDate || "",
+      projectEndDate:
+        activeInfo.details[activeDetailIndex]?.projectEndDate || "",
+      projectDuration:
+        activeInfo.details[activeDetailIndex]?.projectDuration || "",
+
       technology: activeInfo.details[activeDetailIndex]?.technology || "",
       startDate: activeInfo.details[activeDetailIndex]?.startDate || "",
       endDate: activeInfo.details[activeDetailIndex]?.endDate || "",
@@ -159,14 +203,13 @@ const Editor = ({ sections, information, setInformation, profile }) => {
                 name: "Please Enter Name",
               }));
               setValues((prev) => ({ ...prev, name: event.target.value }));
-              // handleSubmission();
             } else {
               setValues((prev) => ({ ...prev, name: event.target.value }));
               setErrorMessage((prev) => ({
                 ...prev,
                 name: "",
               }));
-              handleSubmission();
+              // handleSubmission();
             }
           }}
           errorMessage={errorMessage.name}
@@ -189,10 +232,53 @@ const Editor = ({ sections, information, setInformation, profile }) => {
                 ...prev,
                 title: "",
               }));
+              // handleSubmission();
             }
           }}
           errorMessage={errorMessage.title}
         />
+      </div>
+      <div className={styles.row}>
+        <InputControl
+          label="Year Of Experience"
+          isCompulsory={true}
+          placeholder="Ex. 3.7+ Year Of Experience In Manual Testing"
+          value={values.experienceInYear}
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                experienceInYear: "Please Enter Year Of Experience",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                experienceInYear: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                experienceInYear: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                experienceInYear: "",
+              }));
+            }
+          }}
+          errorMessage={errorMessage.experienceInYear}
+        />
+        <div className="col-6">
+          <SelectControl
+            label="Choose Gender"
+            selectOptions={genderOptions}
+            onChange={(event) => {
+              setValues((prev) => ({
+                ...prev,
+                gender: event.target.value,
+              }));
+            }}
+          />
+        </div>
       </div>
       <div className={styles.row}>
         <TextAreaControl
@@ -283,72 +369,73 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           required
         />
       </div>
-      <div className={styles.row}>
-        <InputControl
-          label="Employment Start Date"
-          isCompulsory={true}
-          type="date"
-          placeholder="Enter Start Date of Employment"
-          value={values.startDate}
-          onChange={(event) => {
-            if (event.target.value.trim() === "") {
-              setErrorMessage((prev) => ({
-                ...prev,
-                startDate: "Please Enter Start Date",
-              }));
-              setValues((prev) => ({
-                ...prev,
-                startDate: event.target.value,
-              }));
-            } else {
-              setValues((prev) => ({
-                ...prev,
-                startDate: event.target.value,
-              }));
-              setErrorMessage((prev) => ({
-                ...prev,
-                startDate: "",
-              }));
-            }
-          }}
-          errorMessage={errorMessage.startDate}
-        />
-        <InputControl
-          label="Employment End Date"
-          isCompulsory={true}
-          type="date"
-          placeholder="Enter End Date of Employment"
-          value={values.endDate}
-          onChange={(event) => {
-            if (event.target.value.trim() === "") {
-              setErrorMessage((prev) => ({
-                ...prev,
-                endDate: "Please Enter End Date",
-              }));
-              setValues((prev) => ({
-                ...prev,
-                endDate: event.target.value,
-              }));
-            } else {
-              setValues((prev) => ({
-                ...prev,
-                endDate: event.target.value,
-              }));
-              setErrorMessage((prev) => ({
-                ...prev,
-                endDate: "",
-              }));
-            }
-          }}
-          errorMessage={errorMessage.endDate}
-          required
-        />
-      </div>
+      <InputControl
+        label="Employment Start Date"
+        isCompulsory={true}
+        type="date"
+        placeholder="Enter Start Date of Employment"
+        value={values.startDate}
+        onChange={(event) => {
+          if (event.target.value.trim() === "") {
+            setErrorMessage((prev) => ({
+              ...prev,
+              startDate: "Please Enter Start Date",
+            }));
+            setValues((prev) => ({
+              ...prev,
+              startDate: event.target.value,
+            }));
+          } else {
+            setValues((prev) => ({
+              ...prev,
+              startDate: event.target.value,
+            }));
+            setErrorMessage((prev) => ({
+              ...prev,
+              startDate: "",
+            }));
+          }
+        }}
+        errorMessage={errorMessage.startDate}
+      />
+      <InputControl
+        label="Employment End Date"
+        isCompulsory={true}
+        type="date"
+        placeholder="Enter End Date of Employment"
+        value={values.endDate}
+        onChange={(event) => {
+          if (event.target.value.trim() === "") {
+            setErrorMessage((prev) => ({
+              ...prev,
+              endDate: "Please Enter End Date",
+            }));
+            setValues((prev) => ({
+              ...prev,
+              endDate: event.target.value,
+            }));
+          } else {
+            setValues((prev) => ({
+              ...prev,
+              endDate: event.target.value,
+            }));
+            setErrorMessage((prev) => ({
+              ...prev,
+              endDate: "",
+            }));
+          }
+        }}
+        errorMessage={errorMessage.endDate}
+        required
+      />
     </div>
   );
 
   const projectBody = (
     <div className={styles.detail}>
+      <div className={styles.warning}>
+        Note : Project Duration Should match with Project Start and End Date.
+      </div>
       <div className={styles.row}>
         <InputControl
           label="Project Name"
@@ -377,6 +464,45 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             }
           }}
           errorMessage={errorMessage.projectName}
+        />
+      </div>
+      <InputControl
+        label="Project Duration"
+        type="text"
+        placeholder="Ex.6 Months,etc"
+        value={values.projectDuration}
+        onChange={(event) => {
+          setValues((prev) => ({
+            ...prev,
+            projectDuration: event.target.value,
+          }));
+        }}
+      />
+      <div className={styles.row}>
+        <InputControl
+          label="Project Start Date"
+          type="month"
+          placeholder="Enter Start Date of Project"
+          value={values.projectStartDate}
+          onChange={(event) => {
+            setValues((prev) => ({
+              ...prev,
+              projectStartDate: event.target.value,
+            }));
+          }}
+        />
+        <InputControl
+          label="Project End Date"
+          type="month"
+          placeholder="Enter End Date of Project"
+          value={values.projectEndDate}
+          onChange={(event) => {
+            console.log(event.target.value);
+            setValues((prev) => ({
+              ...prev,
+              projectEndDate: event.target.value,
+            }));
+          }}
         />
       </div>
       <TextAreaControl
@@ -466,6 +592,35 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           }
         }}
         errorMessage={errorMessage.technology}
+      />
+      <InputControl
+        label="Technology You Worked On"
+        isCompulsory={true}
+        value={values.workedProjectTech}
+        placeholder="Technology Used"
+        onChange={(event) => {
+          if (event.target.value.trim() === "") {
+            setErrorMessage((prev) => ({
+              ...prev,
+              workedProjectTech:
+                "Please Enter Technology You Worked On Project",
+            }));
+            setValues((prev) => ({
+              ...prev,
+              workedProjectTech: event.target.value,
+            }));
+          } else {
+            setValues((prev) => ({
+              ...prev,
+              workedProjectTech: event.target.value,
+            }));
+            setErrorMessage((prev) => ({
+              ...prev,
+              workedProjectTech: "",
+            }));
+          }
+        }}
+        errorMessage={errorMessage.workedProjectTech}
       />
     </div>
   );
@@ -564,6 +719,40 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     </div>
   );
 
+  const certificationBody = (
+    <div className={styles.detail}>
+      <div className={styles.column}>
+        <label>
+          Add Certifications <span className={style.compulsory}>*</span>
+        </label>
+        <button onClick={() => handleAdd()}>
+          <PlusCircle />
+        </button>
+        {values?.points?.length == 0 ? (
+          <div className={styles.warning}>Enter Certifications</div>
+        ) : (
+          <span></span>
+        )}
+        {values?.points?.map((data, index) => (
+          <div className={styles.pointsContainer}>
+            <InputControl
+              placeholder={`Line ${index + 1}`}
+              value={data}
+              onChange={(event) => handleChange(event, index)}
+              className={styles.input}
+            />
+            <button
+              onClick={() => handleDelete(index)}
+              className={styles.crossbtn}
+            >
+              X
+            </button>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
   //we are updating information passed from Body component.
   const handleSubmission = () => {
     switch (sections[activeSectionKey]) {
@@ -590,6 +779,17 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             title: "",
           }));
         }
+        if (isFieldInValid(values.experienceInYear)) {
+          setErrorMessage((prev) => ({
+            ...prev,
+            experienceInYear: "Please Enter Year Of Experience",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            experienceInYear: "",
+          }));
+        }
         if (isFieldInValid(values.profile)) {
           setErrorMessage((prev) => ({
             ...prev,
@@ -602,13 +802,20 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           }));
         }
 
-        if (values.name === "" || values.title === "" || values.profile === "")
+        if (
+          values.name === "" ||
+          values.title === "" ||
+          values.profile === "" ||
+          values.experienceInYear === ""
+        )
           return;
 
         const tempDetail = {
           name: values.name,
           title: values.title,
           profile: values.profile,
+          experienceInYear: values.experienceInYear,
+          gender: values.gender,
         };
 
         setInformation((prev) => ({
@@ -732,11 +939,23 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             technology: "",
           }));
         }
+        if (isFieldInValid(values.workedProjectTech)) {
+          setErrorMessage((prev) => ({
+            ...prev,
+            workedProjectTech: "Please Enter Worked Techonology",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            workedProjectTech: "",
+          }));
+        }
 
         if (
           values.projectName === "" ||
           values.overview === "" ||
           values.technology === "" ||
+          values.workedProjectTech === "" ||
           values.points.length === 0
         )
           return;
@@ -750,6 +969,10 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           overview: values.overview,
           points: filteredPoints,
           technology: values.technology,
+          workedProjectTech: values.workedProjectTech,
+          projectStartDate: values.projectStartDate,
+          projectEndDate: values.projectEndDate,
+          projectDuration: values.projectDuration,
         };
 
         const tempDetails = [...information[sections.project]?.details];
@@ -813,6 +1036,23 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }));
         break;
       }
+      case sections.certification: {
+        if (values.points.length === 0) return;
+
+        const filteredPoints = values.points.filter(
+          (item) => item.length !== 0
+        );
+
+        setInformation((prev) => ({
+          ...prev,
+          [sections.certification]: {
+            ...prev[sections.certification],
+            points: filteredPoints,
+            sectionTitle,
+          },
+        }));
+        break;
+      }
     }
   };
 
@@ -829,6 +1069,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         return educationBody;
       case sections.skills:
         return skillsBody;
+      case sections.certification:
+        return certificationBody;
       default:
         return null;
     }

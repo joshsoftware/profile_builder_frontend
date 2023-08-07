@@ -145,5 +145,6 @@
 
 .warning {
   color: red;
-  font-size: large;
+  /* font-size: large; */
+  font-size: 0.875rem;
 }

@@ -12,10 +12,18 @@ import {
 import styles from "./Resume.module.css";
 import { INTERNAL } from "../Body/Body";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
+import { getMonthString } from "../../utils/helpers";
 
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
-  const { showExperince, information, sections, profile, activeColor } = props;
+  const {
+    showExperince,
+    showCertification,
+    information,
+    sections,
+    profile,
+    activeColor,
+  } = props;
   // const information = props.information;
   // const sections = props.sections;
   // const profile = props.profile;
@@ -32,6 +40,7 @@ const Resume = forwardRef((props, ref) => {
     project: information[sections.project],
     education: information[sections.education],
     skills: information[sections.skills],
+    certification: information[sections.certification],
   };
 
   const getFormattedDate = (value) => {
@@ -59,6 +68,17 @@ const Resume = forwardRef((props, ref) => {
     const givenYear = date.getFullYear();
 
     return givenYear;
+  };
+
+  const getMonthYear = (value) => {
+    console.log("In Month Year Format");
+    if (!value) return;
+    const date = new Date(value);
+
+    const givenYear = date.getFullYear();
+    const givenMonth = date.getMonth();
+
+    return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };
 
   //Different section of tabs for Drag and Drop functionality.
@@ -120,7 +140,24 @@ const Resume = forwardRef((props, ref) => {
               {item?.projectName ? (
                 <h2 className={styles.title}>
                   <b className={styles.underline}>{item.projectName}</b>
+                  {item?.projectStartDate && item?.projectEndDate ? (
+                    <span className={`${styles.monthDuration} px-2`}>
+                      | {getMonthYear(item.projectStartDate)} To
+                      {getMonthYear(item.projectEndDate)}
+                    </span>
+                  ) : (
+                    <span />
+                  )}
                 </h2>
+              ) : (
+                <span />
+              )}
+
+              {item?.projectDuration ? (
+                <span className={styles.duration}>
+                  <b className={styles.title}>Duration : </b>
+                  {item.projectDuration}
+                </span>
               ) : (
                 <span />
               )}
@@ -154,8 +191,16 @@ const Resume = forwardRef((props, ref) => {
               )}
               {item?.technology ? (
                 <p className={styles.overview}>
-                  <b>Technology Used : </b>
+                  <b>Project Techstack : </b>
                   {item.technology}
+                </p>
+              ) : (
+                <span />
+              )}
+              {item?.workedProjectTech ? (
+                <p className={styles.overview}>
+                  <b>My Contribution : </b>
+                  {item.workedProjectTech}
                 </p>
               ) : (
                 <span />
@@ -224,17 +269,53 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
+    [sections.certification]: (
+      <div
+        key={"certification"}
+        className={`${styles.section} ${
+          info.certification?.sectionTitle ? "" : styles.hidden
+        }`}
+      >
+        <div className={styles.separate}></div>
+        <div className={`${styles.leftSection} pt-2`}>
+          {info.certification?.sectionTitle}
+        </div>
+        <div className={styles.content}>
+          {info?.certification?.points?.length > 0 ? (
+            <ul className={styles.numbered}>
+              {info.certification?.points?.map((elem, index) => (
+                <li className={styles.point} key={elem + index}>
+                  {elem}
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <span />
+          )}
+        </div>
+      </div>
+    ),
   };
 
   //At component mount which section of resume contains which tab details.
   useEffect(() => {
-    if (!showExperince) {
-      setColumns([[sections.skills, sections.education], [sections.project]]);
-    } else {
+    if (showExperince && showCertification) {
+      setColumns([
+        [sections.skills, sections.education, sections.certification],
+        [sections.workExp, sections.project],
+      ]);
+    } else if (showCertification) {
+      setColumns([
+        [sections.skills, sections.education, sections.certification],
+        [sections.project],
+      ]);
+    } else if (showExperince) {
       setColumns([
         [sections.skills, sections.education],
         [sections.workExp, sections.project],
       ]);
+    } else {
+      setColumns([[sections.skills, sections.education], [sections.project]]);
     }
   }, [profile, information]);
 
@@ -261,7 +342,15 @@ const Resume = forwardRef((props, ref) => {
       <div ref={containerRef} className={styles.container}>
         <div className={styles.header}>
           <p className={styles.heading}>{info.basicInfo?.detail?.name}</p>
-          <p className={styles.subHeading}>{info.basicInfo?.detail?.title}</p>
+          <p className={styles.subHeading}>
+            {info.basicInfo?.detail?.title}
+            {info.basicInfo?.detail?.gender && (
+              <span className="px-2">({info.basicInfo?.detail?.gender})</span>
+            )}
+          </p>
+          <p className={styles.experienceHeading}>
+            {info.basicInfo?.detail?.experienceInYear}
+          </p>
           <img
             src={joshImage}
             alt="Not Found"

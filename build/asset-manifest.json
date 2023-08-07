@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/static/css/main.0e60d07b.css",
+    "main.js": "/static/js/main.0a39cb08.js",
+    "static/media/Josh-Logo-White-bg.svg": "/static/media/Josh-Logo-White-bg.e317383d4f85dc970ddd3334321fa0b7.svg",
+    "static/media/resume.svg": "/static/media/resume.778f997f78504cc10d15186210b4c204.svg",
+    "index.html": "/index.html",
+    "main.0e60d07b.css.map": "/static/css/main.0e60d07b.css.map",
+    "main.0a39cb08.js.map": "/static/js/main.0a39cb08.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.0e60d07b.css",
+    "static/js/main.0a39cb08.js"
+  ]
+}

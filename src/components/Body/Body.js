@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 import styles from "./Body.module.css";
 import { ArrowDown } from "react-feather";
 import Editor from "../Editor/Editor";
@@ -25,18 +19,37 @@ const Body = () => {
   //Checkbox state to handle experience.
   const [showExperince, setShowExperience] = useState(false);
 
+  const [showCertification, setShowCertification] = useState(false);
+
   //to hold resume ref to print resume.
   const resumeRef = useRef();
 
   //Based on state toggle we hav to dynamically changes section tabs.
   const sections = useMemo(() => {
-    if (showExperince) {
+    if (showExperince && showCertification) {
       return {
         basicInfo: "Basic Info",
         project: "Projects",
         education: "Education",
         skills: "Skills",
         workExp: "Experience",
+        certification: "Certification",
+      };
+    } else if (showExperince) {
+      return {
+        basicInfo: "Basic Info",
+        project: "Projects",
+        education: "Education",
+        skills: "Skills",
+        workExp: "Experience",
+      };
+    } else if (showCertification) {
+      return {
+        basicInfo: "Basic Info",
+        project: "Projects",
+        education: "Education",
+        skills: "Skills",
+        certification: "Certification",
       };
     } else {
       return {
@@ -46,7 +59,7 @@ const Body = () => {
         skills: "Skills",
       };
     }
-  }, [showExperince]);
+  }, [showExperince, showCertification]);
 
   //Defining each tabs information.
   const resumeState = {
@@ -86,6 +99,28 @@ const Body = () => {
     }
   };
 
+  const ShowCertifications = useCallback(
+    (event) => {
+      if (event.target.checked) {
+        sections.certification = "Certification";
+        setResumeInformation((prev) => ({
+          ...prev,
+          [sections.certification]: {
+            id: sections.certification,
+            sectionTitle: sections.certification,
+            points: [],
+          },
+        }));
+      } else {
+        delete sections.certification;
+        delete resumeInformation.certification;
+        setResumeInformation(resumeInformation);
+      }
+      setShowCertification(event.target.checked);
+    },
+    [showCertification]
+  );
+
   const ShowExperience = useCallback(
     (event) => {
       if (event.target.checked) {
@@ -105,13 +140,12 @@ const Body = () => {
       }
       setShowExperience(event.target.checked);
     },
-
     [showExperince]
   );
 
   return (
     <div className={styles.container}>
-      <p className={styles.heading}>Profile Builder</p>
+      <p className={styles.heading}>Resume Builder</p>
       <div className={styles.toolbar}>
         <div className={styles.colors}>
           <div className={styles.select}>
@@ -149,6 +183,17 @@ const Body = () => {
               Do You Want to include Work Experience ?
             </label>
           </div>
+          <div className={styles.checkExperince}>
+            <input
+              type="checkbox"
+              value={showCertification}
+              onChange={(event) => ShowCertifications(event)}
+              id="show-certifications"
+            />
+            <label htmlFor="show-certifications">
+              Do You Want to include Certifications ?
+            </label>
+          </div>
         </div>
 
         <ReactToPrint
@@ -176,6 +221,7 @@ const Body = () => {
           activeColor={profile.color}
           profile={profile.title}
           showExperince={showExperince}
+          showCertification={showCertification}
         />
       </div>
     </div>
