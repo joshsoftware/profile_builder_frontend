@@ -1,4 +1,4 @@
-import React, { isValidElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import styles from "./Editor.module.css";
 import style from "../InputControl/InputControl.module.css";
@@ -8,7 +8,13 @@ import { PlusCircle, X } from "react-feather";
 import TextAreaControl from "../InputControl/TextAreaControl";
 import { isFieldInValid } from "../../helpers";
 import SelectControl from "../InputControl/SelectControl";
-import { genderOptions } from "../../utils/helpers";
+import { genderOptions, skillsOptions } from "../../utils/helpers";
+import DatePicker from "react-datepicker";
+import CreatableSelect from "react-select/creatable";
+
+const components = {
+  DropdownIndicator: null,
+};
 
 const Editor = ({ sections, information, setInformation, profile }) => {
   //State to choose tabs between different by default shows first tab.
@@ -30,7 +36,61 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     projectStartDate: "",
     projectEndDate: "",
     projectDuration: "",
+    grade: "",
   });
+
+  const [inputValue, setInputValue] = React.useState("");
+  const [value, setValue] = useState([]);
+  const [primarySkills, setPrimarySkills] = useState([]);
+
+  const createOption = (label) => ({
+    label,
+    value: label,
+  });
+
+  function removeDuplicates(arr) {
+    return [...new Set(arr)];
+  }
+
+  function selectOptionsValue(array) {
+    const valuesArray = [];
+    array.forEach((element) => {
+      valuesArray.push(element.value);
+    });
+    return valuesArray;
+  }
+
+  useEffect(() => {
+    const otherSkillsArray = selectOptionsValue(value);
+
+    const newArray = [...primarySkills, ...otherSkillsArray];
+    console.log(newArray, "newArray");
+
+    const filteredArray = removeDuplicates(newArray);
+    console.log(filteredArray, "filteredArray");
+
+    setValues((prev) => ({
+      ...prev,
+      points: filteredArray,
+    }));
+
+    if (values.points.length !== 0)
+      setErrorMessage((prev) => ({
+        ...prev,
+        points: "",
+      }));
+  }, [value, setValue, primarySkills]);
+
+  const handleKeyDown = (event) => {
+    if (!inputValue) return;
+    switch (event.key) {
+      case "Enter":
+      case "Tab":
+        setValue((prev) => [...prev, createOption(inputValue)]);
+        setInputValue("");
+        event.preventDefault();
+    }
+  };
 
   //To hold current tab informations.
   const [activeInformation, setActiveInformation] = useState(
@@ -55,6 +115,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     profile: activeInformation?.detail?.profile || "",
     points: activeInformation?.details?.points || [],
     educationTitle: activeInformation?.details?.educationTitle || "",
+    grade: activeInformation?.details?.grade || "",
     workedProjectTech: activeInformation?.details?.workedProjectTech || "",
     projectStartDate: activeInformation?.details?.projectStartDate || "",
     projectEndDate: activeInformation?.details?.projectEndDate || "",
@@ -110,6 +171,10 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       educationTitle: activeInfo?.details
         ? activeInfo.details[0]?.title || ""
         : activeInfo?.detail?.title || "",
+      grade: activeInfo?.details
+        ? activeInfo.details[0]?.grade || ""
+        : activeInfo?.detail?.grade || "",
+
       college: activeInfo?.details ? activeInfo.details[0]?.college || "" : "",
 
       startDate: activeInfo?.details
@@ -167,11 +232,13 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       passOutDate: activeInfo.details[activeDetailIndex]?.passOutDate || "",
       points: activeInfo.details[activeDetailIndex]?.points || [],
       educationTitle: activeInfo.details[activeDetailIndex]?.title || "",
+      grade: activeInfo.details[activeDetailIndex]?.grade || "",
       college: activeInfo.details[activeDetailIndex]?.college || "",
     });
   }, [activeDetailIndex]);
 
   const handleChange = (event, index) => {
+    console.log("Event", event, "Index", index);
     const inputData = [...values.points];
     inputData[index] = event.target.value;
     setValues((prev) => ({ ...prev, points: inputData }));
@@ -241,8 +308,9 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       <div className={styles.row}>
         <InputControl
           label="Year Of Experience"
+          type="number"
           isCompulsory={true}
-          placeholder="Ex. 3.7+ Year Of Experience In Manual Testing"
+          placeholder="Ex. 0.8 , 1 , 2.8 , 3.4"
           value={values.experienceInYear}
           onChange={(event) => {
             if (event.target.value.trim() === "") {
@@ -270,11 +338,11 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         <div className="col-6">
           <SelectControl
             label="Choose Gender"
-            selectOptions={genderOptions}
+            options={genderOptions}
             onChange={(event) => {
               setValues((prev) => ({
                 ...prev,
-                gender: event.target.value,
+                gender: event.value,
               }));
             }}
           />
@@ -369,65 +437,67 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           required
         />
       </div>
-      <InputControl
-        label="Employment Start Date"
-        isCompulsory={true}
-        type="date"
-        placeholder="Enter Start Date of Employment"
-        value={values.startDate}
-        onChange={(event) => {
-          if (event.target.value.trim() === "") {
-            setErrorMessage((prev) => ({
-              ...prev,
-              startDate: "Please Enter Start Date",
-            }));
-            setValues((prev) => ({
-              ...prev,
-              startDate: event.target.value,
-            }));
-          } else {
-            setValues((prev) => ({
-              ...prev,
-              startDate: event.target.value,
-            }));
-            setErrorMessage((prev) => ({
-              ...prev,
-              startDate: "",
-            }));
-          }
-        }}
-        errorMessage={errorMessage.startDate}
-      />
-      <InputControl
-        label="Employment End Date"
-        isCompulsory={true}
-        type="date"
-        placeholder="Enter End Date of Employment"
-        value={values.endDate}
-        onChange={(event) => {
-          if (event.target.value.trim() === "") {
-            setErrorMessage((prev) => ({
-              ...prev,
-              endDate: "Please Enter End Date",
-            }));
-            setValues((prev) => ({
-              ...prev,
-              endDate: event.target.value,
-            }));
-          } else {
-            setValues((prev) => ({
-              ...prev,
-              endDate: event.target.value,
-            }));
-            setErrorMessage((prev) => ({
-              ...prev,
-              endDate: "",
-            }));
-          }
-        }}
-        errorMessage={errorMessage.endDate}
-        required
-      />
+      <div className={styles.row}>
+        <InputControl
+          label="Employment Start Date"
+          isCompulsory={true}
+          type="month"
+          placeholder="Enter Start Date of Employment"
+          value={values.startDate}
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                startDate: "Please Enter Start Date",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                startDate: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                startDate: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                startDate: "",
+              }));
+            }
+          }}
+          errorMessage={errorMessage.startDate}
+        />
+        <InputControl
+          label="Employment End Date"
+          isCompulsory={true}
+          type="month"
+          placeholder="Enter End Date of Employment"
+          value={values.endDate}
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                endDate: "Please Enter End Date",
+              }));
+              setValues((prev) => ({
+                ...prev,
+                endDate: event.target.value,
+              }));
+            } else {
+              setValues((prev) => ({
+                ...prev,
+                endDate: event.target.value,
+              }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                endDate: "",
+              }));
+            }
+          }}
+          errorMessage={errorMessage.endDate}
+          required
+        />
+      </div>
     </div>
   );
 
@@ -497,7 +567,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           placeholder="Enter End Date of Project"
           value={values.projectEndDate}
           onChange={(event) => {
-            console.log(event.target.value);
             setValues((prev) => ({
               ...prev,
               projectEndDate: event.target.value,
@@ -625,6 +694,11 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     </div>
   );
 
+  const renderYearContent = (year) => {
+    const tooltipText = `Tooltip for year: ${year}`;
+    return <span title={tooltipText}>{year}</span>;
+  };
+
   const educationBody = (
     <div className={styles.detail}>
       <div className={styles.row}>
@@ -668,19 +742,41 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           }))
         }
       />
-      <div className="col-6">
-        <InputControl
-          label="Pass Out Date"
-          type="date"
-          placeholder="Enter end date of this education"
-          value={values.passOutDate}
-          onChange={(event) =>
-            setValues((prev) => ({
-              ...prev,
-              passOutDate: event.target.value,
-            }))
-          }
-        />
+      <div className={styles.row}>
+        <div className="col-6">
+          <InputControl
+            label="CGPA/Percentage (%)"
+            // isCompulsory={true}
+            value={values.grade}
+            placeholder="9.2 Or 89%"
+            onChange={(event) => {
+              setValues((prev) => ({
+                ...prev,
+                grade: event.target.value,
+              }));
+            }}
+          />
+        </div>
+        <div className="col-6">
+          <div>
+            <label>Passout Year</label>
+          </div>
+          <DatePicker
+            label="Passout Year"
+            selected={values.passOutDate || new Date()}
+            renderYearContent={renderYearContent}
+            showYearPicker
+            className="form-control mt-1"
+            dateFormat="yyyy"
+            onChange={(year) => {
+              setValues((prev) => ({
+                ...prev,
+                passOutDate: year,
+              }));
+            }}
+            yearDropdownItemNumber={10}
+          />
+        </div>
       </div>
     </div>
   );
@@ -688,10 +784,40 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const skillsBody = (
     <div className={styles.detail}>
       <div className={styles.column}>
-        <label>
-          Add Skills <span className={style.compulsory}>*</span>
-        </label>
-        <button onClick={() => handleAdd()}>
+        <div className="col-8">
+          <SelectControl
+            label="Add Skills"
+            isCompulsory={true}
+            options={skillsOptions}
+            isMulti
+            isSearchable={true}
+            onChange={(skills) => {
+              const skillsArray = selectOptionsValue(skills);
+              setPrimarySkills(skillsArray);
+              setValues((prev) => ({
+                ...prev,
+                points: skillsArray,
+              }));
+            }}
+            errorMessage={errorMessage.points}
+          />
+        </div>
+        <div className="col-8 my-4">
+          <label className="pb-1">Add Other Skills</label>
+          <CreatableSelect
+            components={components}
+            inputValue={inputValue}
+            isClearable
+            isMulti
+            menuIsOpen={false}
+            onChange={(newValue) => setValue(newValue)}
+            onInputChange={(newValue) => setInputValue(newValue)}
+            onKeyDown={handleKeyDown}
+            placeholder="Type Skills and Press Enter..."
+            value={value}
+          />
+        </div>
+        {/* <button onClick={() => handleAdd()}>
           <PlusCircle />
         </button>
         {values?.points?.length == 0 ? (
@@ -714,7 +840,23 @@ const Editor = ({ sections, information, setInformation, profile }) => {
               X
             </button>
           </div>
-        ))}
+        ))} */}
+        {/* {otherSkills?.map((data, index) => (
+          <div className={styles.pointsContainer}>
+            <InputControl
+              placeholder={`Line ${index + 1}`}
+              value={data}
+              onChange={(event) => handleChange(event, index)}
+              className={styles.input}
+            />
+            <button
+              onClick={() => handleDelete(index)}
+              className={styles.crossbtn}
+            >
+              X
+            </button>
+          </div>
+        ))} */}
       </div>
     </div>
   );
@@ -828,6 +970,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }));
         break;
       }
+
       case sections.workExp: {
         if (isFieldInValid(values.startDate)) {
           setErrorMessage((prev) => ({
@@ -889,8 +1032,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           role: values?.role,
         };
 
-        console.log("TempDetails", information?.sections?.workExp?.details);
-
         //finding out details then updating particular details index values.
         const tempDetails = [...information[sections.workExp].details];
         tempDetails[activeDetailIndex] = tempDetail;
@@ -905,6 +1046,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }));
         break;
       }
+
       case sections.project: {
         if (isFieldInValid(values.projectName)) {
           setErrorMessage((prev) => ({
@@ -988,6 +1130,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }));
         break;
       }
+
       case sections.education: {
         if (isFieldInValid(values.educationTitle)) {
           setErrorMessage((prev) => ({
@@ -1005,6 +1148,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           educationTitle: values?.educationTitle,
           college: values?.college,
           passOutDate: values?.passOutDate,
+          grade: values?.grade,
         };
         const tempDetails = [...information[sections.education]?.details];
         tempDetails[activeDetailIndex] = tempDetail;
@@ -1019,18 +1163,30 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         }));
         break;
       }
-      case sections.skills: {
-        if (values.points.length === 0) return;
 
-        const filteredPoints = values.points.filter(
-          (item) => item.length !== 0
-        );
+      case sections.skills: {
+        if (values.points.length === 0) {
+          console.log("In Skills Validation..");
+          setErrorMessage((prev) => ({
+            ...prev,
+            points: "Please Enter Skills",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            points: "",
+          }));
+        }
+
+        // const filteredPoints = values.points.filter(
+        //   (item) => item.length !== 0
+        // );
 
         setInformation((prev) => ({
           ...prev,
           [sections.skills]: {
             ...prev[sections.skills],
-            points: filteredPoints,
+            points: values.points,
             sectionTitle,
           },
         }));

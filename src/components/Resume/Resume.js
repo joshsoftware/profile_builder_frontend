@@ -1,18 +1,9 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import {
-  AtSign,
-  Calendar,
-  GitHub,
-  Linkedin,
-  MapPin,
-  Paperclip,
-  Phone,
-} from "react-feather";
+import { Calendar } from "react-feather";
 
 import styles from "./Resume.module.css";
-import { INTERNAL } from "../Body/Body";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString } from "../../utils/helpers";
+import { genderOptions, getMonthString } from "../../utils/helpers";
 
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
@@ -95,7 +86,7 @@ const Resume = forwardRef((props, ref) => {
           {info?.workExp?.details?.map((item) => (
             <div className={styles.item} key={item.title}>
               {item?.role || item?.companyName ? (
-                <p className={styles.title}>{item.role}</p>
+                <div className={styles.title}>{item.role}</div>
               ) : (
                 <span />
               )}
@@ -103,8 +94,8 @@ const Resume = forwardRef((props, ref) => {
               {item?.companyName ? (
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.companyName}</span>
-                  | <Calendar /> {getFormattedDate(item?.startDate)} -{" "}
-                  {getFormattedDate(item?.endDate)}
+                  | <Calendar /> {getMonthYear(item.startDate)} -
+                  {getMonthYear(item.endDate)}
                 </div>
               ) : (
                 <span />
@@ -141,7 +132,7 @@ const Resume = forwardRef((props, ref) => {
                 <h2 className={styles.title}>
                   <b className={styles.underline}>{item.projectName}</b>
                   {item?.projectStartDate && item?.projectEndDate ? (
-                    <span className={`${styles.monthDuration} px-2`}>
+                    <span className="px-2">
                       | {getMonthYear(item.projectStartDate)} To
                       {getMonthYear(item.projectEndDate)}
                     </span>
@@ -230,13 +221,20 @@ const Resume = forwardRef((props, ref) => {
                 <span />
               )}
               {item.college ? (
-                <p className={styles.subtitle}>{item.college}</p>
+                <div className={styles.subtitle}>{item.college}</div>
               ) : (
                 <span />
               )}
               {item.passOutDate ? (
                 <div className={styles.passingDate}>
-                  Passing Year : {getPassingYear(item.passOutDate)}
+                  Passing Year : {item.passOutDate.getFullYear()}
+                </div>
+              ) : (
+                ""
+              )}
+              {item.grade ? (
+                <div className={styles.passingDate}>
+                  CGPA / Percentage : {item.grade}
                 </div>
               ) : (
                 ""
@@ -342,15 +340,16 @@ const Resume = forwardRef((props, ref) => {
       <div ref={containerRef} className={styles.container}>
         <div className={styles.header}>
           <p className={styles.heading}>{info.basicInfo?.detail?.name}</p>
-          <p className={styles.subHeading}>
+          <div className={styles.subHeading}>
             {info.basicInfo?.detail?.title}
             {info.basicInfo?.detail?.gender && (
               <span className="px-2">({info.basicInfo?.detail?.gender})</span>
             )}
-          </p>
-          <p className={styles.experienceHeading}>
+          </div>
+          <div className={styles.experienceHeading}>
             {info.basicInfo?.detail?.experienceInYear}
-          </p>
+            <span> Year of Experience</span>
+          </div>
           <img
             src={joshImage}
             alt="Not Found"

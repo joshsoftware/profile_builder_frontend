@@ -1,13 +1,11 @@
 import React from "react";
 import styles from "./InputControl.module.css";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
-const SelectControl = ({
-  selectOptions,
-  errorMessage,
-  isCompulsory,
-  label,
-  ...props
-}) => {
+const animatedComponents = makeAnimated();
+
+const SelectControl = ({ errorMessage, isCompulsory, label, ...props }) => {
   return (
     <div>
       {label && (
@@ -15,16 +13,17 @@ const SelectControl = ({
           {label} {isCompulsory && <span className={styles.compulsory}>*</span>}
         </label>
       )}
-      <select
+      {/* <select
         {...props}
         className="form-control"
-        aria-label={`${label}select example`}
+        aria-label={`${label} Select example`}
       >
-        <option selected>{label}</option>
+        <option value="">{label}</option>
         {selectOptions.map((item) => (
           <option value={item.value}>{item.name}</option>
         ))}
-      </select>
+      </select> */}
+      <Select {...props} components={animatedComponents} />
       <span className={styles.errorMessage}>{errorMessage}</span>
     </div>
   );

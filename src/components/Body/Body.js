@@ -68,7 +68,7 @@ const Body = () => {
       sectionTitle: sections.basicInfo,
       detail: {
         profile:
-          "Passionate and Dedicated Software Developer With 3+ Years of Experience Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.",
+          "Passionate and Dedicated Candidate Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.",
       },
     },
     [sections.project]: {

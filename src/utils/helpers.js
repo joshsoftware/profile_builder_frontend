@@ -1,7 +1,31 @@
 export const genderOptions = [
-  { name: "MALE", value: "Male" },
-  { name: "FEMALE", value: "Female" },
-  { name: "OTHER", value: "Other" },
+  { label: "CHOOSE GENDER", value: "" },
+  { label: "MALE", value: "Male" },
+  { label: "FEMALE", value: "Female" },
+  { label: "OTHER", value: "Other" },
+];
+//ReactJs, Angular, Flutter, .Net, NodeJs, React-Native, VueJs
+export const skillsOptions = [
+  { label: ".NET", value: ".NET" },
+  { label: "Android", value: "Android" },
+  { label: "Angular", value: "Angular" },
+  { label: "Business Analyst", value: "Business Analyst" },
+  { label: "Data Science", value: "Data Science" },
+  { label: "DevOps", value: "DevOps" },
+  { label: "Flutter", value: "Flutter" },
+  { label: "GO", value: "Go" },
+  { label: "IOS", value: "IOS" },
+  { label: "Java", value: "Java" },
+  { label: "NodeJs", value: "NodeJs" },
+  { label: "Python", value: "Python" },
+  { label: "PHP", value: "PHP" },
+  { label: "QA-Automation", value: "QA-Automation" },
+  { label: "QA-Manual", value: "QA-Manual" },
+  { label: "Ruby", value: "Ruby" },
+  { label: "ReactJs", value: "ReactJs" },
+  { label: "React-Native", value: "React-Native" },
+  { label: "UI/UX", value: "UI/UX" },
+  { label: "VueJs", value: "VueJs" },
 ];
 
 export const getMonthString = (num) => {
