@@ -62,13 +62,19 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getMonthYear = (value) => {
-    console.log("In Month Year Format");
     if (!value) return;
     const date = new Date(value);
+    const currDate = new Date();
 
     const givenYear = date.getFullYear();
     const givenMonth = date.getMonth();
 
+    if (
+      givenYear === currDate.getFullYear() &&
+      givenMonth === currDate.getMonth()
+    ) {
+      return " Present";
+    }
     return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };
 

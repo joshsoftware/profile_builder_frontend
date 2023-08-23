@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import styles from "./Editor.module.css";
 import style from "../InputControl/InputControl.module.css";
@@ -21,6 +21,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const [activeSectionKey, setActiveSectionKey] = useState(
     Object.keys(sections)[0]
   );
+
+  const [isCurrentCompany, setisCurrentCompany] = useState(false);
 
   //To handle error message state.
   const [errorMessage, setErrorMessage] = useState({
@@ -204,6 +206,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     if (!details) return;
 
     const activeInfo = information[sections[activeSectionKey]];
+
     //we are resetting to initial values whenever new chips gets selected.
     setValues({
       name: activeInfo.details[activeDetailIndex]?.name || "",
@@ -236,6 +239,28 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       college: activeInfo.details[activeDetailIndex]?.college || "",
     });
   }, [activeDetailIndex]);
+
+  const setCurrentCompany = useCallback(
+    (event) => {
+      const checkCurrentCompany = event.target.checked;
+      if (checkCurrentCompany) {
+        console.log(checkCurrentCompany);
+        setisCurrentCompany(checkCurrentCompany);
+        const currDate = new Date();
+        const presentDate = `${currDate.getFullYear()}-${
+          currDate.getMonth() + 1
+        }`;
+        setValues((prev) => ({
+          ...prev,
+          endDate: presentDate,
+        }));
+      } else {
+        setisCurrentCompany(false);
+        return;
+      }
+    },
+    [setisCurrentCompany]
+  );
 
   const handleChange = (event, index) => {
     console.log("Event", event, "Index", index);
@@ -437,66 +462,86 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           required
         />
       </div>
+      <div className="col-6">
+        <input
+          type="checkbox"
+          value={isCurrentCompany}
+          onChange={(event) => setCurrentCompany(event)}
+          id="show-current-company"
+        />
+        <label
+          htmlFor="show-current-company"
+          style={{ color: "red", paddingLeft: "1rem" }}
+        >
+          Is This A Current Company ?
+        </label>
+      </div>
       <div className={styles.row}>
-        <InputControl
-          label="Employment Start Date"
-          isCompulsory={true}
-          type="month"
-          placeholder="Enter Start Date of Employment"
-          value={values.startDate}
-          onChange={(event) => {
-            if (event.target.value.trim() === "") {
-              setErrorMessage((prev) => ({
-                ...prev,
-                startDate: "Please Enter Start Date",
-              }));
-              setValues((prev) => ({
-                ...prev,
-                startDate: event.target.value,
-              }));
-            } else {
-              setValues((prev) => ({
-                ...prev,
-                startDate: event.target.value,
-              }));
-              setErrorMessage((prev) => ({
-                ...prev,
-                startDate: "",
-              }));
-            }
-          }}
-          errorMessage={errorMessage.startDate}
-        />
-        <InputControl
-          label="Employment End Date"
-          isCompulsory={true}
-          type="month"
-          placeholder="Enter End Date of Employment"
-          value={values.endDate}
-          onChange={(event) => {
-            if (event.target.value.trim() === "") {
-              setErrorMessage((prev) => ({
-                ...prev,
-                endDate: "Please Enter End Date",
-              }));
-              setValues((prev) => ({
-                ...prev,
-                endDate: event.target.value,
-              }));
-            } else {
-              setValues((prev) => ({
-                ...prev,
-                endDate: event.target.value,
-              }));
-              setErrorMessage((prev) => ({
-                ...prev,
-                endDate: "",
-              }));
-            }
-          }}
-          errorMessage={errorMessage.endDate}
-          required
-        />
+        <div className="col-6">
+          <InputControl
+            label="Employment Start Date"
+            isCompulsory={true}
+            type="month"
+            placeholder="Enter Start Date of Employment"
+            value={values.startDate}
+            onChange={(event) => {
+              if (event.target.value.trim() === "") {
+                setErrorMessage((prev) => ({
+                  ...prev,
+                  startDate: "Please Enter Start Date",
+                }));
+                setValues((prev) => ({
+                  ...prev,
+                  startDate: event.target.value,
+                }));
+              } else {
+                setValues((prev) => ({
+                  ...prev,
+                  startDate: event.target.value,
+                }));
+                setErrorMessage((prev) => ({
+                  ...prev,
+                  startDate: "",
+                }));
+              }
+            }}
+            errorMessage={errorMessage.startDate}
+          />
+        </div>
+        <div className="col-6">
+          {!isCurrentCompany && (
+            <InputControl
+              label="Employment End Date"
+              isCompulsory={true}
+              type="month"
+              placeholder="Enter End Date of Employment"
+              value={values.endDate}
+              onChange={(event) => {
+                if (event.target.value.trim() === "") {
+                  setErrorMessage((prev) => ({
+                    ...prev,
+                    endDate: "Please Enter End Date",
+                  }));
+                  setValues((prev) => ({
+                    ...prev,
+                    endDate: event.target.value,
+                  }));
+                } else {
+                  setValues((prev) => ({
+                    ...prev,
+                    endDate: event.target.value,
+                  }));
+                  setErrorMessage((prev) => ({
+                    ...prev,
+                    endDate: "",
+                  }));
+                }
+              }}
+              errorMessage={errorMessage.endDate}
+              required
+            />
+          )}
+        </div>
       </div>
     </div>
   );
@@ -983,7 +1028,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             startDate: "",
           }));
         }
-        if (isFieldInValid(values.endDate)) {
+        if (isFieldInValid(values?.endDate)) {
           setErrorMessage((prev) => ({
             ...prev,
             endDate: "Please Enter End Date",
