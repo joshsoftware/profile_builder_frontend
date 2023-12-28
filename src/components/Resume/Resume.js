@@ -164,11 +164,17 @@ const Resume = forwardRef((props, ref) => {
                   <h6>
                     <b>Project Description</b>
                   </h6>
-                  <p className={styles.overview}>{item.overview} </p>
+                  {item.overview?.includes("\n") ? (
+                    <ul className={styles.overview}>
+                      {item.overview.split("\n").map((text) => (
+                        <li>{text.trim()}</li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className={styles.overview}>{item.overview} </p>
+                  )}
                 </div>
-              ) : (
-                <span />
-              )}
+              ) : null}
 
               {item?.points?.length > 0 ? (
                 <div>
@@ -378,9 +384,17 @@ const Resume = forwardRef((props, ref) => {
                   </b>
                 </h4>
               </div>
-              <div className={`${styles.profiledetails} pb-3`}>
-                {info.basicInfo?.detail?.profile}
-              </div>
+              {info.basicInfo?.detail?.profile.includes("\n") ? (
+                <ul className={`${styles.profiledetails} pb-3`}>
+                  {info.basicInfo?.detail?.profile.split("\n").map((text) => (
+                    <li>{text.trim()}</li>
+                  ))}
+                </ul>
+              ) : (
+                <div className={`${styles.profiledetails} pb-3`}>
+                  {info.basicInfo?.detail?.profile}-{" "}
+                </div>
+              )}
               {columns[1].map((item) => sectionDiv[item])}
             </div>
           </div>

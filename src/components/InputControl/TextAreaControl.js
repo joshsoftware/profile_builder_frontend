@@ -12,8 +12,12 @@ const TextAreaControl = ({ label, errorMessage, isCompulsory, ...props }) => {
       <textarea
         className="form-control"
         id="exampleFormControlTextarea1"
+        data-bs-toggle="tooltip"
+        data-bs-placement="top"
+        title="Note: Add content in new line for bulleted list format"
         {...props}
       ></textarea>
+
       <span className={styles.errorMessage}>{errorMessage}</span>
     </div>
   );
