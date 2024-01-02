@@ -5,13 +5,27 @@ import Editor from "../Editor/Editor";
 import Resume from "../Resume/Resume";
 
 import ReactToPrint from "react-to-print";
+import {
+  Col,
+  Nav,
+  NavItem,
+  NavLink,
+  Row,
+  TabContent,
+  TabPane,
+} from "reactstrap";
 
 export const INTERNAL = "INTERNAL";
 export const EXTERNAL = "EXTERNAL";
 const Body = () => {
   const InternalProfile = { title: INTERNAL, color: "#35549c" };
   const ExternalProfile = { title: EXTERNAL, color: "#062e38" };
+  const ProfileDetailsTabId = "profile-details";
+  const ResumePreviewTabId = "preview";
   //to print resume.
+
+  // to set active tabId
+  const [activeTabId, setActiveTabId] = useState(ProfileDetailsTabId);
 
   //to show resume profile and bgcolor.
   const [profile, setProfile] = useState(InternalProfile);
@@ -143,6 +157,10 @@ const Body = () => {
     [showExperince]
   );
 
+  const handleOnClickNavLink = (id) => {
+    setActiveTabId(id);
+  };
+
   return (
     <div className={styles.container}>
       <p className={styles.heading}>Resume Builder</p>
@@ -208,21 +226,47 @@ const Body = () => {
         />
       </div>
       <div className={styles.main}>
-        <Editor
-          sections={sections}
-          information={resumeInformation}
-          setInformation={setResumeInformation}
-          profile={profile}
-        />
-        <Resume
-          ref={resumeRef}
-          sections={sections}
-          information={resumeInformation}
-          activeColor={profile.color}
-          profile={profile.title}
-          showExperince={showExperince}
-          showCertification={showCertification}
-        />
+        <Nav tabs justified>
+          <NavItem>
+            <NavLink
+              href={`#${ProfileDetailsTabId}`}
+              active={activeTabId === ProfileDetailsTabId}
+              onClick={() => handleOnClickNavLink(ProfileDetailsTabId)}
+            >
+              Profile Details
+            </NavLink>
+          </NavItem>
+          <NavItem>
+            <NavLink
+              href={`#${ResumePreviewTabId}`}
+              active={activeTabId === ResumePreviewTabId}
+              onClick={() => handleOnClickNavLink(ResumePreviewTabId)}
+            >
+              Resume Preview
+            </NavLink>
+          </NavItem>
+        </Nav>
+        <TabContent activeTab={activeTabId}>
+          <TabPane tabId="profile-details">
+            <Editor
+              sections={sections}
+              information={resumeInformation}
+              setInformation={setResumeInformation}
+              profile={profile}
+            />
+          </TabPane>
+          <TabPane tabId="preview">
+            <Resume
+              ref={resumeRef}
+              sections={sections}
+              information={resumeInformation}
+              activeColor={profile.color}
+              profile={profile.title}
+              showExperince={showExperince}
+              showCertification={showCertification}
+            />
+          </TabPane>
+        </TabContent>
       </div>
     </div>
   );

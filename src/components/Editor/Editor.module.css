@@ -148,3 +148,7 @@
   /* font-size: large; */
   font-size: 0.875rem;
 }
+
+.floatRight {
+  float: right;
+}
