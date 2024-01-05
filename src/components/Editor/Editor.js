@@ -16,7 +16,7 @@ const components = {
   DropdownIndicator: null,
 };
 
-const Editor = ({ sections, information, setInformation, profile }) => {
+const Editor = ({ sections, information, setInformation }) => {
   //State to choose tabs between different by default shows first tab.
   const [activeSectionKey, setActiveSectionKey] = useState(
     Object.keys(sections)[0]
@@ -26,13 +26,15 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   //To handle error message state.
   const [errorMessage, setErrorMessage] = useState({
+    is_external: "",
+    email: "",
     name: "",
-    title: "",
-    profile: "",
+    designation: "",
+    profile_details: "",
     points: "",
     educationTitle: "",
     college: "",
-    experienceInYear: "",
+    experience: "",
     workedProjectTech: "",
     gender: "",
     projectStartDate: "",
@@ -66,10 +68,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     const otherSkillsArray = selectOptionsValue(value);
 
     const newArray = [...primarySkills, ...otherSkillsArray];
-    console.log(newArray, "newArray");
 
     const filteredArray = removeDuplicates(newArray);
-    console.log(filteredArray, "filteredArray");
 
     setValues((prev) => ({
       ...prev,
@@ -109,12 +109,15 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   //As By Default first tab is selected which is of Basic Info,so all values
   //in basic info tab will be set.
+
   const [values, setValues] = useState({
-    name: activeInformation?.detail?.name || "",
-    title: activeInformation?.detail?.title || "",
-    gender: activeInformation?.detail?.gender || "",
-    experienceInYear: activeInformation?.detail?.experienceInYear || "",
-    profile: activeInformation?.detail?.profile || "",
+    is_external: activeInformation?.details?.is_external || "",
+    email: activeInformation?.details?.email || "",
+    name: activeInformation?.details?.name || "",
+    designation: activeInformation?.details?.designation || "",
+    gender: activeInformation?.details?.gender || "",
+    experience: activeInformation?.details?.experience || "",
+    profile_details: activeInformation?.details?.profile_details || "",
     points: activeInformation?.details?.points || [],
     educationTitle: activeInformation?.details?.educationTitle || "",
     grade: activeInformation?.details?.grade || "",
@@ -129,18 +132,20 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     //whenever section tabs changes then ActiveInformation state contains selected
     //tab information only.
     setActiveInformation(activeInfo);
-    //set section title field when section tabs changes.
+    //set section designation field when section tabs changes.
     setSectionTitle(sections[activeSectionKey]);
 
     //To reset chip.
     setActiveDetailIndex(0);
     setValues({
-      name: activeInfo?.detail?.name || "",
-      title: activeInfo?.detail?.title || "",
-      experienceInYear: activeInfo?.detail?.experienceInYear || "",
-      gender: activeInfo?.detail?.gender || "",
+      is_external: activeInformation?.details?.is_external || "",
+      email: activeInfo?.details?.email || "",
+      name: activeInfo?.details?.name || "",
+      designation: activeInfo?.details?.designation || "",
+      experience: activeInfo?.details?.experience || "",
+      gender: activeInfo?.details?.gender || "",
 
-      profile: activeInfo?.detail?.profile || "",
+      profile_details: activeInfo?.details?.profile_details || "",
 
       role: activeInfo?.details ? activeInfo.details[0]?.role || "" : "",
       companyName: activeInfo?.details
@@ -171,11 +176,11 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         : "",
 
       educationTitle: activeInfo?.details
-        ? activeInfo.details[0]?.title || ""
-        : activeInfo?.detail?.title || "",
+        ? activeInfo.details[0]?.designation || ""
+        : activeInfo?.details?.designation || "",
       grade: activeInfo?.details
         ? activeInfo.details[0]?.grade || ""
-        : activeInfo?.detail?.grade || "",
+        : activeInfo?.details?.grade || "",
 
       college: activeInfo?.details ? activeInfo.details[0]?.college || "" : "",
 
@@ -206,35 +211,31 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     if (!details) return;
 
     const activeInfo = information[sections[activeSectionKey]];
-
     //we are resetting to initial values whenever new chips gets selected.
     setValues({
+      is_external: activeInformation?.details[activeDetailIndex]?.is_external || "",
+      email: activeInfo.details[activeDetailIndex]?.email || "",
       name: activeInfo.details[activeDetailIndex]?.name || "",
-      title: activeInfo.details[activeDetailIndex]?.title || "",
-      experienceInYear:
-        activeInfo.details[activeDetailIndex]?.experienceInYear || "",
+      designation: activeInfo.details[activeDetailIndex]?.designation || "",
+      experience: activeInfo.details[activeDetailIndex]?.experience || "",
       gender: activeInfo.details[activeDetailIndex]?.gender || "",
-      profile: activeInfo.details[activeDetailIndex]?.profile || "",
+      profile_details: activeInfo.details[activeDetailIndex]?.profile_details || "",
       role: activeInfo.details[activeDetailIndex]?.role || "",
       overview: activeInfo.details[activeDetailIndex]?.overview || "",
       companyName: activeInfo.details[activeDetailIndex]?.companyName || "",
       projectName: activeInfo.details[activeDetailIndex]?.projectName || "",
-      workedProjectTech:
-        activeInfo.details[activeDetailIndex]?.workedProjectTech || "",
+      workedProjectTech: activeInfo.details[activeDetailIndex]?.workedProjectTech || "",
 
-      projectStartDate:
-        activeInfo.details[activeDetailIndex]?.projectStartDate || "",
-      projectEndDate:
-        activeInfo.details[activeDetailIndex]?.projectEndDate || "",
-      projectDuration:
-        activeInfo.details[activeDetailIndex]?.projectDuration || "",
+      projectStartDate: activeInfo.details[activeDetailIndex]?.projectStartDate || "",
+      projectEndDate: activeInfo.details[activeDetailIndex]?.projectEndDate || "",
+      projectDuration: activeInfo.details[activeDetailIndex]?.projectDuration || "",
 
       technology: activeInfo.details[activeDetailIndex]?.technology || "",
       startDate: activeInfo.details[activeDetailIndex]?.startDate || "",
       endDate: activeInfo.details[activeDetailIndex]?.endDate || "",
       passOutDate: activeInfo.details[activeDetailIndex]?.passOutDate || "",
       points: activeInfo.details[activeDetailIndex]?.points || [],
-      educationTitle: activeInfo.details[activeDetailIndex]?.title || "",
+      educationTitle: activeInfo.details[activeDetailIndex]?.designation || "",
       grade: activeInfo.details[activeDetailIndex]?.grade || "",
       college: activeInfo.details[activeDetailIndex]?.college || "",
     });
@@ -244,7 +245,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     (event) => {
       const checkCurrentCompany = event.target.checked;
       if (checkCurrentCompany) {
-        console.log(checkCurrentCompany);
         setisCurrentCompany(checkCurrentCompany);
         const currDate = new Date();
         const presentDate = `${currDate.getFullYear()}-${
@@ -263,7 +263,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   );
 
   const handleChange = (event, index) => {
-    console.log("Event", event, "Index", index);
     const inputData = [...values.points];
     inputData[index] = event.target.value;
     setValues((prev) => ({ ...prev, points: inputData }));
@@ -283,6 +282,29 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const basicInfoBody = (
     <div className={styles.detail}>
       <div className={styles.row}>
+        <InputControl
+          label="Email Id"
+          isCompulsory={true}
+          placeholder="Enter Your Email Id"
+          value={values.email}
+          onChange={(event) => {
+            if (event.target.value.trim() === "") {
+              setErrorMessage((prev) => ({
+                ...prev,
+                email: "Please Enter Email Id",
+              }));
+              setValues((prev) => ({ ...prev, email: event.target.value }));
+            } else {
+              setValues((prev) => ({ ...prev, email: event.target.value }));
+              setErrorMessage((prev) => ({
+                ...prev,
+                email: "",
+              }));
+              // handleSubmission();
+            }
+          }}
+          errorMessage={errorMessage.email}
+        />
         <InputControl
           label="Full Name"
           isCompulsory={true}
@@ -309,25 +331,31 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         <InputControl
           label="Designation"
           isCompulsory={true}
-          value={values.title}
+          value={values.designation}
           placeholder="Ex.Frontend Engineer,PowerBI Engineer"
           onChange={(event) => {
             if (event.target.value.trim() === "") {
               setErrorMessage((prev) => ({
                 ...prev,
-                title: "Please Enter Designation",
+                designation: "Please Enter Designation",
               }));
-              setValues((prev) => ({ ...prev, title: event.target.value }));
+              setValues((prev) => ({
+                ...prev,
+                designation: event.target.value,
+              }));
             } else {
-              setValues((prev) => ({ ...prev, title: event.target.value }));
+              setValues((prev) => ({
+                ...prev,
+                designation: event.target.value,
+              }));
               setErrorMessage((prev) => ({
                 ...prev,
-                title: "",
+                designation: "",
               }));
               // handleSubmission();
             }
           }}
-          errorMessage={errorMessage.title}
+          errorMessage={errorMessage.designation}
         />
       </div>
       <div className={styles.row}>
@@ -336,29 +364,29 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           type="number"
           isCompulsory={true}
           placeholder="Ex. 0.8 , 1 , 2.8 , 3.4"
-          value={values.experienceInYear}
+          value={values.experience}
           onChange={(event) => {
             if (event.target.value.trim() === "") {
               setErrorMessage((prev) => ({
                 ...prev,
-                experienceInYear: "Please Enter Year Of Experience",
+                experience: "Please Enter Year Of Experience",
               }));
               setValues((prev) => ({
                 ...prev,
-                experienceInYear: event.target.value,
+                experience: event.target.value,
               }));
             } else {
               setValues((prev) => ({
                 ...prev,
-                experienceInYear: event.target.value,
+                experience: event.target.value,
               }));
               setErrorMessage((prev) => ({
                 ...prev,
-                experienceInYear: "",
+                experience: "",
               }));
             }
           }}
-          errorMessage={errorMessage.experienceInYear}
+          errorMessage={errorMessage.experience}
         />
         <div className="col-6">
           <SelectControl
@@ -377,25 +405,31 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         <TextAreaControl
           label="Profile Details"
           isCompulsory={true}
-          value={values.profile}
+          value={values.profile_details}
           placeholder="Enter Profile Details"
           rows="4"
           onChange={(event) => {
             if (event.target.value.trim() === "") {
               setErrorMessage((prev) => ({
                 ...prev,
-                profile: "Please Enter Profile Details",
+                profile_details: "Please Enter Profile Details",
               }));
-              setValues((prev) => ({ ...prev, profile: event.target.value }));
+              setValues((prev) => ({
+                ...prev,
+                profile_details: event.target.value,
+              }));
             } else {
-              setValues((prev) => ({ ...prev, profile: event.target.value }));
+              setValues((prev) => ({
+                ...prev,
+                profile_details: event.target.value,
+              }));
               setErrorMessage((prev) => ({
                 ...prev,
-                profile: "",
+                profile_details: "",
               }));
             }
           }}
-          errorMessage={errorMessage.profile}
+          errorMessage={errorMessage.profile_details}
         />
       </div>
     </div>
@@ -741,7 +775,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   const renderYearContent = (year) => {
     const tooltipText = `Tooltip for year: ${year}`;
-    return <span title={tooltipText}>{year}</span>;
+    return <span designation={tooltipText}>{year}</span>;
   };
 
   const educationBody = (
@@ -816,7 +850,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             onChange={(year) => {
               setValues((prev) => ({
                 ...prev,
-                passOutDate: year,
+                passOutDate: year.getFullYear(),
               }));
             }}
             yearDropdownItemNumber={10}
@@ -944,6 +978,18 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   const handleSubmission = () => {
     switch (sections[activeSectionKey]) {
       case sections.basicInfo: {
+        if (isFieldInValid(values.email)) {
+          setErrorMessage((prev) => ({
+            ...prev,
+            email: "Please Enter Email Id",
+          }));
+        } else {
+          setErrorMessage((prev) => ({
+            ...prev,
+            email: "",
+          }));
+        }
+
         if (isFieldInValid(values.name)) {
           setErrorMessage((prev) => ({
             ...prev,
@@ -955,61 +1001,65 @@ const Editor = ({ sections, information, setInformation, profile }) => {
             name: "",
           }));
         }
-        if (isFieldInValid(values.title)) {
+        if (isFieldInValid(values.designation)) {
           setErrorMessage((prev) => ({
             ...prev,
-            title: "Designation Can't be blank",
+            designation: "Designation Can't be blank",
           }));
         } else {
           setErrorMessage((prev) => ({
             ...prev,
-            title: "",
+            designation: "",
           }));
         }
-        if (isFieldInValid(values.experienceInYear)) {
+        if (isFieldInValid(values.experience)) {
           setErrorMessage((prev) => ({
             ...prev,
-            experienceInYear: "Please Enter Year Of Experience",
+            experience: "Please Enter Year Of Experience",
           }));
         } else {
           setErrorMessage((prev) => ({
             ...prev,
-            experienceInYear: "",
+            experience: "",
           }));
         }
-        if (isFieldInValid(values.profile)) {
+        if (isFieldInValid(values.profile_details)) {
           setErrorMessage((prev) => ({
             ...prev,
-            profile: "Profile Can't be blank",
+            profile_details: "Profile Can't be blank",
           }));
         } else {
           setErrorMessage((prev) => ({
             ...prev,
-            profile: "",
+            profile_details: "",
           }));
         }
 
         if (
           values.name === "" ||
-          values.title === "" ||
-          values.profile === "" ||
-          values.experienceInYear === ""
+          values.email === "" ||
+          values.designation === "" ||
+          values.profile_details === "" ||
+          values.experience === "" || 
+          values.is_external === ""
         )
           return;
 
         const tempDetail = {
           name: values.name,
-          title: values.title,
-          profile: values.profile,
-          experienceInYear: values.experienceInYear,
+          email: values.email,
+          designation: values.designation,
+          profile_details: values.profile_details,
+          experience: values.experience,
           gender: values.gender,
+          is_external: values.is_external
         };
 
         setInformation((prev) => ({
           ...prev,
           [sections.basicInfo]: {
             ...prev[sections.basicInfo],
-            detail: tempDetail,
+            details: tempDetail,
             sectionTitle,
           },
         }));
@@ -1211,7 +1261,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
       case sections.skills: {
         if (values.points.length === 0) {
-          console.log("In Skills Validation..");
           setErrorMessage((prev) => ({
             ...prev,
             points: "Please Enter Skills",
@@ -1253,6 +1302,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           },
         }));
         break;
+      }
+      default: {
       }
     }
   };
@@ -1310,7 +1361,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
     setActiveDetailIndex((prev) => (prev === index ? 0 : prev));
   };
-
   return (
     <div className={styles.container}>
       <div className={styles.header}>
@@ -1334,13 +1384,14 @@ const Editor = ({ sections, information, setInformation, profile }) => {
       <div className={styles.body}>
         <div className={styles.chips}>
           {/* If details is non empty array(details) then map it to chips. */}
-          {activeInformation?.details
+          {Array.isArray(activeInformation?.details) &&
+          activeInformation?.details.length > 0
             ? activeInformation?.details?.map((item, index) => (
                 <div
                   className={`${styles.chip} ${
                     activeDetailIndex == index ? styles.active : ""
                   }`}
-                  key={item.title + index}
+                  key={item?.title + index}
                   onClick={() => setActiveDetailIndex(index)}
                 >
                   <div>
@@ -1371,7 +1422,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           className="btn btn-primary"
           onClick={handleSubmission}
         >
-          Save
+          Save as draft
         </button>
       </div>
     </div>

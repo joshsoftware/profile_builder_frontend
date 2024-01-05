@@ -14,12 +14,14 @@ import {
   TabContent,
   TabPane,
 } from "reactstrap";
+import { postData } from "../../ApiHelper";
 
 export const INTERNAL = "INTERNAL";
 export const EXTERNAL = "EXTERNAL";
 const Body = () => {
   const InternalProfile = { title: INTERNAL, color: "#35549c" };
   const ExternalProfile = { title: EXTERNAL, color: "#062e38" };
+
   const ProfileDetailsTabId = "profile-details";
   const ResumePreviewTabId = "preview";
   //to print resume.
@@ -80,8 +82,9 @@ const Body = () => {
     [sections.basicInfo]: {
       id: sections.basicInfo,
       sectionTitle: sections.basicInfo,
-      detail: {
-        profile:
+      details: {
+        is_external: false,
+        profile_details:
           "Passionate and Dedicated Candidate Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.",
       },
     },
@@ -106,11 +109,18 @@ const Body = () => {
   const [resumeInformation, setResumeInformation] = useState(resumeState);
 
   const handleRadioButton = (event) => {
-    if (event.target.value === InternalProfile.title) {
-      setProfile(InternalProfile);
-    } else if (event.target.value === ExternalProfile.title) {
-      setProfile(ExternalProfile);
-    }
+    const isProfileTypeExternal = event.target.value === ExternalProfile.title;
+
+    setResumeInformation((prev) => ({
+      ...prev,
+      [sections.basicInfo]: {
+        ...prev[sections.basicInfo],
+        details: {
+          ...prev[sections.basicInfo]["details"],
+          is_external: isProfileTypeExternal,
+        },
+      },
+    }));
   };
 
   const ShowCertifications = useCallback(
@@ -161,6 +171,12 @@ const Body = () => {
     setActiveTabId(id);
   };
 
+  const save = () => {
+    postData("api/profile", resumeInformation).then((res) =>
+      console.log(res, "===api response")
+    );
+  };
+
   return (
     <div className={styles.container}>
       <p className={styles.heading}>Resume Builder</p>
@@ -171,7 +187,7 @@ const Body = () => {
               type="radio"
               value={InternalProfile.title}
               name="profile"
-              defaultChecked
+              checked={!resumeInformation[sections.basicInfo]["details"].is_external}
               onChange={(e) => handleRadioButton(e)}
               id="internal-profile"
             />
@@ -184,6 +200,7 @@ const Body = () => {
               value={ExternalProfile.title}
               name="profile"
               onChange={(e) => handleRadioButton(e)}
+              checked={resumeInformation[sections.basicInfo]["details"].is_external}
               id="external-profile"
             />
             <label htmlFor="external-profile">
@@ -213,17 +230,25 @@ const Body = () => {
             </label>
           </div>
         </div>
-
-        <ReactToPrint
-          trigger={() => {
-            return (
-              <button type="button" class="btn btn-primary">
-                Download <ArrowDown />
-              </button>
-            );
-          }}
-          content={() => resumeRef.current}
-        />
+        <Row>
+          <Col>
+            <button type="button" onClick={save}>
+              Save
+            </button>
+          </Col>
+          <Col>
+            <ReactToPrint
+              trigger={() => {
+                return (
+                  <button type="button">
+                    Download <ArrowDown />
+                  </button>
+                );
+              }}
+              content={() => resumeRef.current}
+            />
+          </Col>
+        </Row>
       </div>
       <div className={styles.main}>
         <Nav tabs justified>

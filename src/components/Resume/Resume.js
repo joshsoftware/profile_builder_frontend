@@ -351,15 +351,15 @@ const Resume = forwardRef((props, ref) => {
       to do so we have to modify --color property in styles. */}
       <div ref={containerRef} className={styles.container}>
         <div className={styles.header}>
-          <p className={styles.heading}>{info.basicInfo?.detail?.name}</p>
+          <p className={styles.heading}>{info.basicInfo?.details?.name}</p>
           <div className={styles.subHeading}>
-            {info.basicInfo?.detail?.title}
-            {info.basicInfo?.detail?.gender && (
-              <span className="px-2">({info.basicInfo?.detail?.gender})</span>
+            {info.basicInfo?.details?.title}
+            {info.basicInfo?.details?.gender && (
+              <span className="px-2">({info.basicInfo?.details?.gender})</span>
             )}
           </div>
           <div className={styles.experienceHeading}>
-            {info.basicInfo?.detail?.experienceInYear}
+            {info.basicInfo?.details?.experience}
             <span> Year of Experience</span>
           </div>
           <img
@@ -384,15 +384,17 @@ const Resume = forwardRef((props, ref) => {
                   </b>
                 </h4>
               </div>
-              {info.basicInfo?.detail?.profile.includes("\n") ? (
+              {info.basicInfo?.details?.profile_details.includes("\n") ? (
                 <ul className={`${styles.profiledetails} pb-3`}>
-                  {info.basicInfo?.detail?.profile.split("\n").map((text) => (
-                    <li>{text.trim()}</li>
-                  ))}
+                  {info.basicInfo?.details?.profile_details
+                    .split("\n")
+                    .map((text) => (
+                      <li>{text.trim()}</li>
+                    ))}
                 </ul>
               ) : (
                 <div className={`${styles.profiledetails} pb-3`}>
-                  {info.basicInfo?.detail?.profile}-{" "}
+                  {info.basicInfo?.details?.profile_details}-{" "}
                 </div>
               )}
               {columns[1].map((item) => sectionDiv[item])}
