@@ -1368,7 +1368,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         {generateBody()}
         <button
           type="button"
-          class="btn btn-primary"
+          className="btn btn-primary"
           onClick={handleSubmission}
         >
           Save

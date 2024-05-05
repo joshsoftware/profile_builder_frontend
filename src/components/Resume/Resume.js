@@ -366,7 +366,7 @@ const Resume = forwardRef((props, ref) => {
         </div>
 
         <div className="container">
-          <div class="row pr-2">
+          <div className="row pr-2">
             <div className={`col-4 pb-5 ${styles.middleSeparatorLine}`}>
               {columns[0].map((item) => sectionDiv[item])}
             </div>
