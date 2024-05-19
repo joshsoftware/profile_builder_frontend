@@ -22,7 +22,7 @@ const ListProfiles = () => {
     <React.Fragment>
       {isFetching && <Skeleton active />}
       {error && <p>Failed to fetch list of Profile!</p>}
-      {data && <Table columns={columns} dataSource={data} />}
+      {data && !isFetching && <Table columns={columns} dataSource={data} />}
     </React.Fragment>
   );
 };
