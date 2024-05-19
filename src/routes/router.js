@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Login from "../components/Login";
 import Dashboard from "../components/Dashboard";
 import { Editor } from "../components/Builder/Index";
-import ListProfiles from "../components/Resume/ListProfiles";
+import ListProfiles from "../components/Profile/List";
+import Login from "../components/Login";
 
 const Router = () => {
   return (
