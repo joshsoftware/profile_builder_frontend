@@ -20,8 +20,6 @@ const Resume = forwardRef((props, ref) => {
   // const profile = props.profile;
   const containerRef = useRef();
 
-  console.log("Information", information);
-
   //which divides an resume into two sections and at mounting tqo section contains which fields are populated.
   const [columns, setColumns] = useState([[], []]);
 
@@ -52,7 +50,6 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getPassingYear = (value) => {
-    console.log("In Passout Year Function...", value);
     if (!value) return "";
     const date = new Date(value);
 

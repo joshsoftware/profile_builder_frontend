@@ -11,8 +11,8 @@ import {
   Space,
   Tag,
 } from "antd";
-import { ResumeContext } from "../../utils/ResumeContext";
-import { DESIGNATION } from "../../Constants";
+import { ResumeContext } from "../../../utils/ResumeContext";
+import { DESIGNATION } from "../../../Constants";
 
 const Experience = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);

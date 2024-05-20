@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
-
 import BasicInfo from "./BasicInfo";
 import Project from "./Project";
 import Skills from "./Skills";
 import Education from "./Education";
 import Experience from "./Experience";
 import Certification from "./Certification";
-
 import { PROFILES } from "../../Constants";
 
 const defaultPanes = [

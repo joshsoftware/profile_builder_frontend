@@ -12,9 +12,9 @@ import {
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
 import style from "./Builder.module.css";
-import { ResumeContext } from "../../utils/ResumeContext";
-import { ROUTES } from "../../Constants";
-import { post } from "../../services/axios";
+import { ResumeContext } from "../../../utils/ResumeContext";
+import { ROUTES } from "../../../Constants";
+import { post } from "../../../services/axios";
 
 const Project = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);
