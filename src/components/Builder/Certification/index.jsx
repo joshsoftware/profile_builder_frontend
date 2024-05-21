@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Button, Col, Form, Input, Row, Space, Typography } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import { ResumeContext } from "../../../utils/ResumeContext";
-import style from "./Builder.module.css";
+import style from "../Builder.module.css";
 import { post } from "../../../services/axios";
 import { ROUTES } from "../../../Constants";
 

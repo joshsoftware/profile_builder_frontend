@@ -10,8 +10,6 @@ import {
   ROUTES,
 } from "../../../Constants";
 
-const { Option } = Select;
-
 const BasicInfo = () => {
   const [form] = Form.useForm();
   const { initialState, setInitialState } = useContext(ResumeContext);

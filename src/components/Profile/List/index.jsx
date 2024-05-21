@@ -102,7 +102,7 @@ const ListProfiles = () => {
       ),
   });
 
-  const { isFetching, data, error, refetch } = useQuery({
+  const { isFetching, data, error } = useQuery({
     queryKey: ["data"],
     queryFn: async () => {
       try {

@@ -1,10 +1,10 @@
 import React, { useContext } from "react";
-import { Button, Col, Flex, Form, Input, Row, Select, Space } from "antd";
+import { Button, Col, Form, Input, Row, Space } from "antd";
 import { ResumeContext } from "../../../utils/ResumeContext";
 import { ROUTES } from "../../../Constants";
 import { post } from "../../../services/axios";
 
-const { Option } = Select;
+// const { Option } = Select;
 
 const Education = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);

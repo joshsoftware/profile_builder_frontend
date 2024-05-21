@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "es2021": true
+  },
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 12,
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "plugins": ["react", "react-hooks"],
+  "rules": {
+    "no-debugger": "warn", // Warn when debugger statements are used
+    "eqeqeq": ["error", "always"], // Enforce the use of === and !==
+    "curly": "error", // Enforce consistent brace style for all control statements
+    "no-unused-vars": [
+      "warn",
+      { "vars": "all", "args": "after-used", "ignoreRestSiblings": false }
+    ], // Warn about unused variables
+    "no-undef": "error", // Disallow the use of undeclared variables
+    "no-multiple-empty-lines": ["error", { "max": 1 }] // Disallow multiple empty lines
+  }
+}

@@ -9,7 +9,6 @@ import {
   Row,
   Select,
   Space,
-  Tag,
 } from "antd";
 import { ResumeContext } from "../../../utils/ResumeContext";
 import { DESIGNATION } from "../../../Constants";
