@@ -1,0 +1,11 @@
+.table {
+  padding-left: 70px;
+  padding-right: 70px;
+}
+
+.heading span {
+  background-clip: text;
+  background-image: linear-gradient(to right, #239ce2, #1369b9);
+  color: transparent;
+  padding-left: 20px;
+}

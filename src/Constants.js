@@ -1,11 +1,29 @@
-export const genderOptions = [
-  { label: "CHOOSE GENDER", value: "" },
+export const PROFILE_DETAILS =
+  "Passionate and Dedicated Candidate Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.";
+
+export const PROFILES = {
+  internal: { title: "INTERNAL", color: "#35549c" },
+  external: { title: "EXTERNAL", color: "#062e38" },
+};
+
+export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },
   { label: "OTHER", value: "Other" },
 ];
-//ReactJs, Angular, Flutter, .Net, NodeJs, React-Native, VueJs
-export const skillsOptions = [
+
+export const DESIGNATION = [
+  { lable: "intern", value: "Intern" },
+  { lable: "software_engineer", value: "Software Engineer" },
+  { lable: "sr_software_engineer", value: "Senior Software Engineer" },
+  { lable: "tech_lead", value: "Technical Lead" },
+  { lable: "project_manager", value: "Project Manager" },
+  { lable: "product_manager", value: "Product Manager" },
+  { lable: "qa", value: "Quality Assurance (QA) Engineer" },
+  { lable: "devOps", value: "DevOps Engineer" },
+];
+
+export const SKILLS = [
   { label: ".NET", value: ".NET" },
   { label: "Android", value: "Android" },
   { label: "Angular", value: "Angular" },
@@ -28,6 +46,11 @@ export const skillsOptions = [
   { label: "VueJs", value: "VueJs" },
 ];
 
+export const ROUTES = {
+  profile: "/api/profile/",
+};
+
+// TODO : Remove once refactor
 export const getMonthString = (num) => {
   let month; //Create a local variable to hold the string
   switch (num) {

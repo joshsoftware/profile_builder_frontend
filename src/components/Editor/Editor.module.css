@@ -1,4 +1,4 @@
-.container {
+/* .container {
   min-height: 600px;
   min-width: 700px;
   max-width: 850px;
@@ -9,6 +9,20 @@
   padding-top: 5px;
   height: fit-content;
   margin: 0 auto;
+} */
+
+.new {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+}
+
+.sub-section {
+  display: flex;
+  align-items: flex-start;
 }
 
 .header {

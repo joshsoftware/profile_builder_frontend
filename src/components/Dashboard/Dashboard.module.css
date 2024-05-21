@@ -1,0 +1,29 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+}
+
+.heading {
+  color: #000;
+  font-size: 1rem;
+  line-height: 4rem;
+}
+
+.heading span {
+  background-clip: text;
+  background-image: linear-gradient(to right, #239ce2, #1369b9);
+  color: transparent;
+}
+
+.createBtn {
+  background-color: #2f77b9;
+  color: #ffffff;
+  border-radius: 3px;
+  font-size: 1.2rem;
+  padding: 10px 100px;
+  border: none;
+}

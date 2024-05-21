@@ -66,10 +66,8 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     const otherSkillsArray = selectOptionsValue(value);
 
     const newArray = [...primarySkills, ...otherSkillsArray];
-    console.log(newArray, "newArray");
 
     const filteredArray = removeDuplicates(newArray);
-    console.log(filteredArray, "filteredArray");
 
     setValues((prev) => ({
       ...prev,
@@ -244,7 +242,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     (event) => {
       const checkCurrentCompany = event.target.checked;
       if (checkCurrentCompany) {
-        console.log(checkCurrentCompany);
         setisCurrentCompany(checkCurrentCompany);
         const currDate = new Date();
         const presentDate = `${currDate.getFullYear()}-${
@@ -263,7 +260,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
   );
 
   const handleChange = (event, index) => {
-    console.log("Event", event, "Index", index);
     const inputData = [...values.points];
     inputData[index] = event.target.value;
     setValues((prev) => ({ ...prev, points: inputData }));
@@ -1211,7 +1207,6 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
       case sections.skills: {
         if (values.points.length === 0) {
-          console.log("In Skills Validation..");
           setErrorMessage((prev) => ({
             ...prev,
             points: "Please Enter Skills",
@@ -1368,7 +1363,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         {generateBody()}
         <button
           type="button"
-          class="btn btn-primary"
+          className="btn btn-primary"
           onClick={handleSubmission}
         >
           Save
