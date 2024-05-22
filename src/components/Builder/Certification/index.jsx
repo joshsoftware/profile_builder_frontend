@@ -45,7 +45,7 @@ const Certification = () => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
-                <Row>
+                <Row key={key}>
                   <Col span={22}>
                     <Form.Item
                       {...restField}
