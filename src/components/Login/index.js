@@ -59,11 +59,7 @@ const Login = () => {
       <div style={divStyle}>
         <h1>Login With Google</h1>
         <button style={buttonStyle} onClick={() => login()}>
-          <img
-            src={googleIcon}
-            alt="Google Icon"
-            style={{ marginRight: "9px" }}
-          />
+          <img src={googleIcon} alt="Google Icon" />
           Login With Google
         </button>
       </div>
