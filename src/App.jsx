@@ -3,6 +3,7 @@ import { ResumeContext } from "./utils/ResumeContext";
 import "./App.css";
 import Router from "./routes/router";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import React from "react";
 
 const App = () => {
   const queryClient = new QueryClient();
