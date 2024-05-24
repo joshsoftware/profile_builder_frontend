@@ -1,16 +1,15 @@
 import React, { useCallback, useEffect, useState } from "react";
-
-import styles from "./Editor.module.css";
-import style from "../InputControl/InputControl.module.css";
-import InputControl from "../InputControl/InputControl";
-
-import { PlusCircle, X } from "react-feather";
-import TextAreaControl from "../InputControl/TextAreaControl";
-import { isFieldInValid } from "../../helpers";
-import SelectControl from "../InputControl/SelectControl";
-import { genderOptions, skillsOptions } from "../../utils/helpers";
 import DatePicker from "react-datepicker";
+import { PlusCircle, X } from "react-feather";
 import CreatableSelect from "react-select/creatable";
+
+import { isFieldInValid } from "../../helpers";
+import { genderOptions, skillsOptions } from "../../utils/helpers";
+import InputControl from "../InputControl/InputControl";
+import style from "../InputControl/InputControl.module.css";
+import SelectControl from "../InputControl/SelectControl";
+import TextAreaControl from "../InputControl/TextAreaControl";
+import styles from "./Editor.module.css";
 
 const components = {
   DropdownIndicator: null,
@@ -659,7 +658,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         )}
 
         {values?.points?.map((data, index) => (
-          <div className={styles.pointsContainer}>
+          <div key={index} className={styles.pointsContainer}>
             <InputControl
               placeholder={`Line ${index + 1}`}
               value={data}
@@ -917,7 +916,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           <span></span>
         )}
         {values?.points?.map((data, index) => (
-          <div className={styles.pointsContainer}>
+          <div key={index} className={styles.pointsContainer}>
             <InputControl
               placeholder={`Line ${index + 1}`}
               value={data}

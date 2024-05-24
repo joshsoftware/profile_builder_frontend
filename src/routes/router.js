@@ -1,9 +1,10 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Dashboard from "../components/Dashboard";
+
 import { Editor } from "../components/Builder/Index";
-import ListProfiles from "../components/Profile/List";
+import Dashboard from "../components/Dashboard";
 import Login from "../components/Login";
+import ListProfiles from "../components/Profile/List";
 import ProtectedRoutes from "./ProtectedRoutes";
 
 const Router = () => {

@@ -1,14 +1,15 @@
 import React, { useContext } from "react";
+
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 
-import { post } from "../../../services/axios";
-import { ResumeContext } from "../../../utils/ResumeContext";
 import {
   DESIGNATION,
   GENDER,
   PROFILE_DETAILS,
   ROUTES,
 } from "../../../Constants";
+import { post } from "../../../services/axios";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const BasicInfo = () => {
   const [form] = Form.useForm();
@@ -32,6 +33,7 @@ const BasicInfo = () => {
       },
     });
   };
+
   return (
     <Form layout="vertical" form={form} name="basic-info" onFinish={onFinish}>
       <Row>
