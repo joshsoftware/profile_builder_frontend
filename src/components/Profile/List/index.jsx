@@ -1,19 +1,23 @@
 import React, { useRef, useState } from "react";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { Button, Input, Space, Skeleton, Table, Tag } from "antd";
 import Highlighter from "react-highlight-words";
-import { useQuery } from "@tanstack/react-query";
-import { get } from "../../../services/axios";
+
+import { Button, Input, Space, Table, Tag } from "antd";
+
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+
+import { useGetProfileListQuery } from "../../../api/profileApi";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+
+  const { data, isFetching, error } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -102,18 +106,6 @@ const ListProfiles = () => {
       ),
   });
 
-  const { isFetching, data, error } = useQuery({
-    queryKey: ["data"],
-    queryFn: async () => {
-      try {
-        const response = await get(`/list_profiles`);
-        return response.data.profiles;
-      } catch (error) {
-        return error;
-      }
-    },
-  });
-
   const columns = [
     {
       title: "Name",
@@ -183,7 +175,7 @@ const ListProfiles = () => {
 
   return (
     <>
-      {isFetching && <Skeleton active />}
+      {isFetching && <p>Loading...</p>}
       {error && <p>Failed to fetch list of Profile!</p>}
       {data && !isFetching && (
         <>
@@ -192,7 +184,7 @@ const ListProfiles = () => {
           </h1>
           <Table
             columns={columns}
-            dataSource={data}
+            dataSource={data.profiles}
             className={styles.table}
             bordered={true}
           />
