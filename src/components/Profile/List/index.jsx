@@ -180,7 +180,7 @@ const ListProfiles = () => {
       {data && !isFetching && (
         <>
           <h1 className={styles.heading}>
-            <span>List of Profiles</span>
+            <span>Profiles</span>
           </h1>
           <Table
             columns={columns}
