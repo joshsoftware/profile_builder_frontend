@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import { Editor } from "../components/Builder/Index";
 import Dashboard from "../components/Dashboard";
+import Error from "../components/Error/Error";
 import Login from "../components/Login";
 import ListProfiles from "../components/Profile/List";
 import ProtectedRoutes from "./ProtectedRoutes";
@@ -25,7 +26,7 @@ const Router = () => {
           path="/profile-builder"
           element={<ProtectedRoutes Component={Editor} />}
         />
-        <Route path="*" element={<Login />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
   );
