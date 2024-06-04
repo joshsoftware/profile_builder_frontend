@@ -4,12 +4,19 @@ export const profileApi = createApi({
   reducerPath: "profileApi",
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.REACT_APP_API_URL,
+    prepareHeaders: (headers, { getState }) => {
+      const token = getState().auth.token;
+      if (token) {
+        headers.set("authorization", `Bearer ${token}`);
+      }
+      return headers;
+    },
   }),
   tagTypes: ["profile"],
   endpoints: (builder) => ({
     getProfileList: builder.query({
       query: () => ({
-        url: `/list_profiles`,
+        url: `/api/list_profiles`,
       }),
       providesTags: ["profile"],
       transformResponse: (response) => response.data,
