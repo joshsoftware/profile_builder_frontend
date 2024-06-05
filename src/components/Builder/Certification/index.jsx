@@ -1,9 +1,6 @@
 import React, { useContext } from "react";
-
 import { Button, Col, Form, Input, Row, Space, Typography } from "antd";
-
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
-
 import { ROUTES } from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";

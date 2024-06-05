@@ -1,5 +1,4 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-
 import { loginApi } from "../loginApi";
 import { profileApi } from "../profileApi";
 import authReducer from "./authSlice";

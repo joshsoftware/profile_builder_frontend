@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
-
 import { PROFILES } from "../../Constants";
+import Resume from "../Resume/Resume";
 import BasicInfo from "./BasicInfo";
 import Certification from "./Certification";
 import Education from "./Education";
@@ -130,6 +129,7 @@ export const Editor = () => {
           onChange={onChange}
         />
       </Col>
+      <Resume />;
     </Row>
   );
 };

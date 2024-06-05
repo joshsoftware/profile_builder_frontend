@@ -1,5 +1,4 @@
 import React, { useContext, useState } from "react";
-
 import {
   Button,
   Checkbox,
@@ -11,7 +10,6 @@ import {
   Select,
   Space,
 } from "antd";
-
 import { DESIGNATION } from "../../../Constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 

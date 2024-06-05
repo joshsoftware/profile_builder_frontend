@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_ENDPOINTS, HTTP_METHODS } from "../Constants";
 export const loginApi = createApi({
   reducerPath: "loginApi",
   baseQuery: fetchBaseQuery({
@@ -9,8 +10,8 @@ export const loginApi = createApi({
   endpoints: (builder) => ({
     login: builder.mutation({
       query: (access_token) => ({
-        url: "/login",
-        method: "POST",
+        url: API_ENDPOINTS.LOGIN,
+        method: HTTP_METHODS.POST,
         body: {
           access_token: access_token,
         },

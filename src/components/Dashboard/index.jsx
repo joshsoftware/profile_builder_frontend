@@ -1,5 +1,4 @@
 import React from "react";
-
 import resumeSvg from "../../assets/banner.svg";
 import styles from "./Dashboard.module.css";
 

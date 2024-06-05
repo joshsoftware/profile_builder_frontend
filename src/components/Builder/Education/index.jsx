@@ -1,7 +1,5 @@
 import React, { useContext } from "react";
-
 import { Button, Col, Form, Input, Row, Space } from "antd";
-
 import { ROUTES } from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";

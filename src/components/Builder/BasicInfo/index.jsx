@@ -1,7 +1,5 @@
 import React, { useContext } from "react";
-
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
-
 import {
   DESIGNATION,
   GENDER,
