@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { API_ENDPOINTS } from "../Constants";
 
 export const profileApi = createApi({
   reducerPath: "profileApi",
@@ -16,7 +17,7 @@ export const profileApi = createApi({
   endpoints: (builder) => ({
     getProfileList: builder.query({
       query: () => ({
-        url: `/api/list_profiles`,
+        url: API_ENDPOINTS.PROFILES_LIST,
       }),
       providesTags: ["profile"],
       transformResponse: (response) => response.data,
