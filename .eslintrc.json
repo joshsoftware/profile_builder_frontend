@@ -31,8 +31,11 @@
     "simple-import-sort/imports": [
       "error",
       {
-        "groups": [["^react"], ["^antd"], ["^@?\\w"], ["@/(.*)"], ["^[./]"]]
+        "groups": [
+          // React and Ant Design imports
+          ["^react", "^antd", "^@?\\w", "^@/(.*)", "^[./]"]
+        ]
       }
-    ] // Enforce import sorting
+    ]
   }
 }
