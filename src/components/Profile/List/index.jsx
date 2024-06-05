@@ -1,14 +1,11 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-
 import { Button, Input, Space, Table, Tag } from "antd";
-
 import {
   DeleteOutlined,
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-
 import { useGetProfileListQuery } from "../../../api/profileApi";
 import styles from "./ListProfiles.module.css";
 

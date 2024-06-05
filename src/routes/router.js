@@ -1,6 +1,5 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-
 import { Editor } from "../components/Builder/Index";
 import Dashboard from "../components/Dashboard";
 import Error from "../components/Error/Error";
@@ -12,7 +11,7 @@ const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
 
         <Route
           path="/profiles"

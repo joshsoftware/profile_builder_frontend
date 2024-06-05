@@ -1,5 +1,4 @@
 import { useDispatch } from "react-redux";
-
 import { logout } from "../../api/store/authSlice";
 
 const Logout = () => {

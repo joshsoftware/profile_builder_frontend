@@ -2,7 +2,6 @@ import React from "react";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import PropTypes from "prop-types";
 
 const ProtectedRoutes = (props) => {

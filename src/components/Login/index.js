@@ -1,9 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-
 import { useGoogleLogin } from "@react-oauth/google";
-
 import { useLoginMutation } from "../../api/loginApi";
 import { login as loginAction } from "../../api/store/authSlice";
 import googleIcon from "../../assets/icons8-google-48.png";
