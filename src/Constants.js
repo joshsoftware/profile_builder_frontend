@@ -6,10 +6,8 @@ export const PROFILES = {
   external: { title: "EXTERNAL", color: "#062e38" },
 };
 
-export const API_ENDPOINTS = {
-  LOGIN: "/login",
-  PROFILES_LIST: "/api/list_profiles",
-};
+export const LOGIN_ENDPOINT = "/login";
+export const PROFILE_LIST_ENDPOINT = "/api/list_profiles";
 
 export const HTTP_METHODS = {
   POST: "POST",
