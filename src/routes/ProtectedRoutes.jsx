@@ -10,7 +10,7 @@ const ProtectedRoutes = (props) => {
   const { Component } = props;
   useEffect(() => {
     if (!token) {
-      navigate("/login");
+      navigate("/");
     }
   });
 
