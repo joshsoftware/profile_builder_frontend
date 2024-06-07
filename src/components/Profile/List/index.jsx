@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Space, Table, Tag } from "antd";
+import { Button, Input, Result, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -172,18 +172,20 @@ const ListProfiles = () => {
 
   return (
     <>
-      {isFetching && <p>Loading...</p>}
-      {error && <p>Failed to fetch list of Profile!</p>}
-      {data && !isFetching && (
+      {error && (
+        <Result status="warning" title="Failed to fetch profiles data" />
+      )}
+      {data && (
         <>
-          <h1 className={styles.heading}>
-            <span>Profiles</span>
-          </h1>
+          <Typography.Title level={1} className={styles.profile_header}>
+            Profiles
+          </Typography.Title>
           <Table
             columns={columns}
-            dataSource={data.profiles}
+            dataSource={data?.profiles}
             className={styles.table}
             bordered={true}
+            loading={isFetching}
           />
         </>
       )}
