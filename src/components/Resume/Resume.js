@@ -1,19 +1,19 @@
+/* eslint-disable */
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
-
-import styles from "./Resume.module.css";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString } from "../../utils/helpers";
+import { genderOptions, getMonthString } from "../../Constants";
+import styles from "./Resume.module.css";
 
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
   const {
-    showExperince,
-    showCertification,
-    information,
-    sections,
-    profile,
-    activeColor,
+    showExperince = {},
+    showCertification = {},
+    information = {},
+    sections = {},
+    profile = {},
+    activeColor = {},
   } = props;
   // const information = props.information;
   // const sections = props.sections;
