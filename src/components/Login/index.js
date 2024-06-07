@@ -1,6 +1,7 @@
 import React from "react";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { Button, Image, Typography } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useLoginMutation } from "../../api/loginApi";
 import { login as loginAction } from "../../api/store/authSlice";
@@ -15,7 +16,9 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       try {
         const accessToken = tokenResponse.access_token;
+        console.log("access token : ", accessToken);
         const response = await loginService(accessToken);
+
         const token = response?.data?.token;
         if (token) {
           dispatch(loginAction({ token }));
@@ -33,11 +36,11 @@ const Login = () => {
 
   return (
     <div className={styles.divStyle}>
-      <h1>Sign In With Google</h1>
-      <button className={styles.buttonStyle} onClick={() => login()}>
-        <img src={googleIcon} alt="Google Icon" />
+      <Typography.Title level={1}>Sign In With Google</Typography.Title>
+      <Button className={styles.buttonStyle} onClick={() => login()}>
+        <Image width={40} src={googleIcon} alt="Google Icon" />
         Login With Google
-      </button>
+      </Button>
     </div>
   );
 };
