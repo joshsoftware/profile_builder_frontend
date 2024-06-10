@@ -3,6 +3,7 @@ import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { PROFILES } from "../../Constants";
 import Resume from "../Resume/Resume";
 import BasicInfo from "./BasicInfo";
+import styles from "./Builder.module.css";
 import Certification from "./Certification";
 import Education from "./Education";
 import Experience from "./Experience";
@@ -79,8 +80,27 @@ export const Editor = () => {
   };
 
   return (
-    <Row>
-      <Col span={10} offset={7}>
+    <Row
+      style={{
+        display: "flex",
+        gap: "60px",
+        justifyContent: "center",
+      }}
+    >
+      <Col
+        xs={{ span: 24 }}
+        sm={{ span: 24 }}
+        md={{ span: 12 }}
+        lg={{ span: 10 }}
+        // span={10}
+        className={styles["hide-scrollbar"]}
+        style={{
+          minheight: "98vh",
+          maxHeight: "98vh",
+          overflow: "auto",
+          padding: "10px",
+        }}
+      >
         <Typography.Title
           level={2}
           style={{
@@ -129,7 +149,21 @@ export const Editor = () => {
           onChange={onChange}
         />
       </Col>
-      <Resume />;
+      <Col
+        xs={{ span: 24 }}
+        sm={{ span: 24 }}
+        md={{ span: 12 }}
+        lg={{ span: 10 }}
+        // span={10}
+        className={styles["hide-scrollbar"]}
+        style={{
+          overflow: "auto",
+          minHeight: "98vh",
+          maxHeight: "98vh",
+        }}
+      >
+        <Resume />
+      </Col>
     </Row>
   );
 };
