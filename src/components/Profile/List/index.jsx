@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Result, Space, Table, Tag, Typography } from "antd";
+import { Button, Input, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -14,11 +14,12 @@ const ListProfiles = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
-  const { data, isFetching, error } = useGetProfileListQuery();
+  const { data, isFetching } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
+
     setSearchedColumn(dataIndex);
   };
 
@@ -172,23 +173,16 @@ const ListProfiles = () => {
 
   return (
     <>
-      {error && (
-        <Result status="warning" title="Failed to fetch profiles data" />
-      )}
-      {data && (
-        <>
-          <Typography.Title level={1} className={styles.profile_header}>
-            Profiles
-          </Typography.Title>
-          <Table
-            columns={columns}
-            dataSource={data?.profiles}
-            className={styles.table}
-            bordered={true}
-            loading={isFetching}
-          />
-        </>
-      )}
+      <Typography.Title level={1} className={styles.profile_header}>
+        Profiles
+      </Typography.Title>
+      <Table
+        columns={columns}
+        dataSource={data?.profiles}
+        className={styles.table}
+        bordered={true}
+        loading={isFetching}
+      />
     </>
   );
 };
