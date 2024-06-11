@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
 
@@ -8,12 +9,12 @@ import { genderOptions, getMonthString } from "../../utils/helpers";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
   const {
-    showExperince,
-    showCertification,
-    information,
-    sections,
-    profile,
-    activeColor,
+    showExperince = {},
+    showCertification = {},
+    information = {},
+    sections = {},
+    profile = {},
+    activeColor = {}
   } = props;
   // const information = props.information;
   // const sections = props.sections;
@@ -29,7 +30,7 @@ const Resume = forwardRef((props, ref) => {
     project: information[sections.project],
     education: information[sections.education],
     skills: information[sections.skills],
-    certification: information[sections.certification],
+    certification: information[sections.certification]
   };
 
   const getFormattedDate = (value) => {
@@ -295,7 +296,7 @@ const Resume = forwardRef((props, ref) => {
           )}
         </div>
       </div>
-    ),
+    )
   };
 
   //At component mount which section of resume contains which tab details.
@@ -303,17 +304,17 @@ const Resume = forwardRef((props, ref) => {
     if (showExperince && showCertification) {
       setColumns([
         [sections.skills, sections.education, sections.certification],
-        [sections.workExp, sections.project],
+        [sections.workExp, sections.project]
       ]);
     } else if (showCertification) {
       setColumns([
         [sections.skills, sections.education, sections.certification],
-        [sections.project],
+        [sections.project]
       ]);
     } else if (showExperince) {
       setColumns([
         [sections.skills, sections.education],
-        [sections.workExp, sections.project],
+        [sections.workExp, sections.project]
       ]);
     } else {
       setColumns([[sections.skills, sections.education], [sections.project]]);

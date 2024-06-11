@@ -13,7 +13,7 @@ const Certification = () => {
   const onFinish = (values) => {
     setInitialState({
       ...initialState,
-      certifications: { ...initialState.certifications, ...values },
+      certifications: { ...initialState.certifications, ...values }
     });
 
     post(ROUTES.profile, initialState);
@@ -24,7 +24,7 @@ const Certification = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      certifications: {},
+      certifications: {}
     });
   };
 
@@ -45,7 +45,7 @@ const Certification = () => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
-                <Row>
+                <Row key={key}>
                   <Col span={22}>
                     <Form.Item
                       {...restField}
@@ -53,8 +53,8 @@ const Certification = () => {
                       rules={[
                         {
                           required: true,
-                          message: "Certifications can not be blank",
-                        },
+                          message: "Certifications can not be blank"
+                        }
                       ]}
                     >
                       <Input placeholder={`Certificate ${key + 1}`} />

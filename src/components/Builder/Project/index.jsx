@@ -7,7 +7,7 @@ import {
   Input,
   Row,
   Space,
-  Typography,
+  Typography
 } from "antd";
 import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 
@@ -24,7 +24,7 @@ const Project = () => {
   const onFinish = (values) => {
     setInitialState({
       ...initialState,
-      projects: { ...initialState.projects, ...values },
+      projects: { ...initialState.projects, ...values }
     });
 
     post(ROUTES.profile, initialState);
@@ -35,7 +35,7 @@ const Project = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      projects: {},
+      projects: {}
     });
   };
 
@@ -53,8 +53,8 @@ const Project = () => {
           rules={[
             {
               required: true,
-              message: "Profile name can not be blank",
-            },
+              message: "Profile name can not be blank"
+            }
           ]}
         >
           <Input placeholder="Enter project name" />
@@ -65,7 +65,7 @@ const Project = () => {
           rules={[
             {
               required: true,
-              message: "Profile duration can not be blank",
+              message: "Profile duration can not be blank"
             },
             ({ getFieldValue }) => ({
               validator(_, value) {
@@ -75,8 +75,8 @@ const Project = () => {
                 return Promise.reject(
                   new Error("Maximum duration is 10 years.")
                 );
-              },
-            }),
+              }
+            })
           ]}
         >
           <Input type="number" placeholder="Ex. 6 Months, etc" />
@@ -87,8 +87,8 @@ const Project = () => {
           rules={[
             {
               required: true,
-              message: "Profile overview can not be blank",
-            },
+              message: "Profile overview can not be blank"
+            }
           ]}
         >
           <Input.TextArea
@@ -106,7 +106,7 @@ const Project = () => {
           {(fields, { add, remove }) => (
             <>
               {fields.map(({ key, name, ...restField }) => (
-                <Row>
+                <Row key={key}>
                   <Col span={22}>
                     <Form.Item
                       {...restField}
@@ -114,8 +114,8 @@ const Project = () => {
                       rules={[
                         {
                           required: true,
-                          message: "Responsibility can not be blank",
-                        },
+                          message: "Responsibility can not be blank"
+                        }
                       ]}
                     >
                       <Input placeholder={`Responsibility ${key + 1}`} />
@@ -152,8 +152,8 @@ const Project = () => {
               rules={[
                 {
                   required: true,
-                  message: "Start date can not be blank",
-                },
+                  message: "Start date can not be blank"
+                }
               ]}
             >
               <DatePicker style={{ width: "100%" }} />
@@ -166,8 +166,8 @@ const Project = () => {
               rules={[
                 {
                   required: true,
-                  message: "End date can not be blank",
-                },
+                  message: "End date can not be blank"
+                }
               ]}
             >
               <DatePicker style={{ width: "100%" }} />
@@ -181,8 +181,8 @@ const Project = () => {
           rules={[
             {
               required: true,
-              message: "Project technology required",
-            },
+              message: "Project technology required"
+            }
           ]}
         >
           <Input placeholder="Project Technology" />
@@ -193,8 +193,8 @@ const Project = () => {
           rules={[
             {
               required: true,
-              message: "Worked technology required",
-            },
+              message: "Worked technology required"
+            }
           ]}
         >
           <Input placeholder="Technology Used" />

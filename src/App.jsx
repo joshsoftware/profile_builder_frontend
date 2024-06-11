@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { ResumeContext } from "./utils/ResumeContext";
 import "./App.css";
 import Router from "./routes/router";
@@ -12,7 +12,7 @@ const App = () => {
     skills: [],
     education: [],
     workExperience: [],
-    certifications: [],
+    certifications: []
   });
 
   return (
