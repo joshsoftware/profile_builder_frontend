@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { PROFILES } from "../../Constants";
 import Resume from "../Resume/Resume";
@@ -14,40 +14,42 @@ const defaultPanes = [
   {
     key: "basic-info",
     label: <b>Basic Info</b>,
-    children: <BasicInfo />,
+    children: <BasicInfo />
   },
   {
     key: "projects",
     label: <b>Projects</b>,
-    children: <Project />,
+    children: <Project />
   },
   {
     key: "education",
     label: <b>Education</b>,
-    children: <Education />,
+    children: <Education />
   },
   {
     key: "skills",
     label: <b>Skills</b>,
-    children: <Skills />,
-  },
+    children: <Skills />
+  }
 ];
 
 const experience = {
   key: "experience",
   label: <b>Experience</b>,
-  children: <Experience />,
+  children: <Experience />
 };
 
 const certification = {
   key: "certification",
   label: <b>Certification</b>,
-  children: <Certification />,
+  children: <Certification />
 };
 
 export const Editor = () => {
   const [items, setItems] = useState(defaultPanes);
   const [profile, setProfile] = useState(PROFILES.internal);
+
+  const resumeRef = useRef();
 
   const onChange = (key) => {
     console.log(key);
@@ -83,8 +85,8 @@ export const Editor = () => {
     <Row
       style={{
         display: "flex",
-        gap: "60px",
-        justifyContent: "center",
+        gap: "5%",
+        justifyContent: "center"
       }}
     >
       <Col
@@ -92,13 +94,12 @@ export const Editor = () => {
         sm={{ span: 24 }}
         md={{ span: 12 }}
         lg={{ span: 10 }}
-        // span={10}
         className={styles["hide-scrollbar"]}
         style={{
           minheight: "98vh",
           maxHeight: "98vh",
           overflow: "auto",
-          padding: "10px",
+          padding: "10px"
         }}
       >
         <Typography.Title
@@ -106,7 +107,7 @@ export const Editor = () => {
           style={{
             display: "flex",
             justifyContent: "center",
-            marginTop: "10px",
+            marginTop: "10px"
           }}
         >
           Resume Builder
@@ -154,15 +155,14 @@ export const Editor = () => {
         sm={{ span: 24 }}
         md={{ span: 12 }}
         lg={{ span: 10 }}
-        // span={10}
         className={styles["hide-scrollbar"]}
         style={{
           overflow: "auto",
           minHeight: "98vh",
-          maxHeight: "98vh",
+          maxHeight: "98vh"
         }}
       >
-        <Resume />
+        <Resume ref={resumeRef} />
       </Col>
     </Row>
   );
