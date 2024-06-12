@@ -16,9 +16,7 @@ const Login = () => {
     onSuccess: async (tokenResponse) => {
       try {
         const accessToken = tokenResponse.access_token;
-        console.log("access token : ", accessToken);
         const response = await loginService(accessToken);
-
         const token = response?.data?.token;
         if (token) {
           dispatch(loginAction({ token }));
@@ -31,7 +29,7 @@ const Login = () => {
     },
     onError: (errorResponse) => {
       throw new Error(errorResponse.error);
-    },
+    }
   });
 
   return (

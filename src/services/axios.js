@@ -4,8 +4,8 @@ import store from "../api/store/store";
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: {
-    "Content-Type": "application/json",
-  },
+    "Content-Type": "application/json"
+  }
 });
 
 axiosInstance.interceptors.request.use(
@@ -15,8 +15,6 @@ axiosInstance.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
-    console.log("Token in response interceptor : ", token);
-    console.log("Config : ", config);
     return config;
   },
   (error) => {
@@ -26,7 +24,6 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => {
-    console.log("response in interceptor : ", response);
     return response;
   },
   (error) => {
