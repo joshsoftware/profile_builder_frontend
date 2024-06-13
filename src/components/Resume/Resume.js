@@ -1,19 +1,17 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
-
-import styles from "./Resume.module.css";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString } from "../../utils/helpers";
-
+import { genderOptions, getMonthString } from "../../Constants";
+import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
   const {
-    showExperince,
-    showCertification,
-    information,
-    sections,
-    profile,
-    activeColor,
+    showExperince = {},
+    showCertification = {},
+    information = {},
+    sections = {},
+    profile = {},
+    activeColor = {}
   } = props;
   // const information = props.information;
   // const sections = props.sections;
@@ -29,7 +27,7 @@ const Resume = forwardRef((props, ref) => {
     project: information[sections.project],
     education: information[sections.education],
     skills: information[sections.skills],
-    certification: information[sections.certification],
+    certification: information[sections.certification]
   };
 
   const getFormattedDate = (value) => {
@@ -46,7 +44,9 @@ const Resume = forwardRef((props, ref) => {
       todayDate.getFullYear() === givenYear
     ) {
       return "Present";
-    } else return `${givenDate}/${givenMonth}/${givenYear}`;
+    } else {
+      return `${givenDate}/${givenMonth}/${givenYear}`;
+    }
   };
 
   const getPassingYear = (value) => {
@@ -59,7 +59,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getMonthYear = (value) => {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
     const date = new Date(value);
     const currDate = new Date();
 
@@ -130,7 +132,7 @@ const Resume = forwardRef((props, ref) => {
         <div className={styles.sectionTitle}>{info?.project?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.project?.details?.map((item) => (
-            <div className={styles.item}>
+            <div className={styles.item} key={"key"}>
               {item?.projectName ? (
                 <h2 className={styles.title}>
                   <b className={styles.underline}>{item.projectName}</b>
@@ -217,7 +219,7 @@ const Resume = forwardRef((props, ref) => {
         </div>
         <div className={styles.content}>
           {info?.education?.details?.map((item) => (
-            <div className={styles.educationItem}>
+            <div className={styles.educationItem} key={item.id}>
               {item.educationTitle ? (
                 <p className={styles.subtitleHeading}>{item.educationTitle}</p>
               ) : (
@@ -295,7 +297,7 @@ const Resume = forwardRef((props, ref) => {
           )}
         </div>
       </div>
-    ),
+    )
   };
 
   //At component mount which section of resume contains which tab details.
@@ -303,17 +305,17 @@ const Resume = forwardRef((props, ref) => {
     if (showExperince && showCertification) {
       setColumns([
         [sections.skills, sections.education, sections.certification],
-        [sections.workExp, sections.project],
+        [sections.workExp, sections.project]
       ]);
     } else if (showCertification) {
       setColumns([
         [sections.skills, sections.education, sections.certification],
-        [sections.project],
+        [sections.project]
       ]);
     } else if (showExperince) {
       setColumns([
         [sections.skills, sections.education],
-        [sections.workExp, sections.project],
+        [sections.workExp, sections.project]
       ]);
     } else {
       setColumns([[sections.skills, sections.education], [sections.project]]);
@@ -387,4 +389,5 @@ const Resume = forwardRef((props, ref) => {
   );
 });
 
+Resume.displayName = "Resume";
 export default Resume;

@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { ResumeContext } from "./utils/ResumeContext";
-import "./App.css";
-import Router from "./routes/router";
+import React, { useState } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import Router from "./routes/router";
+import { ResumeContext } from "./utils/ResumeContext";
+
+import "./App.css";
 
 const App = () => {
   const queryClient = new QueryClient();

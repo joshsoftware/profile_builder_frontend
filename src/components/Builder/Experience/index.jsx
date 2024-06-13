@@ -10,8 +10,8 @@ import {
   Select,
   Space,
 } from "antd";
-import { ResumeContext } from "../../../utils/ResumeContext";
 import { DESIGNATION } from "../../../Constants";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Experience = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);
