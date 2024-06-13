@@ -1,11 +1,9 @@
 /* eslint-disable */
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
-
-import styles from "./Resume.module.css";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString } from "../../utils/helpers";
-
+import { genderOptions, getMonthString } from "../../Constants";
+import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
   const {
@@ -47,7 +45,9 @@ const Resume = forwardRef((props, ref) => {
       todayDate.getFullYear() === givenYear
     ) {
       return "Present";
-    } else return `${givenDate}/${givenMonth}/${givenYear}`;
+    } else {
+      return `${givenDate}/${givenMonth}/${givenYear}`;
+    }
   };
 
   const getPassingYear = (value) => {
@@ -60,7 +60,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getMonthYear = (value) => {
-    if (!value) return;
+    if (!value) {
+      return;
+    }
     const date = new Date(value);
     const currDate = new Date();
 
@@ -131,7 +133,7 @@ const Resume = forwardRef((props, ref) => {
         <div className={styles.sectionTitle}>{info?.project?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.project?.details?.map((item) => (
-            <div className={styles.item}>
+            <div className={styles.item} key={"key"}>
               {item?.projectName ? (
                 <h2 className={styles.title}>
                   <b className={styles.underline}>{item.projectName}</b>
@@ -218,7 +220,7 @@ const Resume = forwardRef((props, ref) => {
         </div>
         <div className={styles.content}>
           {info?.education?.details?.map((item) => (
-            <div className={styles.educationItem}>
+            <div className={styles.educationItem} key={item.id}>
               {item.educationTitle ? (
                 <p className={styles.subtitleHeading}>{item.educationTitle}</p>
               ) : (
@@ -388,4 +390,5 @@ const Resume = forwardRef((props, ref) => {
   );
 });
 
+Resume.displayName = "Resume";
 export default Resume;

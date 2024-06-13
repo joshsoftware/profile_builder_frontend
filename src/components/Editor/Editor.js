@@ -1,16 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-
-import styles from "./Editor.module.css";
-import style from "../InputControl/InputControl.module.css";
-import InputControl from "../InputControl/InputControl";
-
-import { PlusCircle, X } from "react-feather";
-import TextAreaControl from "../InputControl/TextAreaControl";
-import { isFieldInValid } from "../../helpers";
-import SelectControl from "../InputControl/SelectControl";
-import { genderOptions, skillsOptions } from "../../utils/helpers";
 import DatePicker from "react-datepicker";
+import { PlusCircle, X } from "react-feather";
 import CreatableSelect from "react-select/creatable";
+import { isFieldInValid } from "../../helpers";
+import { genderOptions, skillsOptions } from "../../utils/helpers";
+import InputControl from "../InputControl/InputControl";
+import style from "../InputControl/InputControl.module.css";
+import SelectControl from "../InputControl/SelectControl";
+import TextAreaControl from "../InputControl/TextAreaControl";
+import styles from "./Editor.module.css";
 
 const components = {
   DropdownIndicator: null,
@@ -75,14 +73,14 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     }));
 
     if (values.points.length !== 0)
-      setErrorMessage((prev) => ({
+      {setErrorMessage((prev) => ({
         ...prev,
         points: "",
-      }));
+      }));}
   }, [value, setValue, primarySkills]);
 
   const handleKeyDown = (event) => {
-    if (!inputValue) return;
+    if (!inputValue) {return;}
     switch (event.key) {
       case "Enter":
       case "Tab":
@@ -201,7 +199,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   useEffect(() => {
     const details = activeInformation?.details;
-    if (!details) return;
+    if (!details) {return;}
 
     const activeInfo = information[sections[activeSectionKey]];
 
@@ -659,7 +657,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         )}
 
         {values?.points?.map((data, index) => (
-          <div className={styles.pointsContainer}>
+          <div key={index} className={styles.pointsContainer}>
             <InputControl
               placeholder={`Line ${index + 1}`}
               value={data}
@@ -917,7 +915,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           <span></span>
         )}
         {values?.points?.map((data, index) => (
-          <div className={styles.pointsContainer}>
+          <div key={index} className={styles.pointsContainer}>
             <InputControl
               placeholder={`Line ${index + 1}`}
               value={data}
@@ -991,7 +989,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           values.profile === "" ||
           values.experienceInYear === ""
         )
-          return;
+          {return;}
 
         const tempDetail = {
           name: values.name,
@@ -1064,7 +1062,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           values.startDate === "" ||
           values.endDate === ""
         )
-          return;
+          {return;}
 
         const tempDetail = {
           startDate: values?.startDate,
@@ -1141,7 +1139,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
           values.workedProjectTech === "" ||
           values.points.length === 0
         )
-          return;
+          {return;}
 
         const filteredPoints = values.points.filter(
           (item) => item.length !== 0
@@ -1233,7 +1231,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
         break;
       }
       case sections.certification: {
-        if (values.points.length === 0) return;
+        if (values.points.length === 0) {return;}
 
         const filteredPoints = values.points.filter(
           (item) => item.length !== 0
@@ -1274,10 +1272,10 @@ const Editor = ({ sections, information, setInformation, profile }) => {
 
   const handleAddNew = () => {
     const details = activeInformation.details;
-    if (!details) return;
+    if (!details) {return;}
     const lastDetail = details?.slice(-1)[0];
     //if last experience is not added then he would not be able to create new.
-    if (!Object.keys(lastDetail).length) return;
+    if (!Object.keys(lastDetail).length) {return;}
     details?.push({});
     setInformation((prev) => ({
       ...prev,
@@ -1293,7 +1291,7 @@ const Editor = ({ sections, information, setInformation, profile }) => {
     const details = activeInformation?.details
       ? [...activeInformation.details]
       : "";
-    if (!details) return;
+    if (!details) {return;}
     details.splice(index, 1);
     setInformation((prev) => ({
       ...prev,

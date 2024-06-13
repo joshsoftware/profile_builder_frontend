@@ -6,6 +6,15 @@ export const PROFILES = {
   external: { title: "EXTERNAL", color: "#062e38" },
 };
 
+export const LOGIN_ENDPOINT = "/login";
+export const PROFILE_LIST_ENDPOINT = "/api/list_profiles";
+
+export const HTTP_METHODS = {
+  POST: "POST",
+  GET: "GET",
+  PUT: "PUT",
+};
+
 export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },

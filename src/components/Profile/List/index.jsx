@@ -1,13 +1,12 @@
 import React, { useRef, useState } from "react";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { Button, Input, Space, Skeleton, Table, Tag } from "antd";
 import Highlighter from "react-highlight-words";
-import { useQuery } from "@tanstack/react-query";
-import { get } from "../../../services/axios";
+import { Button, Input, Space, Table, Tag, Typography } from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined,
+} from "@ant-design/icons";
+import { useGetProfileListQuery } from "../../../api/profileApi";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
@@ -15,9 +14,12 @@ const ListProfiles = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
 
+  const { data, isFetching } = useGetProfileListQuery();
+
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
+
     setSearchedColumn(dataIndex);
   };
 
@@ -102,18 +104,6 @@ const ListProfiles = () => {
       ),
   });
 
-  const { isFetching, data, error } = useQuery({
-    queryKey: ["data"],
-    queryFn: async () => {
-      try {
-        const response = await get(`/list_profiles`);
-        return response.data.profiles;
-      } catch (error) {
-        return error;
-      }
-    },
-  });
-
   const columns = [
     {
       title: "Name",
@@ -183,21 +173,16 @@ const ListProfiles = () => {
 
   return (
     <>
-      {isFetching && <Skeleton active />}
-      {error && <p>Failed to fetch list of Profile!</p>}
-      {data && !isFetching && (
-        <>
-          <h1 className={styles.heading}>
-            <span>List of Profiles</span>
-          </h1>
-          <Table
-            columns={columns}
-            dataSource={data}
-            className={styles.table}
-            bordered={true}
-          />
-        </>
-      )}
+      <Typography.Title level={1} className={styles.profile_header}>
+        Profiles
+      </Typography.Title>
+      <Table
+        columns={columns}
+        dataSource={data?.profiles}
+        className={styles.table}
+        bordered={true}
+        loading={isFetching}
+      />
     </>
   );
 };

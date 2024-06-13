@@ -3,9 +3,10 @@
   padding-right: 70px;
 }
 
-.heading span {
+.profile_header {
   background-clip: text;
   background-image: linear-gradient(to right, #239ce2, #1369b9);
   color: transparent;
   padding-left: 20px;
 }
+
