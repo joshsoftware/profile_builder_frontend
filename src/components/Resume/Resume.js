@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 import { genderOptions, getMonthString } from "../../Constants";
+import jsonData from "./jsonData.json";
 import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
@@ -12,7 +13,7 @@ const Resume = forwardRef((props, ref) => {
     sections = {},
     profile = {},
     activeColor = {}
-  } = props;
+  } = jsonData;
   // const information = props.information;
   // const sections = props.sections;
   // const profile = props.profile;
@@ -31,7 +32,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getFormattedDate = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
     const todayDate = new Date();
 
@@ -50,7 +53,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getPassingYear = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
 
     const givenYear = date.getFullYear();
@@ -327,7 +332,9 @@ const Resume = forwardRef((props, ref) => {
   useEffect(() => {
     //to get that container div in which --color property to be changed.
     const container = containerRef.current;
-    if (!activeColor || !container) return;
+    if (!activeColor || !container) {
+      return;
+    }
 
     container.style.setProperty("--color", activeColor);
   }, [activeColor]);
