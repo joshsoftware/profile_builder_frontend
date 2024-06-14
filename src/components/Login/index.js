@@ -21,7 +21,7 @@ const Login = () => {
         if (token) {
           dispatch(loginAction({ token }));
           window.localStorage.setItem("token", token);
-          navigate("/dashboard");
+          navigate("/profiles");
         }
       } catch (error) {
         throw new Error(error);
