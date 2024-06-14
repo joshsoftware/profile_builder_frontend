@@ -1,10 +1,26 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Calendar } from "react-feather";
+import { Link } from "react-router-dom";
+import { useReactToPrint } from "react-to-print";
+import { Button } from "antd";
+import {
+  CalendarOutlined,
+  CaretRightOutlined,
+  DownloadOutlined,
+  GithubOutlined,
+  LinkedinOutlined,
+  MailOutlined,
+  MobileOutlined
+} from "@ant-design/icons";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString } from "../../Constants";
+import { getMonthString } from "../../Constants";
+import jsonData from "./jsonData.json";
 import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
+  const hadlePrint = useReactToPrint({
+    content: () => ref.current
+  });
+
   const {
     showExperince = {},
     showCertification = {},
@@ -12,7 +28,7 @@ const Resume = forwardRef((props, ref) => {
     sections = {},
     profile = {},
     activeColor = {}
-  } = props;
+  } = jsonData;
   // const information = props.information;
   // const sections = props.sections;
   // const profile = props.profile;
@@ -22,16 +38,19 @@ const Resume = forwardRef((props, ref) => {
   const [columns, setColumns] = useState([[], []]);
 
   const info = {
-    basicInfo: information[sections.basicInfo],
+    profile: information[sections.profile],
     workExp: information[sections.workExp],
     project: information[sections.project],
     education: information[sections.education],
     skills: information[sections.skills],
-    certification: information[sections.certification]
+    certification: information[sections.certification],
+    achievements: information[sections.achievements]
   };
 
   const getFormattedDate = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
     const todayDate = new Date();
 
@@ -50,7 +69,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getPassingYear = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
 
     const givenYear = date.getFullYear();
@@ -86,37 +107,38 @@ const Resume = forwardRef((props, ref) => {
           info.workExp?.sectionTitle ? "" : styles.hidden
         } `}
       >
+        <div className={styles.separateRight}></div>
         <div className={styles.sectionTitle}>{info.workExp?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.workExp?.details?.map((item) => (
-            <div className={styles.item} key={item.title}>
-              {item?.role || item?.companyName ? (
-                <div className={styles.title}>{item.role}</div>
+            <div className={styles.item} key={item.id}>
+              {item?.designation || item?.company_name ? (
+                <div className={styles.title}>{item.designation}</div>
               ) : (
                 <span />
               )}
 
-              {item?.companyName ? (
+              {item?.company_name ? (
                 <div className={styles.date}>
-                  <span className={styles.subtitle}>{item.companyName}</span>
-                  | <Calendar /> {getMonthYear(item.startDate)} -
-                  {getMonthYear(item.endDate)}
+                  <span className={styles.subtitle}>{item.company_name}</span>
+                  | <CalendarOutlined /> {getMonthYear(item.from_date)} -
+                  {getMonthYear(item.to_date)}
                 </div>
               ) : (
                 <span />
               )}
 
-              {item?.points?.length > 0 ? (
-                <ul className={styles.points}>
-                  {item.points?.map((elem, index) => (
-                    <li className={styles.point} key={elem + index}>
-                      {elem}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <span />
-              )}
+              {/* {item?.points?.length > 0 ? (
+                  <ul className={styles.points}>
+                    {item.points?.map((elem, index) => (
+                      <li className={styles.point} key={elem + index}>
+                        {elem}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span />
+                )} */}
             </div>
           ))}
         </div>
@@ -129,17 +151,18 @@ const Resume = forwardRef((props, ref) => {
           info.project?.sectionTitle ? "" : styles.hidden
         }`}
       >
+        <div className={styles.separateRight}></div>
         <div className={styles.sectionTitle}>{info?.project?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.project?.details?.map((item) => (
-            <div className={styles.item} key={"key"}>
-              {item?.projectName ? (
+            <div className={styles.item} key={item.id}>
+              {item?.name ? (
                 <h2 className={styles.title}>
-                  <b className={styles.underline}>{item.projectName}</b>
-                  {item?.projectStartDate && item?.projectEndDate ? (
+                  <b className={styles.underline}>{item.name}</b>
+                  {item?.working_start_date && item?.working_end_date ? (
                     <span className="px-2">
-                      | {getMonthYear(item.projectStartDate)} To
-                      {getMonthYear(item.projectEndDate)}
+                      | {getMonthYear(item.working_start_date)} -
+                      {getMonthYear(item.working_end_date)}
                     </span>
                   ) : (
                     <span />
@@ -149,55 +172,74 @@ const Resume = forwardRef((props, ref) => {
                 <span />
               )}
 
-              {item?.projectDuration ? (
+              {item?.duration ? (
                 <span className={styles.duration}>
-                  <b className={styles.title}>Duration : </b>
-                  {item.projectDuration}
+                  <b className={styles.overview}>Duration : </b>
+                  {item.duration}
                 </span>
               ) : (
                 <span />
               )}
 
-              {item?.overview ? (
+              {item?.description ? (
                 <div>
-                  <h6>
-                    <b>Project Description</b>
-                  </h6>
-                  <p className={styles.overview}>{item.overview} </p>
+                  <span className={styles.duration}>
+                    <b className={styles.overview}>Project Description : </b>
+                    {item.description}
+                  </span>
+                  {/* <p className={styles.overview}>{item.description} </p> */}
                 </div>
               ) : (
                 <span />
               )}
 
-              {item?.points?.length > 0 ? (
-                <div>
-                  <h6>
-                    <b>Roles and Responsibility :</b>{" "}
-                  </h6>
-                  <ul className={styles.projectPoints}>
-                    {item.points?.map((elem, index) => (
-                      <li className={styles.point} key={elem + index}>
-                        {elem}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              {/* {item?.points?.length > 0 ? (
+                  <div>
+                    <h6>
+                      <b>Roles and Responsibility :</b>{" "}
+                    </h6>
+                    <ul className={styles.projectPoints}>
+                      {item.points?.map((elem, index) => (
+                        <li className={styles.point} key={elem + index}>
+                          {elem}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : (
+                  <span />
+                )} */}
+
+              {item?.role ? (
+                <span className={styles.duration}>
+                  <b className={styles.overview}>Role : </b>
+                  {item.role}
+                </span>
               ) : (
                 <span />
               )}
-              {item?.technology ? (
-                <p className={styles.overview}>
-                  <b>Project Techstack : </b>
-                  {item.technology}
-                </p>
+              {item?.responsibilities ? (
+                <span className={styles.duration}>
+                  <b className={styles.overview}>Responsibility : </b>
+                  {item.responsibilities}
+                </span>
               ) : (
                 <span />
               )}
-              {item?.workedProjectTech ? (
-                <p className={styles.overview}>
-                  <b>My Contribution : </b>
-                  {item.workedProjectTech}
-                </p>
+
+              {item?.technologies ? (
+                <span className={styles.duration}>
+                  <b className={styles.overview}>Project Techstack : </b>
+                  {item.technologies}
+                </span>
+              ) : (
+                <span />
+              )}
+              {item?.tech_worked_on ? (
+                <span className={styles.duration}>
+                  <b className={styles.overview}>My Contribution : </b>
+                  {item.tech_worked_on}
+                </span>
               ) : (
                 <span />
               )}
@@ -206,12 +248,34 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
+    [sections.achievements]: (
+      <div
+        key={"achievements"}
+        className={`${styles.section} ${
+          info.achievements?.sectionTitle ? "" : styles.hidden
+        }`}
+      >
+        <div className={styles.separate}></div>
+        <div className={`${styles.leftSection} pt-2`}>
+          {info.achievements?.sectionTitle}
+        </div>
+        <div className={styles.title} style={{ textAlign: "right" }}>
+          <ul className={styles.achievement}>
+            {info?.achievements?.details?.map((item) => (
+              <li key={item.id}>
+                {item?.name ? <span>• {item.name}</span> : <span />}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    ),
     [sections.education]: (
       <div
         key={"education"}
-        className={`${styles.section} ${
+        className={`${styles.section} pb-2 ${
           info.education?.sectionTitle ? "" : styles.hidden
-        } pt-3`}
+        } `}
       >
         <div className={styles.separate}></div>
         <div className={`${styles.leftSection} pt-2`}>
@@ -220,26 +284,28 @@ const Resume = forwardRef((props, ref) => {
         <div className={styles.content}>
           {info?.education?.details?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
-              {item.educationTitle ? (
-                <p className={styles.subtitleHeading}>{item.educationTitle}</p>
+              {item.degree ? (
+                <p className={styles.subtitleHeading}>{item.degree}</p>
               ) : (
                 <span />
               )}
-              {item.college ? (
-                <div className={styles.subtitle}>{item.college}</div>
+              {item.university_name || item.place ? (
+                <div className={styles.subtitle}>
+                  {item.university_name} , {item.place}
+                </div>
               ) : (
                 <span />
               )}
-              {item.passOutDate ? (
+              {item.passing_year ? (
                 <div className={styles.passingDate}>
-                  Passing Year : {item.passOutDate.getFullYear()}
+                  Passing Year : {new Date(item.passing_year).getFullYear()}
                 </div>
               ) : (
                 ""
               )}
-              {item.grade ? (
+              {item.percent_or_cgpa ? (
                 <div className={styles.passingDate}>
-                  CGPA / Percentage : {item.grade}
+                  CGPA / Percentage : {item.percent_or_cgpa}
                 </div>
               ) : (
                 ""
@@ -259,7 +325,7 @@ const Resume = forwardRef((props, ref) => {
         <div className={styles.leftSection}>{info.skills?.sectionTitle}</div>
         <div className={styles.content}>
           {info?.skills?.points?.length > 0 ? (
-            <ul className={styles.numbered}>
+            <ul className={styles.skillNumbered}>
               {info.skills?.points?.map((elem, index) => (
                 <li className={styles.point} key={elem + index}>
                   {elem}
@@ -272,6 +338,7 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
+
     [sections.certification]: (
       <div
         key={"certification"}
@@ -284,17 +351,35 @@ const Resume = forwardRef((props, ref) => {
           {info.certification?.sectionTitle}
         </div>
         <div className={styles.content}>
-          {info?.certification?.points?.length > 0 ? (
-            <ul className={styles.numbered}>
-              {info.certification?.points?.map((elem, index) => (
-                <li className={styles.point} key={elem + index}>
-                  {elem}
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <span />
-          )}
+          {info?.certification?.details?.map((item) => (
+            <div className={styles.educationItem} key={item.id}>
+              {item.name ? (
+                <p className={styles.subtitleHeading}>{item.name}</p>
+              ) : (
+                <span />
+              )}
+              {item.organization_name ? (
+                <div className={styles.subtitle}>{item.organization_name}</div>
+              ) : (
+                <span />
+              )}
+              {item.issued_date ? (
+                <div className={styles.passingDate}>
+                  Issue Date : {item.issued_date}
+                </div>
+              ) : (
+                ""
+              )}
+              {/* {item?.description ? (
+                  <div>
+                    <b>Description : </b>
+                    <p className={styles.overview}>{item.description} </p>
+                  </div>
+                ) : (
+                  <span />
+                )} */}
+            </div>
+          ))}
         </div>
       </div>
     )
@@ -304,30 +389,42 @@ const Resume = forwardRef((props, ref) => {
   useEffect(() => {
     if (showExperince && showCertification) {
       setColumns([
-        [sections.skills, sections.education, sections.certification],
+        [
+          sections.skills,
+          sections.education,
+          sections.certification,
+          sections.achievements
+        ],
         [sections.workExp, sections.project]
       ]);
     } else if (showCertification) {
       setColumns([
-        [sections.skills, sections.education, sections.certification],
+        [
+          sections.skills,
+          sections.education,
+          sections.certification,
+          sections.achievements
+        ],
         [sections.project]
       ]);
     } else if (showExperince) {
       setColumns([
-        [sections.skills, sections.education],
+        [sections.skills, sections.education, sections.achievements],
         [sections.workExp, sections.project]
       ]);
     } else {
       setColumns([[sections.skills, sections.education], [sections.project]]);
     }
-  }, [profile, information]);
+  }, []);
 
   //Whenever active colour changes from Body component then this effect
   // will be called.
   useEffect(() => {
     //to get that container div in which --color property to be changed.
     const container = containerRef.current;
-    if (!activeColor || !container) return;
+    if (!activeColor || !container) {
+      return;
+    }
 
     container.style.setProperty("--color", activeColor);
   }, [activeColor]);
@@ -337,55 +434,89 @@ const Resume = forwardRef((props, ref) => {
   };
 
   return (
-    // Passing to be print content ref to reacttopdf component.
-    <div ref={ref}>
-      <style>{getPageMargins()}</style>
-      {/* No we have to change color of text so we are taking container ref.
-      to do so we have to modify --color property in styles. */}
-      <div ref={containerRef} className={styles.container}>
-        <div className={styles.header}>
-          <p className={styles.heading}>{info.basicInfo?.detail?.name}</p>
-          <div className={styles.subHeading}>
-            {info.basicInfo?.detail?.title}
-            {info.basicInfo?.detail?.gender && (
-              <span className="px-2">({info.basicInfo?.detail?.gender})</span>
-            )}
-          </div>
-          <div className={styles.experienceHeading}>
-            {info.basicInfo?.detail?.experienceInYear}
-            <span> Year of Experience</span>
-          </div>
-          <img
-            src={joshImage}
-            alt="Not Found"
-            width={250}
-            height={180}
-            className={styles.logo}
-          />
-        </div>
-
-        <div className="container">
-          <div className="row pr-2">
-            <div className={`col-4 pb-5 ${styles.middleSeparatorLine}`}>
-              {columns[0].map((item) => sectionDiv[item])}
+    // Passing to be print content ref to reacttopdf component
+    <>
+      <Button
+        onClick={hadlePrint}
+        type="primary"
+        icon={<DownloadOutlined />}
+        style={{ margin: "10px" }}
+      >
+        Download
+      </Button>
+      <div ref={ref}>
+        <style>{getPageMargins()}</style>
+        {/* No we have to change color of text so we are taking container ref.
+        to do so we have to modify --color property in styles. */}
+        <div ref={containerRef} className={styles.container}>
+          <div className={styles.header}>
+            <p className={styles.heading}>{info.profile?.detail?.name}</p>
+            <div className={styles.subHeading}>
+              {info.profile?.detail?.designation}
+              {info.profile?.detail?.gender && (
+                <span className="px-2">({info.profile?.detail?.gender})</span>
+              )}
             </div>
-            <div className="col-8 mr-5">
+            <div className={styles.experienceHeading}>
               <div>
-                <h4>
-                  <b className={`${styles.paddingLeft} ${styles.sectionTitle}`}>
-                    Profile
-                  </b>
-                </h4>
+                <CaretRightOutlined />{" "}
+                {info.profile?.detail?.years_of_experience}
+                <span> Year of Experience</span>
               </div>
-              <div className={`${styles.profiledetails} pb-3`}>
-                {info.basicInfo?.detail?.profile}
+              <div>
+                <MailOutlined /> {info.profile?.detail?.email}
               </div>
-              {columns[1].map((item) => sectionDiv[item])}
+              {info.profile?.detail?.mobile && (
+                <div>
+                  <MobileOutlined /> {info.profile?.detail?.mobile}
+                </div>
+              )}
+
+              <div className={styles.socialLink}>
+                <GithubOutlined />{" "}
+                <Link target="_blank" to={info.profile?.detail?.github_link}>
+                  GitHub
+                </Link>{" "}
+                <LinkedinOutlined />{" "}
+                <Link target="_blank" to={info.profile?.detail?.linkedin_link}>
+                  LinkedIn
+                </Link>
+              </div>
+            </div>
+            <img
+              src={joshImage}
+              alt="Not Found"
+              width={250}
+              height={180}
+              className={styles.logo}
+            />
+          </div>
+
+          <div className="container">
+            <div className="row pr-2">
+              <div className={`col-4 pb-5 ${styles.middleSeparatorLine}`}>
+                {columns[0].map((item) => sectionDiv[item])}
+              </div>
+              <div className="col-8 mr-5">
+                <div>
+                  <h4>
+                    <b
+                      className={`${styles.paddingLeft} ${styles.sectionTitle}`}
+                    >
+                      Profile
+                    </b>
+                  </h4>
+                </div>
+                <div className={`${styles.profiledetails} pb-3`}>
+                  {info.profile?.detail?.description}
+                </div>
+                {columns[1].map((item) => sectionDiv[item])}
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 });
 
