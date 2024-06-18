@@ -102,7 +102,8 @@ export const Editor = () => {
             minheight: "98vh",
             maxHeight: "98vh",
             overflow: "auto",
-            padding: "10px"
+            padding: "10px",
+            top: "3rem"
           }}
         >
           <Typography.Title
@@ -162,7 +163,8 @@ export const Editor = () => {
           style={{
             overflow: "auto",
             minHeight: "98vh",
-            maxHeight: "98vh"
+            maxHeight: "98vh",
+            top: "4rem"
           }}
         >
           <Resume ref={resumeRef} />
