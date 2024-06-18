@@ -17,36 +17,11 @@ import jsonData from "./jsonData.json";
 import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {
+  const containerRef = useRef();
+  const [columns, setColumns] = useState([[], []]);
   const hadlePrint = useReactToPrint({
     content: () => ref.current
   });
-
-  const {
-    showExperince = {},
-    showCertification = {},
-    information = {},
-    sections = {},
-    profile = {},
-    activeColor = {}
-  } = jsonData;
-  // const information = props.information;
-  // const sections = props.sections;
-  // const profile = props.profile;
-  const containerRef = useRef();
-
-  //which divides an resume into two sections and at mounting tqo section contains which fields are populated.
-  const [columns, setColumns] = useState([[], []]);
-
-  const info = {
-    profile: information[sections.profile],
-    workExp: information[sections.workExp],
-    project: information[sections.project],
-    education: information[sections.education],
-    skills: information[sections.skills],
-    certification: information[sections.certification],
-    achievements: information[sections.achievements]
-  };
-
   const getFormattedDate = (value) => {
     if (!value) {
       return "";
@@ -98,21 +73,20 @@ const Resume = forwardRef((props, ref) => {
     return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };
 
-  //Different section of tabs for Drag and Drop functionality.
   const sectionDiv = {
-    [sections.workExp]: (
+    experiences: (
       <div
-        key={"workexp"}
+        key={"experiences"}
         className={`${styles.section} pb-2 ${
-          info.workExp?.sectionTitle ? "" : styles.hidden
+          jsonData.experiences?.length > 0 ? "" : styles.hidden
         } `}
       >
         <div className={styles.separateRight}></div>
-        <div className={styles.sectionTitle}>{info.workExp?.sectionTitle}</div>
+        <div className={styles.sectionTitle}>Experiences</div>
         <div className={styles.content}>
-          {info?.workExp?.details?.map((item) => (
+          {jsonData?.experiences?.map((item) => (
             <div className={styles.item} key={item.id}>
-              {item?.designation || item?.company_name ? (
+              {item?.designation ? (
                 <div className={styles.title}>{item.designation}</div>
               ) : (
                 <span />
@@ -127,34 +101,22 @@ const Resume = forwardRef((props, ref) => {
               ) : (
                 <span />
               )}
-
-              {/* {item?.points?.length > 0 ? (
-                  <ul className={styles.points}>
-                    {item.points?.map((elem, index) => (
-                      <li className={styles.point} key={elem + index}>
-                        {elem}
-                      </li>
-                    ))}
-                  </ul>
-                ) : (
-                  <span />
-                )} */}
             </div>
           ))}
         </div>
       </div>
     ),
-    [sections.project]: (
+    projects: (
       <div
-        key={"project"}
+        key={"projects"}
         className={`${styles.section} pb-3 ${
-          info.project?.sectionTitle ? "" : styles.hidden
+          jsonData.projects?.length > 0 ? "" : styles.hidden
         }`}
       >
         <div className={styles.separateRight}></div>
-        <div className={styles.sectionTitle}>{info?.project?.sectionTitle}</div>
+        <div className={styles.sectionTitle}>Projects</div>
         <div className={styles.content}>
-          {info?.project?.details?.map((item) => (
+          {jsonData.projects?.map((item) => (
             <div className={styles.item} key={item.id}>
               {item?.name ? (
                 <h2 className={styles.title}>
@@ -187,29 +149,10 @@ const Resume = forwardRef((props, ref) => {
                     <b className={styles.overview}>Project Description : </b>
                     {item.description}
                   </span>
-                  {/* <p className={styles.overview}>{item.description} </p> */}
                 </div>
               ) : (
                 <span />
               )}
-
-              {/* {item?.points?.length > 0 ? (
-                  <div>
-                    <h6>
-                      <b>Roles and Responsibility :</b>{" "}
-                    </h6>
-                    <ul className={styles.projectPoints}>
-                      {item.points?.map((elem, index) => (
-                        <li className={styles.point} key={elem + index}>
-                          {elem}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : (
-                  <span />
-                )} */}
-
               {item?.role ? (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Role : </b>
@@ -248,20 +191,18 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
-    [sections.achievements]: (
+    achievements: (
       <div
         key={"achievements"}
         className={`${styles.section} ${
-          info.achievements?.sectionTitle ? "" : styles.hidden
+          jsonData.achievements?.length > 0 ? "" : styles.hidden
         }`}
       >
         <div className={styles.separate}></div>
-        <div className={`${styles.leftSection} pt-2`}>
-          {info.achievements?.sectionTitle}
-        </div>
+        <div className={`${styles.leftSection} pt-2`}>Achievements</div>
         <div className={styles.title} style={{ textAlign: "right" }}>
           <ul className={styles.achievement}>
-            {info?.achievements?.details?.map((item) => (
+            {jsonData.achievements?.map((item) => (
               <li key={item.id}>
                 {item?.name ? <span>• {item.name}</span> : <span />}
               </li>
@@ -270,40 +211,38 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
-    [sections.education]: (
+    educations: (
       <div
         key={"education"}
         className={`${styles.section} pb-2 ${
-          info.education?.sectionTitle ? "" : styles.hidden
+          jsonData.educations?.length > 0 ? "" : styles.hidden
         } `}
       >
         <div className={styles.separate}></div>
-        <div className={`${styles.leftSection} pt-2`}>
-          {info.education?.sectionTitle}
-        </div>
+        <div className={`${styles.leftSection} pt-2`}>Educations</div>
         <div className={styles.content}>
-          {info?.education?.details?.map((item) => (
+          {jsonData.educations?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
-              {item.degree ? (
+              {item?.degree ? (
                 <p className={styles.subtitleHeading}>{item.degree}</p>
               ) : (
                 <span />
               )}
-              {item.university_name || item.place ? (
+              {item?.university_name || item?.place ? (
                 <div className={styles.subtitle}>
                   {item.university_name} , {item.place}
                 </div>
               ) : (
                 <span />
               )}
-              {item.passing_year ? (
+              {item?.passing_year ? (
                 <div className={styles.passingDate}>
                   Passing Year : {new Date(item.passing_year).getFullYear()}
                 </div>
               ) : (
                 ""
               )}
-              {item.percent_or_cgpa ? (
+              {item?.percent_or_cgpa ? (
                 <div className={styles.passingDate}>
                   CGPA / Percentage : {item.percent_or_cgpa}
                 </div>
@@ -315,18 +254,18 @@ const Resume = forwardRef((props, ref) => {
         </div>
       </div>
     ),
-    [sections.skills]: (
+    skills: (
       <div
         key={"skills"}
         className={`${styles.section} ${
-          info.skills?.sectionTitle ? "" : styles.hidden
+          jsonData.skills?.length > 0 ? "" : styles.hidden
         }`}
       >
-        <div className={styles.leftSection}>{info.skills?.sectionTitle}</div>
+        <div className={styles.leftSection}>Skills</div>
         <div className={styles.content}>
-          {info?.skills?.points?.length > 0 ? (
+          {jsonData.skills?.length > 0 ? (
             <ul className={styles.skillNumbered}>
-              {info.skills?.points?.map((elem, index) => (
+              {jsonData.skills?.map((elem, index) => (
                 <li className={styles.point} key={elem + index}>
                   {elem}
                 </li>
@@ -339,31 +278,29 @@ const Resume = forwardRef((props, ref) => {
       </div>
     ),
 
-    [sections.certification]: (
+    certifications: (
       <div
-        key={"certification"}
+        key={"certifications"}
         className={`${styles.section} ${
-          info.certification?.sectionTitle ? "" : styles.hidden
+          jsonData.certifications?.length > 0 ? "" : styles.hidden
         }`}
       >
         <div className={styles.separate}></div>
-        <div className={`${styles.leftSection} pt-2`}>
-          {info.certification?.sectionTitle}
-        </div>
+        <div className={`${styles.leftSection} pt-2`}>Certifications</div>
         <div className={styles.content}>
-          {info?.certification?.details?.map((item) => (
+          {jsonData.certifications?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
-              {item.name ? (
+              {item?.name ? (
                 <p className={styles.subtitleHeading}>{item.name}</p>
               ) : (
                 <span />
               )}
-              {item.organization_name ? (
+              {item?.organization_name ? (
                 <div className={styles.subtitle}>{item.organization_name}</div>
               ) : (
                 <span />
               )}
-              {item.issued_date ? (
+              {item?.issued_date ? (
                 <div className={styles.passingDate}>
                   Issue Date : {item.issued_date}
                 </div>
@@ -385,36 +322,16 @@ const Resume = forwardRef((props, ref) => {
     )
   };
 
-  //At component mount which section of resume contains which tab details.
   useEffect(() => {
-    if (showExperince && showCertification) {
-      setColumns([
-        [
-          sections.skills,
-          sections.education,
-          sections.certification,
-          sections.achievements
-        ],
-        [sections.workExp, sections.project]
-      ]);
-    } else if (showCertification) {
-      setColumns([
-        [
-          sections.skills,
-          sections.education,
-          sections.certification,
-          sections.achievements
-        ],
-        [sections.project]
-      ]);
-    } else if (showExperince) {
-      setColumns([
-        [sections.skills, sections.education, sections.achievements],
-        [sections.workExp, sections.project]
-      ]);
-    } else {
-      setColumns([[sections.skills, sections.education], [sections.project]]);
-    }
+    const leftColumn = [
+      "skills",
+      "educations",
+      jsonData.showCertification ? "certifications" : null,
+      jsonData.showAcheivements ? "achievements" : null
+    ].filter(Boolean);
+
+    const rightColumn = ["experiences", "projects"].filter(Boolean);
+    setColumns([leftColumn, rightColumn]);
   }, []);
 
   //Whenever active colour changes from Body component then this effect
@@ -422,12 +339,11 @@ const Resume = forwardRef((props, ref) => {
   useEffect(() => {
     //to get that container div in which --color property to be changed.
     const container = containerRef.current;
-    if (!activeColor || !container) {
+    if (!jsonData.activeColor || !container) {
       return;
     }
-
-    container.style.setProperty("--color", activeColor);
-  }, [activeColor]);
+    container.style.setProperty("--color", jsonData.activeColor);
+  }, []);
 
   const getPageMargins = () => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
@@ -450,37 +366,45 @@ const Resume = forwardRef((props, ref) => {
         to do so we have to modify --color property in styles. */}
         <div ref={containerRef} className={styles.container}>
           <div className={styles.header}>
-            <p className={styles.heading}>{info.profile?.detail?.name}</p>
+            <p className={styles.heading}>{jsonData.profile?.name}</p>
             <div className={styles.subHeading}>
-              {info.profile?.detail?.designation}
-              {info.profile?.detail?.gender && (
-                <span className="px-2">({info.profile?.detail?.gender})</span>
+              {jsonData.profile?.designation && (
+                <span className="px-1">{jsonData.profile?.designation}</span>
+              )}
+              {jsonData.profile?.gender && (
+                <span className="px-1">({jsonData.profile?.gender})</span>
               )}
             </div>
             <div className={styles.experienceHeading}>
               <div>
-                <CaretRightOutlined />{" "}
-                {info.profile?.detail?.years_of_experience}
+                <CaretRightOutlined /> {jsonData.profile?.years_of_experience}
                 <span> Year of Experience</span>
               </div>
               <div>
-                <MailOutlined /> {info.profile?.detail?.email}
+                <MailOutlined /> {jsonData.profile?.email}
               </div>
-              {info.profile?.detail?.mobile && (
+              {jsonData.profile?.mobile && (
                 <div>
-                  <MobileOutlined /> {info.profile?.detail?.mobile}
+                  <MobileOutlined /> {jsonData.profile?.mobile}
                 </div>
               )}
-
               <div className={styles.socialLink}>
-                <GithubOutlined />{" "}
-                <Link target="_blank" to={info.profile?.detail?.github_link}>
-                  GitHub
-                </Link>{" "}
-                <LinkedinOutlined />{" "}
-                <Link target="_blank" to={info.profile?.detail?.linkedin_link}>
-                  LinkedIn
-                </Link>
+                {jsonData.profile?.github_link && (
+                  <>
+                    <GithubOutlined />{" "}
+                    <Link target="_blank" to={jsonData.profile?.github_link}>
+                      GitHub
+                    </Link>{" "}
+                  </>
+                )}
+                {jsonData.profile?.linkedin_link && (
+                  <>
+                    <LinkedinOutlined />{" "}
+                    <Link target="_blank" to={jsonData.profile?.linkedin_link}>
+                      LinkedIn
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
             <img
@@ -508,7 +432,7 @@ const Resume = forwardRef((props, ref) => {
                   </h4>
                 </div>
                 <div className={`${styles.profiledetails} pb-3`}>
-                  {info.profile?.detail?.description}
+                  {jsonData.profile?.description}
                 </div>
                 {columns[1].map((item) => sectionDiv[item])}
               </div>
