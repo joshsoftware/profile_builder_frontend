@@ -26,11 +26,11 @@ const Navbar = () => {
     <Layout>
       <Header
         style={{
-          position: "sticky",
+          position: "fixed",
           top: 0,
-          zIndex: 1,
+          zIndex: 100,
           width: "100%",
-          display: "flex",
+          display: "block",
           alignItems: "center"
         }}
       >
@@ -58,6 +58,20 @@ const Navbar = () => {
             Editor
           </Button>
         </Link>
+        <Button
+          type="text"
+          icon=<LogoutOutlined />
+          style={{
+            marginRight: "auto",
+            paddingTop: "16px",
+            color: "white",
+            fontSize: "20px",
+            float: "right"
+          }}
+          onClick={showModal}
+        >
+          Logout
+        </Button>
         <Menu
           theme="dark"
           mode="horizontal"
@@ -67,20 +81,6 @@ const Navbar = () => {
             minWidth: 0
           }}
         />
-
-        <Button
-          type="text"
-          icon=<LogoutOutlined />
-          style={{
-            marginRight: "auto",
-            paddingBottom: "36px",
-            color: "white",
-            fontSize: "20px"
-          }}
-          onClick={showModal}
-        >
-          Logout
-        </Button>
       </Header>
       <Modal
         title="Confirm Logout"
