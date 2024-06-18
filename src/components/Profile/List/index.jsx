@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Row, Space, Table, Tag, Typography } from "antd";
+import { Button, Input, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -20,7 +20,6 @@ const ListProfiles = () => {
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
-
     setSearchedColumn(dataIndex);
   };
 
