@@ -19,7 +19,6 @@
   background-color: var(--color);
   height: 10rem;
   position: relative;
-  z-index: 1;
 }
 
 .header .logo {
