@@ -82,24 +82,18 @@ export const Editor = () => {
   };
 
   return (
-    <Row
-      style={{
-        display: "flex",
-        gap: "5%",
-        justifyContent: "center"
-      }}
-    >
+    <Row>
       <Col
         xs={{ span: 24 }}
         sm={{ span: 24 }}
         md={{ span: 12 }}
-        lg={{ span: 10 }}
+        lg={{ span: 12 }}
         className={styles["hide-scrollbar"]}
         style={{
           minheight: "98vh",
           maxHeight: "98vh",
           overflow: "auto",
-          padding: "10px"
+          padding: "2%"
         }}
       >
         <Typography.Title
@@ -154,12 +148,13 @@ export const Editor = () => {
         xs={{ span: 24 }}
         sm={{ span: 24 }}
         md={{ span: 12 }}
-        lg={{ span: 10 }}
+        lg={{ span: 12 }}
         className={styles["hide-scrollbar"]}
         style={{
           overflow: "auto",
           minHeight: "98vh",
-          maxHeight: "98vh"
+          maxHeight: "98vh",
+          padding: "2%"
         }}
       >
         <Resume ref={resumeRef} />
