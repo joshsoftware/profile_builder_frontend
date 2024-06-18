@@ -1,7 +1,5 @@
 .container {
   --color: #35549c;
-  min-width: 700px;
-  max-width: 850px;
   font-family: "Times New Roman, serif";
   margin: 0 auto;
   flex: 1.2;
