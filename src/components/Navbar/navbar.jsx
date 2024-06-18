@@ -1,21 +1,24 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import { Button, Layout, Menu, Modal } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { logout } from "../../api/store/authSlice";
 import joshLogo from "../../assets/Josh-new-logo.png";
-import Logout from "../Logout/logout";
+import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
 
 const Navbar = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { Header } = Layout;
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isLogout, setIsLogout] = useState(false);
   const showModal = () => {
     setIsModalVisible(true);
   };
   const handleOk = () => {
     setIsModalVisible(false);
-    setIsLogout(true);
-    console.log("logout");
+    dispatch(logout());
+    window.localStorage.removeItem("token");
   };
 
   const handleCancel = () => {
@@ -39,7 +42,7 @@ const Navbar = () => {
           alt="josh-logo"
           style={{ marginRight: "50px", paddingBottom: "10px" }}
         />
-        <Link to={"/profiles"}>
+        <Link to={PROFILE_LIST_ROUTE}>
           <Button
             type="text"
             icon=<UserOutlined />
@@ -48,10 +51,9 @@ const Navbar = () => {
             Profiles
           </Button>
         </Link>
-        <Link to={"/profile-builder"}>
+        <Link to={EDITOR_ROUTE}>
           <Button
             type="text"
-            href="/profile-builder"
             icon=<EditOutlined />
             style={{ marginRight: "auto", color: "white", fontSize: "20px" }}
           >
@@ -90,9 +92,8 @@ const Navbar = () => {
         okText="Yes"
         cancelText="No"
       >
-        <p>Are you sure you want to logout?</p>
+        Are you sure you want to logout?
       </Modal>
-      {isLogout && <Logout />}
     </Layout>
   );
 };
