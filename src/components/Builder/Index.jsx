@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { PROFILES } from "../../Constants";
+import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
 import BasicInfo from "./BasicInfo";
 import styles from "./Builder.module.css";
@@ -82,88 +83,88 @@ export const Editor = () => {
   };
 
   return (
-    <Row
-      style={{
-        display: "flex",
-        gap: "5%",
-        justifyContent: "center"
-      }}
-    >
-      <Col
-        xs={{ span: 24 }}
-        sm={{ span: 24 }}
-        md={{ span: 12 }}
-        lg={{ span: 10 }}
-        className={styles["hide-scrollbar"]}
-        style={{
-          minheight: "98vh",
-          maxHeight: "98vh",
-          overflow: "auto",
-          padding: "10px"
-        }}
-      >
-        <Typography.Title
-          level={2}
+    <>
+      <Navbar />
+      <Row>
+        <Col
+          xs={{ span: 24 }}
+          sm={{ span: 24 }}
+          md={{ span: 12 }}
+          lg={{ span: 12 }}
+          className={styles["hide-scrollbar"]}
           style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "10px"
+            minheight: "98vh",
+            maxHeight: "98vh",
+            overflow: "auto",
+            padding: "2rem",
+            top: "3rem"
           }}
         >
-          Resume Builder
-        </Typography.Title>
-        <hr />
-        <Radio.Group
-          defaultValue={profile.title}
-          onChange={onProfileChange}
-          buttonStyle="solid"
-          style={{ display: "flex", justifyContent: "center" }}
-        >
-          <Radio.Button value={PROFILES.internal.title}>
-            Internal Profile
-          </Radio.Button>
-          <Radio.Button value={PROFILES.external.title}>
-            External Profile
-          </Radio.Button>
-        </Radio.Group>
+          <Typography.Title
+            level={2}
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "10px"
+            }}
+          >
+            Resume Builder
+          </Typography.Title>
+          <hr />
+          <Radio.Group
+            defaultValue={profile.title}
+            onChange={onProfileChange}
+            buttonStyle="solid"
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <Radio.Button value={PROFILES.internal.title}>
+              Internal Profile
+            </Radio.Button>
+            <Radio.Button value={PROFILES.external.title}>
+              External Profile
+            </Radio.Button>
+          </Radio.Group>
 
-        <hr />
-        <Space direction="vertical">
-          <Space>
-            <Switch size="small" onChange={handleExperience} />
-            <Typography.Text>
-              Do you want to include work experience?
-            </Typography.Text>
+          <hr />
+          <Space direction="vertical">
+            <Space>
+              <Switch size="small" onChange={handleExperience} />
+              <Typography.Text>
+                Do you want to include work experience?
+              </Typography.Text>
+            </Space>
+            <Space>
+              <Switch size="small" onChange={handleCertification} />
+              <Typography.Text>
+                Do you want to include certifications?
+              </Typography.Text>
+            </Space>
           </Space>
-          <Space>
-            <Switch size="small" onChange={handleCertification} />
-            <Typography.Text>
-              Do you want to include certifications?
-            </Typography.Text>
-          </Space>
-        </Space>
-        <hr />
-        <Tabs
-          size="small"
-          defaultActiveKey="basic-info"
-          items={items}
-          onChange={onChange}
-        />
-      </Col>
-      <Col
-        xs={{ span: 24 }}
-        sm={{ span: 24 }}
-        md={{ span: 12 }}
-        lg={{ span: 10 }}
-        className={styles["hide-scrollbar"]}
-        style={{
-          overflow: "auto",
-          minHeight: "98vh",
-          maxHeight: "98vh"
-        }}
-      >
-        <Resume ref={resumeRef} />
-      </Col>
-    </Row>
+          <hr />
+          <Tabs
+            size="small"
+            defaultActiveKey="basic-info"
+            items={items}
+            onChange={onChange}
+          />
+        </Col>
+        <Col
+          xs={{ span: 24 }}
+          sm={{ span: 24 }}
+          md={{ span: 12 }}
+          lg={{ span: 12 }}
+          className={styles["hide-scrollbar"]}
+          style={{
+            overflow: "auto",
+            minHeight: "98vh",
+            maxHeight: "98vh",
+            padding: "2rem",
+            top: "4rem"
+          }}
+        >
+          <Resume ref={resumeRef} />
+        </Col>
+      </Row>
+    </>
   );
 };

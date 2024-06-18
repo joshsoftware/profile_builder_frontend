@@ -12,7 +12,7 @@ const Resume = forwardRef((props, ref) => {
     sections = {},
     profile = {},
     activeColor = {}
-  } = props;
+  } = jsonData;
   // const information = props.information;
   // const sections = props.sections;
   // const profile = props.profile;
@@ -31,7 +31,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getFormattedDate = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
     const todayDate = new Date();
 
@@ -50,7 +52,9 @@ const Resume = forwardRef((props, ref) => {
   };
 
   const getPassingYear = (value) => {
-    if (!value) return "";
+    if (!value) {
+      return "";
+    }
     const date = new Date(value);
 
     const givenYear = date.getFullYear();
@@ -109,7 +113,7 @@ const Resume = forwardRef((props, ref) => {
               {item?.points?.length > 0 ? (
                 <ul className={styles.points}>
                   {item.points?.map((elem, index) => (
-                    <li className={styles.point} key={elem + index}>
+                    <li className={styles.point} key={`experience-${index}`}>
                       {elem}
                     </li>
                   ))}
@@ -176,7 +180,7 @@ const Resume = forwardRef((props, ref) => {
                   </h6>
                   <ul className={styles.projectPoints}>
                     {item.points?.map((elem, index) => (
-                      <li className={styles.point} key={elem + index}>
+                      <li className={styles.point} key={`project-${index}`}>
                         {elem}
                       </li>
                     ))}
@@ -261,7 +265,7 @@ const Resume = forwardRef((props, ref) => {
           {info?.skills?.points?.length > 0 ? (
             <ul className={styles.numbered}>
               {info.skills?.points?.map((elem, index) => (
-                <li className={styles.point} key={elem + index}>
+                <li className={styles.point} key={`skills-${index}`}>
                   {elem}
                 </li>
               ))}
@@ -274,7 +278,6 @@ const Resume = forwardRef((props, ref) => {
     ),
     [sections.certification]: (
       <div
-        key={"certification"}
         className={`${styles.section} ${
           info.certification?.sectionTitle ? "" : styles.hidden
         }`}
@@ -287,7 +290,7 @@ const Resume = forwardRef((props, ref) => {
           {info?.certification?.points?.length > 0 ? (
             <ul className={styles.numbered}>
               {info.certification?.points?.map((elem, index) => (
-                <li className={styles.point} key={elem + index}>
+                <li className={styles.point} key={`certificate-${index}`}>
                   {elem}
                 </li>
               ))}
@@ -320,14 +323,16 @@ const Resume = forwardRef((props, ref) => {
     } else {
       setColumns([[sections.skills, sections.education], [sections.project]]);
     }
-  }, [profile, information]);
+  }, []);
 
   //Whenever active colour changes from Body component then this effect
   // will be called.
   useEffect(() => {
     //to get that container div in which --color property to be changed.
     const container = containerRef.current;
-    if (!activeColor || !container) return;
+    if (!activeColor || !container) {
+      return;
+    }
 
     container.style.setProperty("--color", activeColor);
   }, [activeColor]);

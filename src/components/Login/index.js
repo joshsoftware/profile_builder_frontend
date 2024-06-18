@@ -6,6 +6,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { useLoginMutation } from "../../api/loginApi";
 import { login as loginAction } from "../../api/store/authSlice";
 import googleIcon from "../../assets/icons8-google-48.png";
+import { PROFILE_LIST_ROUTE } from "../../Constants";
 import styles from "./Login.module.css";
 
 const Login = () => {
@@ -21,7 +22,7 @@ const Login = () => {
         if (token) {
           dispatch(loginAction({ token }));
           window.localStorage.setItem("token", token);
-          navigate("/dashboard");
+          navigate(PROFILE_LIST_ROUTE);
         }
       } catch (error) {
         throw new Error(error);

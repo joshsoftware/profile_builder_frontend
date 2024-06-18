@@ -4,9 +4,10 @@ import { Button, Input, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
-  SearchOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
 import { useGetProfileListQuery } from "../../../api/profileApi";
+import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
@@ -19,7 +20,6 @@ const ListProfiles = () => {
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
-
     setSearchedColumn(dataIndex);
   };
 
@@ -34,7 +34,7 @@ const ListProfiles = () => {
       selectedKeys,
       confirm,
       clearFilters,
-      close,
+      close
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -101,7 +101,7 @@ const ListProfiles = () => {
         />
       ) : (
         text
-      ),
+      )
   });
 
   const columns = [
@@ -110,21 +110,21 @@ const ListProfiles = () => {
       dataIndex: "name",
       key: "name",
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("name")
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: "20%",
-      ...getColumnSearchProps("email"),
+      ...getColumnSearchProps("email")
     },
     {
       title: "Years of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
-      sortDirections: ["descend", "ascend"],
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Primary Skills",
@@ -147,7 +147,7 @@ const ListProfiles = () => {
             );
           })}
         </>
-      ),
+      )
     },
     {
       title: "Is Current Employee",
@@ -157,7 +157,7 @@ const ListProfiles = () => {
         <strong>{is_current_employee === 1 ? "YES" : "NO"}</strong>
       ),
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"],
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Action",
@@ -167,12 +167,13 @@ const ListProfiles = () => {
           <EditOutlined />
           <DeleteOutlined />
         </Space>
-      ),
-    },
+      )
+    }
   ];
 
   return (
     <>
+      <Navbar />
       <Typography.Title level={1} className={styles.profile_header}>
         Profiles
       </Typography.Title>

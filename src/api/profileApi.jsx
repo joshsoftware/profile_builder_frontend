@@ -5,16 +5,16 @@ import axiosBaseQuery from "./axiosBaseQuery/service";
 export const profileApi = createApi({
   reducerPath: "profileApi",
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["profile"],
+  tagTypes: ["profiles"],
   endpoints: (builder) => ({
     getProfileList: builder.query({
       query: () => ({
-        url: PROFILE_LIST_ENDPOINT,
+        url: PROFILE_LIST_ENDPOINT
       }),
-      providesTags: ["profile"],
-      transformResponse: (response) => response.data,
-    }),
-  }),
+      providesTags: ["profiles"],
+      transformResponse: (response) => response.data
+    })
+  })
 });
 
 export const { useGetProfileListQuery } = profileApi;
