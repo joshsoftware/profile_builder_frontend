@@ -96,7 +96,7 @@ export const Editor = () => {
             minheight: "98vh",
             maxHeight: "98vh",
             overflow: "auto",
-            padding: "2%",
+            padding: "2rem",
             top: "3rem"
           }}
         >
@@ -158,7 +158,7 @@ export const Editor = () => {
             overflow: "auto",
             minHeight: "98vh",
             maxHeight: "98vh",
-            padding: "2%",
+            padding: "2rem",
             top: "4rem"
           }}
         >
