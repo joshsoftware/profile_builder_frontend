@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Button, Layout, Menu, Modal } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { logout } from "../../api/store/authSlice";
@@ -9,7 +9,6 @@ import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
 
 const Navbar = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const { Header } = Layout;
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = () => {
