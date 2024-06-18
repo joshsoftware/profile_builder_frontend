@@ -9,12 +9,12 @@ export const profileApi = createApi({
   endpoints: (builder) => ({
     getProfileList: builder.query({
       query: () => ({
-        url: PROFILE_LIST_ENDPOINT,
+        url: PROFILE_LIST_ENDPOINT
       }),
       providesTags: ["profile"],
-      transformResponse: (response) => response.data,
-    }),
-  }),
+      transformResponse: (response) => response.data
+    })
+  })
 });
 
 export const { useGetProfileListQuery } = profileApi;
