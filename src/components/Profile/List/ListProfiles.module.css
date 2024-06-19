@@ -8,4 +8,14 @@
   background-image: linear-gradient(to right, #239ce2, #1369b9);
   color: transparent;
   padding-left: 20px;
+  padding-right: 1030px;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+}
+
+.button{
+  margin-top: 15px;
 }

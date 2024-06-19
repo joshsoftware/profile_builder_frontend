@@ -13,6 +13,7 @@ const Router = () => {
         <Route path="/profiles" element={<ListProfiles />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/profile-builder" element={<Editor />} />
+        <Route path="/profile-builder/:id" element={<Editor />} />
 
         <Route path="*" element={<Login />} />
       </Routes>

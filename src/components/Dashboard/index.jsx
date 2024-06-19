@@ -3,6 +3,7 @@ import React from "react";
 import styles from "./Dashboard.module.css";
 
 import resumeSvg from "../../assets/banner.svg";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   return (
@@ -13,7 +14,8 @@ const Dashboard = () => {
         <span>Download as PDF.</span>
       </p>
 
-      <button className={styles.createBtn}>Create My Resume</button>
+      <Link to={`/profiles`}>
+      <button className={styles.createBtn}>Get it started!</button></Link>
     </div>
   );
 };

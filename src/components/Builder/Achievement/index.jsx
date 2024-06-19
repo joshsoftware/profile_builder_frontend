@@ -1,8 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs, Select } from "antd";
+import { Button, Form, Input, Space, Tabs } from "antd";
 import { ResumeContext } from "../../../utils/ResumeContext";
 import { get, post } from "../../../services/axios";
-import moment from "moment";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
@@ -18,7 +17,6 @@ const DraggableTabNode = ({ ...props }) => {
     transition,
     cursor: "move",
   };
-
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
@@ -27,14 +25,13 @@ const DraggableTabNode = ({ ...props }) => {
   });
 };
 
-const Project = () => {
+const Achievement = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([{ label: "Achievement 1", children: null, key: "0" }]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
-
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10,
@@ -43,38 +40,37 @@ const Project = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/profiles/${id}/projects`)
+      get(`/profiles/${id}/achievements`)
         .then(response => {
-          const projects = response.data.projects || [];
-          setInitialState({ ...initialState, projects });
+          const achievements = response.data.achievements || [];
+          setInitialState({ ...initialState, achievements });
 
-          if (projects.length > 0) {
-            const tabs = projects.map((project, index) => ({
-              label: `Project ${index + 1}`,
+          if (achievements.length > 0) {
+            const tabs = achievements.map((achievement, index) => ({
+              label: `Achievement ${index + 1}`,
               children: null,
               key: `${index}`,
             }));
             setItems(tabs);
-            newTabIndex.current = projects.length;
+            newTabIndex.current = achievements.length;
             form.setFieldsValue(
-              projects.reduce((acc, project, index) => {
-                acc[`project_${index}`] = {
-                  ...project,
-                  working_start_date: project.working_start_date ? moment(project.working_start_date) : null,
-                  working_end_date: project.working_end_date ? moment(project.working_end_date, "MMM-YYYY") : null,
+              achievements.reduce((acc, achievement, index) => {
+                acc[`achievement_${index}`] = {
+                  name: achievement.name,
+                  description: achievement.description,
                 };
                 return acc;
               }, {})
             );
             setActiveKey("0");
           } else {
-            setItems([{ label: "Project 1", children: null, key: "0" }]);
+            setItems([{ label: "Achievement 1", children: null, key: "0" }]);
             newTabIndex.current = 1;
             form.setFieldsValue({});
           }
         })
         .catch(() => {
-          setItems([{ label: "Project 1", children: null, key: "0" }]);
+          setItems([{ label: "Achievement 1", children: null, key: "0" }]);
           newTabIndex.current = 1;
           form.setFieldsValue({});
         });
@@ -82,35 +78,26 @@ const Project = () => {
   }, [id]);
 
   const onFinish = (values) => {
-    const projects = items.map((item, index) => {
-      const project = values[`project_${index}`];
-  
-      return {
-        name: project.name,
-        description: project.description,
-        role: project.role,
-        responsibilities: project.responsibilities,
-        technologies: project.technologies,
-        tech_worked_on: project.tech_worked_on,
-        working_start_date: project.working_start_date ? project.working_start_date.format("MMM-YYYY") : null,
-        working_end_date: project.working_end_date ? project.working_end_date.format("MMM-YYYY") : null,
-        duration: project.duration,
-      };
-    });
-  
+    const achievements = items.map((item, index) => ({
+      name: values[`achievement_${index}`]?.name,
+      description: values[`achievement_${index}`]?.description,
+    }));
+
     setInitialState({
       ...initialState,
-      projects,
+      achievements,
     });
-    post(`/profiles/${id}/projects`, { projects });
+    console.log({ achievements });
+
+    post(`/profiles/${id}/achievements`, { achievements })
     // form.resetFields();
-  };  
+  };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      projects: [],
+      achievements: [],
     });
   };
 
@@ -122,7 +109,7 @@ const Project = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Project ${newTabIndex.current}`, children: null, key: newActiveKey },
+      { label: `Achievement ${newTabIndex.current}`, children: null, key: newActiveKey },
     ]);
     setActiveKey(newActiveKey);
   };
@@ -158,7 +145,7 @@ const Project = () => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Project</Button>
+        <Button onClick={add}>Add Achievement</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
         <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
@@ -174,13 +161,13 @@ const Project = () => {
                 <Form
                   layout="vertical"
                   form={form}
-                  name={`project-form-${item.key}`}
+                  name={`achievement_${item.key}`}
                   onFinish={onFinish}
                   key={item.key}
                 >
                   <Form.Item
-                    name={[`project_${index}`, "name"]}
-                    label="Project Name"
+                    name={[`achievement_${index}`, "name"]}
+                    label="Achievement Name"
                     rules={[
                       {
                         required: true,
@@ -188,82 +175,18 @@ const Project = () => {
                       },
                     ]}
                   >
-                    <Input placeholder="Enter project name" />
+                    <Input placeholder="Achievement name eg. star performer" />
                   </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`project_${index}`, "role"]}
-                        label="Role"
-                      >
-                        <Input placeholder="Enter role" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`project_${index}`, "duration"]}
-                        label="Project Duration (in years)"
-                      >
-                        <Input type="number" placeholder="Eg. 2, 1.5" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
                   <Form.Item
-                    name={[`project_${index}`, "responsibilities"]}
-                    label="Responsibilities"
+                    name={[`achievement_${index}`, "description"]}
+                    label="Description"
                   >
                     <Input.TextArea
-                      placeholder="Please provide responsibilities"
+                      placeholder="Please provide a basic overview of the above achievement"
                       showCount
                       maxLength={300}
                     />
                   </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "description"]}
-                    label="Description of Project"
-                  >
-                    <Input.TextArea
-                      placeholder="Please provide a basic overview of the project"
-                      showCount
-                      maxLength={300}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "technologies"]}
-                    label="Technologies"
-                  >
-                    <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "tech_worked_on"]}
-                    label="Technology You Worked On"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Worked technology is required",
-                      },
-                    ]}
-                  >
-                    <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
-                  </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`project_${index}`, "working_start_date"]}
-                        label="Project Start Date"
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`project_${index}`, "working_end_date"]}
-                        label="Project End Date"
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
                   <Form.Item>
                     <Space>
                       <Button type="primary" htmlType="submit">
@@ -293,4 +216,4 @@ const Project = () => {
   );
 };
 
-export default Project;
+export default Achievement;

@@ -9,11 +9,13 @@ import Highlighter from "react-highlight-words";
 import { useQuery } from "@tanstack/react-query";
 import { get } from "../../../services/axios";
 import styles from "./ListProfiles.module.css";
+import { Link, useNavigate } from "react-router-dom";
 
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
+  const navigate = useNavigate();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -106,13 +108,17 @@ const ListProfiles = () => {
     queryKey: ["data"],
     queryFn: async () => {
       try {
-        const response = await get(`/list_profiles`);
+        const response = await get(`/api/profiles`);
         return response.data.profiles;
       } catch (error) {
         return error;
       }
     },
   });
+
+  const handleClick = (id) => {
+    navigate(`/profile-builder/${id}`);
+  };
 
   const columns = [
     {
@@ -140,6 +146,7 @@ const ListProfiles = () => {
       title: "Primary Skills",
       key: "primary_skills",
       dataIndex: "primary_skills",
+      ...getColumnSearchProps("primary_skills"),
       render: (_, { primary_skills }) => (
         <>
           {primary_skills.map((tag, index) => {
@@ -164,17 +171,15 @@ const ListProfiles = () => {
       dataIndex: "is_current_employee",
       key: "is_current_employee",
       render: (is_current_employee) => (
-        <strong>{is_current_employee === 1 ? "YES" : "NO"}</strong>
+        <strong>{is_current_employee}</strong>
       ),
-      sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Action",
       key: "action",
-      render: () => (
+      render: (_, record) => (
         <Space size="middle">
-          <EditOutlined />
+          <EditOutlined onClick={() => handleClick(record.id)} />
           <DeleteOutlined />
         </Space>
       ),
@@ -187,12 +192,16 @@ const ListProfiles = () => {
       {error && <p>Failed to fetch list of Profile!</p>}
       {data && !isFetching && (
         <>
-          <h1 className={styles.heading}>
-            <span>List of Profiles</span>
-          </h1>
+          <div className={styles.header}>
+            <h1 className={styles.heading}>
+              <span>Profiles</span>
+            </h1>
+            <Link to={`/profile-builder`}>
+            <Button type="primary" className={styles.button}> + New </Button></Link>
+          </div>
           <Table
             columns={columns}
-            dataSource={data}
+            dataSource={data?.length > 0 ? data : []}
             className={styles.table}
             bordered={true}
           />

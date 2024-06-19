@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const client = axios.create({
   baseURL: "http://localhost:1925",
@@ -25,7 +26,6 @@ client.interceptors.response.use(
   },
   (error) => {
     // Handle response errors here
-
     return Promise.reject(error);
   }
 );
@@ -42,6 +42,7 @@ export const get = async (url) => {
 export const post = async (url, payload) => {
   try {
     const response = await client.post(url, payload);
+    toast.success(response.data.data.message);
     return response.data;
   } catch (error) {
     throw new Error(error.message);

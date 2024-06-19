@@ -47,7 +47,12 @@ export const SKILLS = [
 ];
 
 export const ROUTES = {
-  profile: "/api/profile/",
+  profile: "/api/profiles",
+  project:"/profiles/2/projects",
+  education:"/profiles/2/educations",
+  experience:"/profiles/2/experiences",
+  achievement:"/profiles/2/achievements",
+  certificate:"/profiles/2/certificates"
 };
 
 // TODO : Remove once refactor
