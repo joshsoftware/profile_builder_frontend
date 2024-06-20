@@ -1,21 +1,23 @@
 import React, { useRef, useState } from "react";
-import {
-  SearchOutlined,
-  EditOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
-import { Button, Input, Space, Skeleton, Table, Tag } from "antd";
 import Highlighter from "react-highlight-words";
-import { useQuery } from "@tanstack/react-query";
-import { get } from "../../../services/axios";
-import styles from "./ListProfiles.module.css";
 import { Link, useNavigate } from "react-router-dom";
+import { Button, Input, Space, Table, Tag, Typography } from "antd";
+import {
+  DeleteOutlined,
+  EditOutlined,
+  SearchOutlined
+} from "@ant-design/icons";
+import { useGetProfileListQuery } from "../../../api/profileApi";
+import Navbar from "../../Navbar/navbar";
+import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const navigate = useNavigate();
+
+  const { data, isFetching } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -34,7 +36,7 @@ const ListProfiles = () => {
       selectedKeys,
       confirm,
       clearFilters,
-      close,
+      close
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -101,19 +103,7 @@ const ListProfiles = () => {
         />
       ) : (
         text
-      ),
-  });
-
-  const { isFetching, data, error } = useQuery({
-    queryKey: ["data"],
-    queryFn: async () => {
-      try {
-        const response = await get(`/api/profiles`);
-        return response.data.profiles;
-      } catch (error) {
-        return error;
-      }
-    },
+      )
   });
 
   const handleClick = (id) => {
@@ -126,21 +116,21 @@ const ListProfiles = () => {
       dataIndex: "name",
       key: "name",
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("name")
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: "20%",
-      ...getColumnSearchProps("email"),
+      ...getColumnSearchProps("email")
     },
     {
       title: "Years of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
-      sortDirections: ["descend", "ascend"],
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Primary Skills",
@@ -164,7 +154,7 @@ const ListProfiles = () => {
             );
           })}
         </>
-      ),
+      )
     },
     {
       title: "Is Current Employee",
@@ -173,6 +163,8 @@ const ListProfiles = () => {
       render: (is_current_employee) => (
         <strong>{is_current_employee}</strong>
       ),
+      sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Action",
@@ -182,22 +174,32 @@ const ListProfiles = () => {
           <EditOutlined onClick={() => handleClick(record.id)} />
           <DeleteOutlined />
         </Space>
-      ),
-    },
+      )
+    }
   ];
 
   return (
     <>
-      {isFetching && <Skeleton active />}
-      {error && <p>Failed to fetch list of Profile!</p>}
-      {data && !isFetching && (
+      <Navbar />
+      <Typography.Title level={1} className={styles.profile_header}>
+        Profiles
+        <Link to={`/profile-builder`}>
+            <Button type="primary" className={styles.button}> + New </Button></Link>
+      </Typography.Title>
+      <Table
+        columns={columns}
+        dataSource={data?.profiles}
+        className={styles.table}
+        bordered={true}
+        loading={isFetching}
+      />
+      {/* {data && !isFetching && (
         <>
           <div className={styles.header}>
             <h1 className={styles.heading}>
               <span>Profiles</span>
             </h1>
-            <Link to={`/profile-builder`}>
-            <Button type="primary" className={styles.button}> + New </Button></Link>
+            
           </div>
           <Table
             columns={columns}
@@ -206,7 +208,7 @@ const ListProfiles = () => {
             bordered={true}
           />
         </>
-      )}
+      )} */}
     </>
   );
 };

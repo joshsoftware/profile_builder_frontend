@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs, Select } from "antd";
-import { ResumeContext } from "../../../utils/ResumeContext";
-import { get, post } from "../../../services/axios";
-import moment from "moment";
+import { useParams } from "react-router-dom";
+import { Button, Col, DatePicker, Form, Input, Row, Select,Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useParams } from "react-router-dom";
+import moment from "moment";
+import { get, post } from "../../../services/axios";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -43,7 +43,7 @@ const Project = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/profiles/${id}/projects`)
+      get(`/api/profiles/${id}/projects`)
         .then(response => {
           const projects = response.data.projects || [];
           setInitialState({ ...initialState, projects });
@@ -102,7 +102,7 @@ const Project = () => {
       ...initialState,
       projects,
     });
-    post(`/profiles/${id}/projects`, { projects });
+    post(`/api/profiles/${id}/projects`, { projects });
     // form.resetFields();
   };  
 

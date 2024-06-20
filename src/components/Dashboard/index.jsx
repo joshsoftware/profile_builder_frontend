@@ -1,9 +1,7 @@
 import React from "react";
-
-import styles from "./Dashboard.module.css";
-
-import resumeSvg from "../../assets/banner.svg";
 import { Link } from "react-router-dom";
+import resumeSvg from "../../assets/banner.svg";
+import styles from "./Dashboard.module.css";
 
 const Dashboard = () => {
   return (

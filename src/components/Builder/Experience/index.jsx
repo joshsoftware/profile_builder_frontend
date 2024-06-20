@@ -1,13 +1,13 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import moment from "moment";
+import { useParams } from "react-router-dom";
 import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select, Space, Tabs } from "antd";
-import { ResumeContext } from "../../../utils/ResumeContext";
-import { DESIGNATION } from "../../../Constants";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import moment from "moment";
+import { DESIGNATION } from "../../../Constants";
 import { get, post } from "../../../services/axios";
-import { useParams } from "react-router-dom";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -42,7 +42,7 @@ const Experience = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/profiles/${id}/experiences`)
+      get(`/api/profiles/${id}/experiences`)
         .then(response => {
           const experiences = response.data.experiences || [];
           setInitialState({ ...initialState, experiences });
@@ -98,7 +98,7 @@ const Experience = () => {
       experiences,
     });
 
-    post(`/profiles/${id}/experiences`, { experiences })
+    post(`/api/profiles/${id}/experiences`, { experiences })
     //form.resetFields();
   };
 

@@ -3,13 +3,24 @@ export const PROFILE_DETAILS =
 
 export const PROFILES = {
   internal: { title: "INTERNAL", color: "#35549c" },
-  external: { title: "EXTERNAL", color: "#062e38" },
+  external: { title: "EXTERNAL", color: "#062e38" }
+};
+
+// API ROUTES
+export const LOGIN_ENDPOINT = "/login";
+export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+
+// HTTP METHODS
+export const HTTP_METHODS = {
+  POST: "POST",
+  GET: "GET",
+  PUT: "PUT"
 };
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },
-  { label: "OTHER", value: "Other" },
+  { label: "OTHER", value: "Other" }
 ];
 
 export const DESIGNATION = [
@@ -20,7 +31,7 @@ export const DESIGNATION = [
   { lable: "project_manager", value: "Project Manager" },
   { lable: "product_manager", value: "Product Manager" },
   { lable: "qa", value: "Quality Assurance (QA) Engineer" },
-  { lable: "devOps", value: "DevOps Engineer" },
+  { lable: "devOps", value: "DevOps Engineer" }
 ];
 
 export const SKILLS = [
@@ -43,7 +54,7 @@ export const SKILLS = [
   { label: "ReactJs", value: "ReactJs" },
   { label: "React-Native", value: "React-Native" },
   { label: "UI/UX", value: "UI/UX" },
-  { label: "VueJs", value: "VueJs" },
+  { label: "VueJs", value: "VueJs" }
 ];
 
 export const ROUTES = {
@@ -100,3 +111,11 @@ export const getMonthString = (num) => {
   }
   return month;
 };
+
+// ROUTES
+export const ROOT_ROUTE = "/";
+export const PROFILE_LIST_ROUTE = "/profiles";
+export const DASHBOARD_ROUTE = "/dashboard";
+export const EDITOR_ROUTE = "/profile-builder";
+export const EDITOR_PROFILE_ROUTE = "/profile-builder/:id";
+export const ERROR_ROUTE = "*";

@@ -1,10 +1,10 @@
 import React, { useContext, useEffect } from "react";
-import PropTypes from "prop-types"; // Import PropTypes
+import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
+import PropTypes from "prop-types"; // Import PropTypes
+import { DESIGNATION, GENDER, PROFILE_DETAILS, ROUTES, SKILLS } from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
-import { DESIGNATION, GENDER, PROFILE_DETAILS, ROUTES, SKILLS } from "../../../Constants";
-import { useNavigate } from "react-router-dom";
 
 const BasicInfo = ({ profileData }) => {
   const [form] = Form.useForm();
@@ -12,7 +12,6 @@ const BasicInfo = ({ profileData }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log(profileData);
     if (profileData) {
       form.setFieldsValue(profileData.profile);
     }

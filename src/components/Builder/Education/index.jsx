@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
-import { ResumeContext } from "../../../utils/ResumeContext";
-import { get, post } from "../../../services/axios";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useParams } from "react-router-dom";
+import { get, post } from "../../../services/axios";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -40,7 +40,7 @@ const Education = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/profiles/${id}/educations`)
+      get(`/api/profiles/${id}/educations`)
         .then(response => {
           const educations = response.data.educations || [];
           setInitialState({ ...initialState, educations });
@@ -90,7 +90,7 @@ const Education = () => {
       educations,
     });
 
-    post(`/profiles/${id}/educations`, { educations: educations })
+    post(`/api/profiles/${id}/educations`, { educations: educations })
     // form.resetFields();
   };
 

@@ -1,7 +1,7 @@
 import React from "react";
-import styles from "./InputControl.module.css";
 import Select from "react-select";
 import makeAnimated from "react-select/animated";
+import styles from "./InputControl.module.css";
 
 const animatedComponents = makeAnimated();
 

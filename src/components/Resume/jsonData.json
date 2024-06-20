@@ -1,0 +1,102 @@
+
+{
+  "showAcheivements": true,
+  "showCertification": true,
+  "activeColor": "blue",
+
+  "profile": {
+    "profile_id": 1,
+    "name": "Prabhat Singh",
+    "email": "email@joshsoftware.com",
+    "gender": "Male",
+    "mobile": "1234567890",
+    "designation": "Software Engineer",
+    "description": "Passionate and Dedicated Candidate Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.",
+    "title": "Software Engineer",
+    "years_of_experience": 5,
+    "github_link": "github.com/dummy-user",
+    "linkedin_link": "linkedin.com/dummy-user"
+  },
+  "experiences": [
+    {
+      "id": 1,
+      "profile_id": 1,
+      "designation": "Senior Developer",
+      "company_name": "Tech Corp",
+      "from_date": "2020-01-01",
+      "to_date": "2023-01-01"
+    },
+    {
+      "id": 2,
+      "profile_id": 1,
+      "designation": "Junior Developer",
+      "company_name": "Tech Corp",
+      "from_date": "2017-01-01",
+      "to_date": "2020-01-01"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "profile_id": 1,
+      "name": "E-Commerce Platform",
+      "description": "Developed a full-fledged e-commerce platform. Which is the platform used to get the ecommenrce product with the best price.From which you can buy anything you want in the relatives price.",
+      "role": "Frontend Developer",
+      "responsibilities": "Led the frontend development.",
+      "technologies": "React, Node.js, MongoDB , CSS , HTML",
+      "tech_worked_on": "Django, AWS",
+      "working_start_date": "2021-01-01",
+      "working_end_date": "2022-01-01",
+      "duration": "1 Year"
+    }
+  ],
+  "educations": [
+    {
+      "id": 1,
+      "profile_id": 1,
+      "degree": "Bachelor of Technology",
+      "university_name": "Pune University",
+      "place": "Pune",
+      "percent_or_cgpa": "8.5",
+      "passing_year": "2017"
+    },
+    {
+      "id": 2,
+      "profile_id": 1,
+      "degree": "Higher Secondary",
+      "university_name": "CBSE",
+      "place": "Delhi",
+      "percent_or_cgpa": "85",
+      "passing_year": "2013"
+    }
+  ],
+  "skills": ["JavaScript", "React", "Node.js", "MongoDB", "CSS"],
+
+  "certifications": [
+    {
+      "id": 1,
+      "profile_id": 1,
+      "name": "Golang Certification",
+      "organization_name": "iNeuron.ai",
+      "description": "A Bootcamp for Mastering Golang Concepts",
+      "issued_date": "Dec-2023",
+      "from_date": "June-2023",
+      "to_date": "Dec-2023"
+    }
+  ],
+
+  "achievements": [
+    {
+      "id": 1,
+      "profile_id": 1,
+      "name": "Employee of the Year",
+      "description": "Description of Award"
+    },
+    {
+      "id": 2,
+      "profile_id": 1,
+      "name": "Best Employee",
+      "description": "Description of Award"
+    }
+  ]
+}

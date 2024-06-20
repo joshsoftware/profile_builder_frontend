@@ -1,21 +1,42 @@
 import React from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import Dashboard from "../components/Dashboard";
 import { Editor } from "../components/Builder/Index";
-import ListProfiles from "../components/Profile/List";
+import Dashboard from "../components/Dashboard";
+import Error from "../components/Error/Error";
 import Login from "../components/Login";
-
+import ListProfiles from "../components/Profile/List";
+import {
+  DASHBOARD_ROUTE,
+  EDITOR_PROFILE_ROUTE,
+  EDITOR_ROUTE,
+  ERROR_ROUTE,
+  PROFILE_LIST_ROUTE,
+  ROOT_ROUTE
+} from "../Constants";
+import ProtectedRoutes from "./ProtectedRoutes";
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/profiles" element={<ListProfiles />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/profile-builder" element={<Editor />} />
-        <Route path="/profile-builder/:id" element={<Editor />} />
+        <Route path={ROOT_ROUTE} element={<Login />} />
 
-        <Route path="*" element={<Login />} />
+        <Route
+          path={PROFILE_LIST_ROUTE}
+          element={<ProtectedRoutes Component={ListProfiles} />}
+        />
+        <Route
+          path={DASHBOARD_ROUTE}
+          element={<ProtectedRoutes Component={Dashboard} />}
+        />
+        <Route
+          path={EDITOR_ROUTE}
+          element={<ProtectedRoutes Component={Editor} />}
+        />
+        <Route
+          path={EDITOR_PROFILE_ROUTE}
+          element={<ProtectedRoutes Component={Editor} />}
+        />
+        <Route path={ERROR_ROUTE} element={<Error />} />
       </Routes>
     </BrowserRouter>
   );

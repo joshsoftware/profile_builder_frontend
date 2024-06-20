@@ -1,12 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Button, Col, Form, Input, Row, Space, DatePicker, Tabs } from "antd";
-import { ResumeContext } from "../../../utils/ResumeContext";
-import { get, post } from "../../../services/axios";
+import { useParams } from "react-router-dom";
+import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { useParams } from "react-router-dom";
 import moment from "moment";
+import { get, post } from "../../../services/axios";
+import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
@@ -41,7 +41,7 @@ const Certification = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/profiles/${id}/certificates`)
+      get(`/api/profiles/${id}/certificates`)
         .then(response => {
           const certificates = response.data.certificates || [];
           setInitialState({ ...initialState, certificates });
@@ -96,7 +96,7 @@ const Certification = () => {
     });
     console.log({ certificates });
 
-    post(`/profiles/${id}/certificates`, { certificates })
+    post(`/api/profiles/${id}/certificates`, { certificates })
     // form.resetFields();
   };
 

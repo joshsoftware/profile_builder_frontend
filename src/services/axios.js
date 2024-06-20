@@ -1,13 +1,18 @@
-import axios from "axios";
 import toast from "react-hot-toast";
+import axios from "axios";
+import store from "../api/store/store";
 
-const client = axios.create({
-  baseURL: "http://localhost:1925",
+const axiosInstance = axios.create({
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: {
+    "Content-Type": "application/json"
+  }
 });
 
-client.interceptors.request.use(
+axiosInstance.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    const state = store.getState();
+    const token = state.auth.token;
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,10 +23,8 @@ client.interceptors.request.use(
   }
 );
 
-client.interceptors.response.use(
+axiosInstance.interceptors.response.use(
   (response) => {
-    // Modify the response data here (e.g., parse, transform)
-
     return response;
   },
   (error) => {
@@ -32,7 +35,7 @@ client.interceptors.response.use(
 
 export const get = async (url) => {
   try {
-    const response = await client.get(url);
+    const response = await axiosInstance.get(url);
     return response.data;
   } catch (error) {
     throw new Error(error.message);
@@ -41,7 +44,7 @@ export const get = async (url) => {
 
 export const post = async (url, payload) => {
   try {
-    const response = await client.post(url, payload);
+    const response = await axiosInstance.post(url, payload);
     toast.success(response.data.data.message);
     return response.data;
   } catch (error) {
@@ -51,7 +54,7 @@ export const post = async (url, payload) => {
 
 export const put = async (url) => {
   try {
-    const response = await client.put(url);
+    const response = await axiosInstance.put(url);
     return response.data;
   } catch (error) {
     throw new Error(error.message);
@@ -60,7 +63,7 @@ export const put = async (url) => {
 
 export const patch = async (url) => {
   try {
-    const response = await client.patch(url);
+    const response = await axiosInstance.patch(url);
     return response.data;
   } catch (error) {
     throw new Error(error.message);
@@ -69,9 +72,11 @@ export const patch = async (url) => {
 
 export const remove = async (url) => {
   try {
-    const response = await client.delete(url);
+    const response = await axiosInstance.delete(url);
     return response.data;
   } catch (error) {
     throw new Error(error.message);
   }
 };
+
+export default axiosInstance;
