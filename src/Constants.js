@@ -9,6 +9,12 @@ export const PROFILES = {
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+export const PROFILE_ENDPOINT = "/api/profiles/";
+export const PROJECT_ENDPOINT = "/projects";
+export const EDUCATION_ENDPOINT = "/educations";
+export const EXPERIENCE_ENDPOINT = "/experiences";
+export const ACHIEVEMENT_ENDPOINT = "/achievements";
+export const CERTIFICATE_ENDPOINT = "/certificates";
 
 // HTTP METHODS
 export const HTTP_METHODS = {

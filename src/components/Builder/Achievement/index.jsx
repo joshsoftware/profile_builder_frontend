@@ -4,7 +4,8 @@ import { Button, Form, Input, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { get, post } from "../../../services/axios";
+import { useGetAchievementsQuery } from "../../../api/achievementApi";
+import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
@@ -32,50 +33,41 @@ const Achievement = () => {
   const [items, setItems] = useState([{ label: "Achievement 1", children: null, key: "0" }]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
-  const sensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 10,
-    },
-  });
+  const { data } = useGetAchievementsQuery(id);
+  const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/achievements`)
-        .then(response => {
-          const achievements = response.data.achievements || [];
-          setInitialState({ ...initialState, achievements });
-
-          if (achievements.length > 0) {
-            const tabs = achievements.map((achievement, index) => ({
-              label: `Achievement ${index + 1}`,
-              children: null,
-              key: `${index}`,
-            }));
-            setItems(tabs);
-            newTabIndex.current = achievements.length;
-            form.setFieldsValue(
-              achievements.reduce((acc, achievement, index) => {
-                acc[`achievement_${index}`] = {
-                  name: achievement.name,
-                  description: achievement.description,
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+    if (id && data) {
+      setInitialState({ ...initialState, data });
+      if (data.length > 0) {
+        const tabs = data.map((achievement, index) => ({
+          label: `Achievement ${index + 1}`,
+          children: null,
+          key: `${index}`,
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, achievement, index) => {
+            acc[`achievement_${index}`] = {
+              name: achievement.name,
+              description: achievement.description,
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        resetItems();
+      }
     }
-  }, [id]);
+  }, [id, data]);
+
+  const resetItems = () => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  };
 
   const onFinish = (values) => {
     const achievements = items.map((item, index) => ({
@@ -83,22 +75,13 @@ const Achievement = () => {
       description: values[`achievement_${index}`]?.description,
     }));
 
-    setInitialState({
-      ...initialState,
-      achievements,
-    });
-    console.log({ achievements });
-
-    post(`/api/profiles/${id}/achievements`, { achievements })
-    // form.resetFields();
+    setInitialState({ ...initialState, achievements });
+    post(`/api/profiles/${id}/achievements`, { achievements });
   };
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      achievements: [],
-    });
+    setInitialState({ ...initialState, achievements: [] });
   };
 
   const onChange = (key) => {
@@ -107,21 +90,16 @@ const Achievement = () => {
 
   const add = () => {
     const newActiveKey = `${newTabIndex.current++}`;
-    setItems([
-      ...items,
-      { label: `Achievement ${newTabIndex.current}`, children: null, key: newActiveKey },
-    ]);
+    setItems([...items, { label: `Achievement ${newTabIndex.current}`, children: null, key: newActiveKey }]);
     setActiveKey(newActiveKey);
   };
 
   const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
-      setActiveKey(key);
+    const newItems = items.filter((item) => item.key !== targetKey);
+    setItems(newItems);
+    if (newItems.length && targetKey === activeKey) {
+      setActiveKey(newItems[0].key);
     }
-    setItems(newPanes);
   };
 
   const onEdit = (targetKey, action) => {
@@ -158,29 +136,15 @@ const Achievement = () => {
             items={items.map((item, index) => ({
               ...item,
               children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`achievement_${item.key}`}
-                  onFinish={onFinish}
-                  key={item.key}
-                >
+                <Form layout="vertical" form={form} name={`achievement_${item.key}`} onFinish={onFinish} key={item.key}>
                   <Form.Item
                     name={[`achievement_${index}`, "name"]}
                     label="Achievement Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Name required",
-                      },
-                    ]}
+                    rules={[{ required: true, message: "Name required" }]}
                   >
                     <Input placeholder="Achievement name eg. star performer" />
                   </Form.Item>
-                  <Form.Item
-                    name={[`achievement_${index}`, "description"]}
-                    label="Description"
-                  >
+                  <Form.Item name={[`achievement_${index}`, "description"]} label="Description">
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above achievement"
                       showCount

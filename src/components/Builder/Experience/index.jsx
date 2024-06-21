@@ -5,8 +5,9 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import moment from "moment";
+import { useGetExperiencesQuery } from "../../../api/experienceApi";
 import { DESIGNATION } from "../../../Constants";
-import { get, post } from "../../../services/axios";
+import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
@@ -34,6 +35,7 @@ const Experience = () => {
   const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
+  const { data } = useGetExperiencesQuery(id);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10,
@@ -41,57 +43,46 @@ const Experience = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/experiences`)
-        .then(response => {
-          const experiences = response.data.experiences || [];
-          setInitialState({ ...initialState, experiences });
+    if (id && data) {
+      setInitialState({ ...initialState, data });
 
-          if (experiences.length > 0) {
-            const tabs = experiences.map((experience, index) => ({
-              label: `Experience ${index + 1}`,
-              children: null,
-              key: `${index}`,
-            }));
-            setItems(tabs);
-            newTabIndex.current = experiences.length;
-            form.setFieldsValue(
-              experiences.reduce((acc, experience, index) => {
-                acc[`experience_${index}`] = {
-                  ...experience,
-                  employmentStart: experience.from_date ? moment(experience.from_date, "MMM-YYYY") : null,
-                  employmentEnd: experience.to_date && experience.to_date !== "Present" ? moment(experience.to_date, "MMM-YYYY") : null,
-                  isCurrentCompany: experience.to_date === "Present"
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Experience 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Experience 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data.length > 0) {
+        const tabs = data.map((experience, index) => ({
+          label: `Experience ${index + 1}`,
+          children: null,
+          key: `${index}`,
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, experience, index) => {
+            acc[`experience_${index}`] = {
+              ...experience,
+              employmentStart: experience.from_date ? moment(experience.from_date, "MMM-YYYY") : null,
+              employmentEnd: experience.to_date && experience.to_date !== "Present" ? moment(experience.to_date, "MMM-YYYY") : null,
+              isCurrentCompany: experience.to_date === "Present"
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Experience 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [id, data]);
 
   const onFinish = (values) => {
-    const experiences = items.map((item, index) => {
-      return {
-        designation: values[`experience_${index}`]?.designation,
-        company_name: values[`experience_${index}`]?.company_name,
-        from_date: values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
-        to_date: values[`experience_${index}`]?.isCurrentCompany
-          ? "Present"
-          : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY"),
-      };
-    });
+    const experiences = items.map((item, index) => ({
+      designation: values[`experience_${index}`]?.designation,
+      company_name: values[`experience_${index}`]?.company_name,
+      from_date: values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
+      to_date: values[`experience_${index}`]?.isCurrentCompany
+        ? "Present"
+        : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY"),
+    }));
 
     setInitialState({
       ...initialState,
@@ -99,7 +90,7 @@ const Experience = () => {
     });
 
     post(`/api/profiles/${id}/experiences`, { experiences })
-    //form.resetFields();
+    // form.resetFields();
   };
 
   const onReset = () => {

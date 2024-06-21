@@ -16,7 +16,6 @@ const ListProfiles = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const navigate = useNavigate();
-
   const { data, isFetching } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -181,34 +180,23 @@ const ListProfiles = () => {
   return (
     <>
       <Navbar />
-      <Typography.Title level={1} className={styles.profile_header}>
-        Profiles
-        <Link to={`/profile-builder`}>
-            <Button type="primary" className={styles.button}> + New </Button></Link>
-      </Typography.Title>
-      <Table
-        columns={columns}
-        dataSource={data?.profiles}
-        className={styles.table}
-        bordered={true}
-        loading={isFetching}
-      />
-      {/* {data && !isFetching && (
-        <>
-          <div className={styles.header}>
-            <h1 className={styles.heading}>
-              <span>Profiles</span>
-            </h1>
-            
-          </div>
-          <Table
-            columns={columns}
-            dataSource={data?.length > 0 ? data : []}
-            className={styles.table}
-            bordered={true}
-          />
-        </>
-      )} */}
+      <div className={styles.content}>
+        <div className={styles.header}>
+          <Typography.Title level={1} className={styles.profile_header}>
+            Profiles
+          </Typography.Title>
+          <Link to={`/profile-builder`}>
+            <Button type="primary" className={styles.button}>+ New</Button>
+          </Link>
+        </div>
+        <Table
+          columns={columns}
+          dataSource={data?.profiles}
+          className={styles.table}
+          bordered={true}
+          loading={isFetching}
+        />
+      </div>
     </>
   );
 };

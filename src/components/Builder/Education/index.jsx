@@ -4,7 +4,8 @@ import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { get, post } from "../../../services/axios";
+import { useGetEducationsQuery } from "../../../api/educationApi";
+import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
@@ -32,6 +33,7 @@ const Education = () => {
   const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
+  const { data } = useGetEducationsQuery(id);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10,
@@ -39,58 +41,47 @@ const Education = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/educations`)
-        .then(response => {
-          const educations = response.data.educations || [];
-          setInitialState({ ...initialState, educations });
+    if (id && data) {
+      setInitialState({ ...initialState, data });
 
-          if (educations.length > 0) {
-            const tabs = educations.map((education, index) => ({
-              label: `Education ${index + 1}`,
-              children: null,
-              key: `${index}`,
-            }));
-            setItems(tabs);
-            newTabIndex.current = educations.length;
-            form.setFieldsValue(
-              educations.reduce((acc, education, index) => {
-                acc[`education_${index}`] = education;
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Education 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Education 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data.length > 0) {
+        const tabs = data.map((education, index) => ({
+          label: `Education ${index + 1}`,
+          children: null,
+          key: `${index}`,
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, education, index) => {
+            acc[`education_${index}`] = education;
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Education 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [id, data]);
 
   const onFinish = (values) => {
-    const educations = items.map((item, index) => {
-      return {
-        degree: values[`education_${index}`]?.degree,
-        university_name: values[`education_${index}`]?.university_name,
-        place: values[`education_${index}`]?.place,
-        percent_or_cgpa: values[`education_${index}`]?.percent_or_cgpa,
-        passing_year: values[`education_${index}`]?.passing_year,
-      };
-    });
+    const educations = items.map((item, index) => ({
+      degree: values[`education_${index}`]?.degree,
+      university_name: values[`education_${index}`]?.university_name,
+      place: values[`education_${index}`]?.place,
+      percent_or_cgpa: values[`education_${index}`]?.percent_or_cgpa,
+      passing_year: values[`education_${index}`]?.passing_year,
+    }));
 
     setInitialState({
       ...initialState,
       educations,
     });
 
-    post(`/api/profiles/${id}/educations`, { educations: educations })
+    post(`/api/profiles/${id}/educations`, { educations })
     // form.resetFields();
   };
 

@@ -1,11 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select,Space, Tabs } from "antd";
+import { Button, Col, DatePicker, Form, Input, Row, Select, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import moment from "moment";
-import { get, post } from "../../../services/axios";
+import { useGetProjectQuery } from "../../../api/projectApi";
+import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
@@ -34,6 +35,7 @@ const Project = () => {
   const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
+  const { data } = useGetProjectQuery(id);
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -43,48 +45,41 @@ const Project = () => {
 
   useEffect(() => {
     if (id) {
-      get(`/api/profiles/${id}/projects`)
-        .then(response => {
-          const projects = response.data.projects || [];
-          setInitialState({ ...initialState, projects });
+      if (data) {
+        setInitialState({ ...initialState, data });
+      }
 
-          if (projects.length > 0) {
-            const tabs = projects.map((project, index) => ({
-              label: `Project ${index + 1}`,
-              children: null,
-              key: `${index}`,
-            }));
-            setItems(tabs);
-            newTabIndex.current = projects.length;
-            form.setFieldsValue(
-              projects.reduce((acc, project, index) => {
-                acc[`project_${index}`] = {
-                  ...project,
-                  working_start_date: project.working_start_date ? moment(project.working_start_date) : null,
-                  working_end_date: project.working_end_date ? moment(project.working_end_date, "MMM-YYYY") : null,
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Project 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Project 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data?.length > 0) {
+        const tabs = data.map((project, index) => ({
+          label: `Project ${index + 1}`,
+          children: null,
+          key: `${index}`,
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, project, index) => {
+            acc[`project_${index}`] = {
+              ...project,
+              working_start_date: project.working_start_date ? moment(project.working_start_date) : null,
+              working_end_date: project.working_end_date ? moment(project.working_end_date, "MMM-YYYY") : null,
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Project 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [id, data]);
 
   const onFinish = (values) => {
     const projects = items.map((item, index) => {
       const project = values[`project_${index}`];
-  
+
       return {
         name: project.name,
         description: project.description,
@@ -97,14 +92,14 @@ const Project = () => {
         duration: project.duration,
       };
     });
-  
+
     setInitialState({
       ...initialState,
       projects,
     });
     post(`/api/profiles/${id}/projects`, { projects });
     // form.resetFields();
-  };  
+  };
 
   const onReset = () => {
     form.resetFields();
