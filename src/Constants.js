@@ -6,9 +6,23 @@ export const PROFILES = {
   external: { title: "EXTERNAL", color: "#062e38" }
 };
 
+// ROUTES
+export const ROOT_ROUTE = "/";
+export const PROFILE_LIST_ROUTE = "/profiles";
+export const DASHBOARD_ROUTE = "/dashboard";
+export const EDITOR_ROUTE = "/profile-builder";
+export const EDITOR_PROFILE_ROUTE = "/profile-builder/:id";
+export const ERROR_ROUTE = "*";
+
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
+export const CREATE_ACHIEVEMENT_ENDPOINTS = "/api/profiles/:id/achievements";
+export const CREATE_CERTIFICATE_ENDPOINTS = "/api/profiles/:id/certificates";
+export const CREATE_EDUCATION_ENDPOINTS = "/api/profiles/:id/educations";
+export const CREATE_EXPERIENCE_ENDPOINTS = "/api/profiles/:id/experiences";
+export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:id/projects";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
@@ -16,6 +30,23 @@ export const HTTP_METHODS = {
   GET: "GET",
   PUT: "PUT"
 };
+// Redux Toolkit Query
+export const LOGIN_REDUCER_PATH = "loginApi";
+export const PROFILE_REDUCER_PATH = "profileApi";
+export const ACHIEVEMENT_REDUCER_PATH = "achievementApi";
+export const CERTIFICATE_REDUCER_PATH = "certificateApi";
+export const EDUCATION_REDUCER_PATH = "educationApi";
+export const EXPERIENCE_REDUCER_PATH = "experienceApi";
+export const PROJECT_REDUCER_PATH = "projectApi";
+
+// Redux Tag Types
+export const LOGIN_TAG_TYPES = ["login"];
+export const PROFILE_TAG_TYPES = ["profile"];
+export const ACHIEVEMENT_TAG_TYPES = ["achievement"];
+export const CERTIFICATE_TAG_TYPES = ["certificate"];
+export const EDUCATION_TAG_TYPES = ["education"];
+export const EXPERIENCE_TAG_TYPES = ["experience"];
+export const PROJECT_TAG_TYPES = ["project"];
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
@@ -59,11 +90,11 @@ export const SKILLS = [
 
 export const ROUTES = {
   profile: "/api/profiles",
-  project:"/profiles/2/projects",
-  education:"/profiles/2/educations",
-  experience:"/profiles/2/experiences",
-  achievement:"/profiles/2/achievements",
-  certificate:"/profiles/2/certificates"
+  project: "/profiles/2/projects",
+  education: "/profiles/2/educations",
+  experience: "/profiles/2/experiences",
+  achievement: "/profiles/2/achievements",
+  certificate: "/profiles/2/certificates"
 };
 
 // TODO : Remove once refactor
@@ -111,11 +142,3 @@ export const getMonthString = (num) => {
   }
   return month;
 };
-
-// ROUTES
-export const ROOT_ROUTE = "/";
-export const PROFILE_LIST_ROUTE = "/profiles";
-export const DASHBOARD_ROUTE = "/dashboard";
-export const EDITOR_ROUTE = "/profile-builder";
-export const EDITOR_PROFILE_ROUTE = "/profile-builder/:id";
-export const ERROR_ROUTE = "*";
