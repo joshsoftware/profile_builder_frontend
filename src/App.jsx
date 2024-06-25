@@ -14,7 +14,7 @@ const App = () => {
     skills: [],
     education: [],
     workExperience: [],
-    certifications: [],
+    certifications: []
   });
 
   return (
@@ -22,7 +22,7 @@ const App = () => {
       <ResumeContext.Provider value={{ initialState, setInitialState }}>
         <QueryClientProvider client={queryClient}>
           <Router />
-          <Toaster position='top-right' />
+          <Toaster position="top-right" />
         </QueryClientProvider>
       </ResumeContext.Provider>
     </div>
