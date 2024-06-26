@@ -1,6 +1,7 @@
 import toast from "react-hot-toast";
 import axios from "axios";
 import store from "../api/store/store";
+import { NETWORK_ERROR } from "../Constants";
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
@@ -30,8 +31,7 @@ axiosInstance.interceptors.response.use(
   (error) => {
     error.response?.data?.error_code
       ? toast.error(error.response?.data?.error_message)
-      : toast.error("Network Error");
-
+      : toast.error(NETWORK_ERROR);
     return Promise.reject(error);
   }
 );
