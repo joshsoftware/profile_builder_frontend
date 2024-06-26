@@ -1,48 +1,61 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import moment from "moment";
-import { get, post } from "../../../services/axios";
+import { useCreateCertificateMutation } from "../../../api/certificationApi";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { get } from "../../../services/axios";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-node-key"]
+    });
   const style = {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    cursor: "move",
+    cursor: "move"
   };
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
     ...attributes,
-    ...listeners,
+    ...listeners
   });
 };
 
 const Certification = () => {
+  const [createCertificateService] = useCreateCertificateMutation();
   const [form] = Form.useForm();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([{ label: "Certification 1", children: null, key: "0" }]);
+  const [items, setItems] = useState([
+    { label: "Certification 1", children: null, key: "0" }
+  ]);
   const newTabIndex = useRef(1);
   const { id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}/certificates`)
-        .then(response => {
+        .then((response) => {
           const certificates = response.data.certificates || [];
           setInitialState({ ...initialState, certificates });
 
@@ -50,18 +63,25 @@ const Certification = () => {
             const tabs = certificates.map((certificate, index) => ({
               label: `Certification ${index + 1}`,
               children: null,
-              key: `${index}`,
+              key: `${index}`
             }));
             setItems(tabs);
             newTabIndex.current = certificates.length;
             form.setFieldsValue(
               certificates.reduce((acc, certificate, index) => {
                 acc[`name_${index}`] = certificate.name;
-                acc[`organization_name_${index}`] = certificate.organization_name;
+                acc[`organization_name_${index}`] =
+                  certificate.organization_name;
                 acc[`description_${index}`] = certificate.description;
-                acc[`issued_date_${index}`] = certificate.issued_date ? moment(certificate.issued_date, "MMM-YYYY") : null;
-                acc[`from_date_${index}`] = certificate.from_date ? moment(certificate.from_date, "MMM-YYYY") : null;
-                acc[`to_date_${index}`] = certificate.to_date ? moment(certificate.to_date, "MMM-YYYY") : null;
+                acc[`issued_date_${index}`] = certificate.issued_date
+                  ? moment(certificate.issued_date, "MMM-YYYY")
+                  : null;
+                acc[`from_date_${index}`] = certificate.from_date
+                  ? moment(certificate.from_date, "MMM-YYYY")
+                  : null;
+                acc[`to_date_${index}`] = certificate.to_date
+                  ? moment(certificate.to_date, "MMM-YYYY")
+                  : null;
                 return acc;
               }, {})
             );
@@ -80,31 +100,44 @@ const Certification = () => {
     }
   }, [id]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const certificates = items.map((item, index) => ({
       name: values[`name_${index}`],
       organization_name: values[`organization_name_${index}`],
       description: values[`description_${index}`],
       issued_date: values[`issued_date_${index}`]?.format("MMM-YYYY"),
       from_date: values[`from_date_${index}`]?.format("MMM-YYYY"),
-      to_date: values[`to_date_${index}`]?.format("MMM-YYYY"),
+      to_date: values[`to_date_${index}`]?.format("MMM-YYYY")
     }));
 
     setInitialState({
       ...initialState,
-      certificates,
+      certificates
     });
-    console.log({ certificates });
 
-    post(`/api/profiles/${id}/certificates`, { certificates })
-    // form.resetFields();
+    if (!validateId(id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createCertificateService({
+        profile_id: id,
+        values: certificates
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      certificates: [],
+      certificates: []
     });
   };
 
@@ -116,7 +149,11 @@ const Certification = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Certification ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Certification ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -125,7 +162,10 @@ const Certification = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -155,7 +195,10 @@ const Certification = () => {
         <Button onClick={add}>Add Certification</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -180,8 +223,8 @@ const Certification = () => {
                         rules={[
                           {
                             required: true,
-                            message: "Name required",
-                          },
+                            message: "Name required"
+                          }
                         ]}
                       >
                         <Input placeholder="Enter certificate name" />
@@ -196,10 +239,7 @@ const Certification = () => {
                       </Form.Item>
                     </Col>
                   </Row>
-                  <Form.Item
-                    name={`description_${index}`}
-                    label="Description"
-                  >
+                  <Form.Item name={`description_${index}`} label="Description">
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above certificate"
                       showCount
@@ -245,7 +285,7 @@ const Certification = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
