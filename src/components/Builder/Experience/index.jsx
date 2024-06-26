@@ -5,7 +5,8 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import moment from "moment";
 import { useGetExperiencesQuery } from "../../../api/experienceApi";
-import { DESIGNATION, DraggableTabNode } from "../../../Constants";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import { DESIGNATION } from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 

@@ -16,12 +16,9 @@ export const profileApi = createApi({
     }),
 
     getBasicInfo: builder.query({
-      query: (id) => {
-        if (id === undefined) {
-          return { data: null };
-        }
+      query: (profile_id) => {
         return {
-          url: PROFILE_GET_ENDPOINT + id
+          url: PROFILE_GET_ENDPOINT.replace(":profile_id", profile_id),
         };
       },
       providesTags: ["profiles"],

@@ -1,7 +1,3 @@
-import React from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-
 export const PROFILE_DETAILS =
   "Passionate and Dedicated Candidate Looking for an Opportunity where I can apply my Skills and Knowledge to Enhance user experience, build Scalable products and Contribute to organization's Success.";
 
@@ -13,7 +9,7 @@ export const PROFILES = {
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
-export const PROFILE_GET_ENDPOINT = "/api/profiles/";
+export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
 export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
 export const EDUCATION_LIST_ENDPOINT = "/api/profiles/:profile_id/educations";
 export const EXPERIENCE_LIST_ENDPOINT = "/api/profiles/:profile_id/experiences";
@@ -138,22 +134,3 @@ export const DASHBOARD_ROUTE = "/dashboard";
 export const EDITOR_ROUTE = "/profile-builder";
 export const EDITOR_PROFILE_ROUTE = "/profile-builder/:profile_id";
 export const ERROR_ROUTE = "*";
-
-//Draggble Tabs
-export const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move",
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners,
-  });
-};
