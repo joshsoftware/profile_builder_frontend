@@ -1,17 +1,17 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { PROFILE_ENDPOINT, PROFILE_LIST_ENDPOINT } from "../Constants";
+import { PROFILE_GET_ENDPOINT, PROFILE_LIST_ENDPOINT, ReducerPath, TagTypes } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const profileApi = createApi({
-  reducerPath: "profileApi",
+  reducerPath: ReducerPath.profile,
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["profiles"],
+  tagTypes: [TagTypes.profile],
   endpoints: (builder) => ({
     getProfileList: builder.query({
       query: () => ({
         url: PROFILE_LIST_ENDPOINT
       }),
-      providesTags: ["profiles"],
+      providesTags: [TagTypes.profile],
       transformResponse: (response) => response.data
     }),
 
@@ -21,7 +21,7 @@ export const profileApi = createApi({
           return { data: null };
         }
         return {
-          url: PROFILE_ENDPOINT + id
+          url: PROFILE_GET_ENDPOINT + id
         };
       },
       providesTags: ["profiles"],

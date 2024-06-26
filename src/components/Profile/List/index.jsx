@@ -8,6 +8,7 @@ import {
   SearchOutlined
 } from "@ant-design/icons";
 import { useGetProfileListQuery } from "../../../api/profileApi";
+import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
 
@@ -106,7 +107,7 @@ const ListProfiles = () => {
   });
 
   const handleClick = (id) => {
-    navigate(`/profile-builder/${id}`);
+    navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id));
   };
 
   const columns = [
@@ -160,7 +161,7 @@ const ListProfiles = () => {
       dataIndex: "is_current_employee",
       key: "is_current_employee",
       render: (is_current_employee) => (
-        <strong>{is_current_employee}</strong>
+        is_current_employee
       ),
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
       sortDirections: ["descend", "ascend"]
@@ -185,7 +186,7 @@ const ListProfiles = () => {
           <Typography.Title level={1} className={styles.profile_header}>
             Profiles
           </Typography.Title>
-          <Link to={`/profile-builder`}>
+          <Link to={EDITOR_ROUTE}>
             <Button type="primary" className={styles.button}>+ New</Button>
           </Link>
         </div>

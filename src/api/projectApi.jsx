@@ -1,18 +1,18 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { PROFILE_ENDPOINT, PROJECT_ENDPOINT } from "../Constants";
+import { PROJECT_LIST_ENDPOINT, ReducerPath, TagTypes } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const projectApi = createApi({
-  reducerPath: "projectApi",
+  reducerPath: ReducerPath.project,
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["projects"],
+  tagTypes: [TagTypes.project],
   endpoints: (builder) => ({
 
-    getProject :builder.query({
+    getProject: builder.query({
       query: (profile_id)=>({
-        url: PROFILE_ENDPOINT+profile_id+PROJECT_ENDPOINT
+        url: PROJECT_LIST_ENDPOINT.replace(":profile_id", profile_id),
       }),
-      providesTags: ["projects"],
+      providesTags: [TagTypes.project],
       transformResponse: (response) => response.data.projects
     })
 

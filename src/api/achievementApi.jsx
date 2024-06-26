@@ -1,18 +1,18 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { ACHIEVEMENT_ENDPOINT, PROFILE_ENDPOINT } from "../Constants";
+import { ACHIEVEMENT_LIST_ENDPOINT, ReducerPath, TagTypes } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const achievementApi = createApi({
-  reducerPath: "achievementApi",
+  reducerPath: ReducerPath.achievement,
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["achievements"],
+  tagTypes: [TagTypes.achievement],
   endpoints: (builder) => ({
 
-    getAchievements :builder.query({
+    getAchievements: builder.query({
       query: (profile_id)=>({
-        url: PROFILE_ENDPOINT+profile_id+ACHIEVEMENT_ENDPOINT
+        url: ACHIEVEMENT_LIST_ENDPOINT.replace(":profile_id", profile_id),
       }),
-      providesTags: ["achievements"],
+      providesTags: [TagTypes.achievement],
       transformResponse: (response) => response.data.achievements
     })
 

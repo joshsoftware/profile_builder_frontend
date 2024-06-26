@@ -2,31 +2,12 @@ import React, { useContext, useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
 import moment from "moment";
 import { useGetExperiencesQuery } from "../../../api/experienceApi";
-import { DESIGNATION } from "../../../Constants";
+import { DESIGNATION, DraggableTabNode } from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
-
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move",
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners,
-  });
-};
 
 const Experience = () => {
   const { initialState, setInitialState } = useContext(ResumeContext);
@@ -153,127 +134,129 @@ const Experience = () => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Experience</Button>
-      </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`experience_${item.key}`}
-                  onFinish={onFinish}
-                  key={item.key}
-                >
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`experience_${index}`, "designation"]}
-                        label="Designation"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Designation can not be blank",
-                          },
-                        ]}
-                      >
-                        <Select
-                          placeholder="Select designation"
-                          options={DESIGNATION}
-                          allowClear
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`experience_${index}`, "company_name"]}
-                        label="Company Name"
-                      >
-                        <Input placeholder="Enter Company Name eg. Amazon" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row style={{ margin: "10px 0px 10px 0px" }}>
-                    <Col>
-                      <Form.Item name={[`experience_${index}`, "isCurrentCompany"]} valuePropName="checked" initialValue={false}>
-                        <Checkbox
-                          onChange={(e) => onChangeCheckbox(e, item.key)}
-                        >
-                          Is This A Current Company?
-                        </Checkbox>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`experience_${index}`, "employmentStart"]}
-                        label="Employment Start Date"
-                        rules={[
-                          {
-                            type: "object",
-                            required: true,
-                            message: "Start date can not be blank",
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month"/>
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      {!item.isCurrentCompany && (
+    <>
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Experience</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`experience_${item.key}`}
+                    onFinish={onFinish}
+                    key={item.key}
+                  >
+                    <Row>
+                      <Col span={11}>
                         <Form.Item
-                          name={[`experience_${index}`, "employmentEnd"]}
-                          label="Employment End Date"
+                          name={[`experience_${index}`, "designation"]}
+                          label="Designation"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Designation can not be blank",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select designation"
+                            options={DESIGNATION}
+                            allowClear
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`experience_${index}`, "company_name"]}
+                          label="Company Name"
+                        >
+                          <Input placeholder="Enter Company Name eg. Amazon" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row style={{ margin: "10px 0px 10px 0px" }}>
+                      <Col>
+                        <Form.Item name={[`experience_${index}`, "isCurrentCompany"]} valuePropName="checked" initialValue={false}>
+                          <Checkbox
+                            onChange={(e) => onChangeCheckbox(e, item.key)}
+                          >
+                            Is This A Current Company?
+                          </Checkbox>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`experience_${index}`, "employmentStart"]}
+                          label="Employment Start Date"
                           rules={[
                             {
                               type: "object",
                               required: true,
-                              message: "End date can not be blank",
+                              message: "Start date can not be blank",
                             },
                           ]}
                         >
                           <DatePicker style={{ width: "100%" }} picker="month"/>
                         </Form.Item>
-                      )}
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button type="primary" htmlType="submit">
-                        Save
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        {!item.isCurrentCompany && (
+                          <Form.Item
+                            name={[`experience_${index}`, "employmentEnd"]}
+                            label="Employment End Date"
+                            rules={[
+                              {
+                                type: "object",
+                                required: true,
+                                message: "End date can not be blank",
+                              },
+                            ]}
+                          >
+                            <DatePicker style={{ width: "100%" }} picker="month"/>
+                          </Form.Item>
+                        )}
+                      </Col>
+                    </Row>
+                    <Form.Item>
+                      <Space>
+                        <Button type="primary" htmlType="submit">
+                          Save
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
+      </div>
+    </>
   );
 };
 

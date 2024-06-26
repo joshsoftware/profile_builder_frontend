@@ -1,18 +1,18 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { EXPERIENCE_ENDPOINT, PROFILE_ENDPOINT } from "../Constants";
+import { EXPERIENCE_LIST_ENDPOINT, ReducerPath, TagTypes } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const experienceApi = createApi({
-  reducerPath: "experienceApi",
+  reducerPath: ReducerPath.experience,
   baseQuery: axiosBaseQuery(),
-  tagTypes: ["experiences"],
+  tagTypes: [TagTypes.experience],
   endpoints: (builder) => ({
 
-    getExperiences :builder.query({
+    getExperiences: builder.query({
       query: (profile_id)=>({
-        url: PROFILE_ENDPOINT+profile_id+EXPERIENCE_ENDPOINT
+        url: EXPERIENCE_LIST_ENDPOINT.replace(":profile_id", profile_id),
       }),
-      providesTags: ["experiences"],
+      providesTags: [TagTypes.experience],
       transformResponse: (response) => response.data.experiences
     })
 

@@ -2,7 +2,13 @@ import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
-import { DESIGNATION, GENDER, PROFILE_DETAILS, ROUTES, SKILLS } from "../../../Constants";
+import {
+  DESIGNATION,
+  GENDER,
+  PROFILE_DETAILS,
+  PROFILE_LIST_ENDPOINT,
+  SKILLS,
+} from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
@@ -32,8 +38,8 @@ const BasicInfo = ({ profileData }) => {
     });
 
     try {
-      await post(ROUTES.profile, { profile: updatedBasicInfo });
-      navigate(`/profiles`);
+      await post(PROFILE_LIST_ENDPOINT, { profile: updatedBasicInfo });
+      navigate(PROFILE_LIST_ENDPOINT);
     } catch (error) {
       console.error("Error posting basic info:", error);
     }
@@ -56,7 +62,9 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
-      initialValues={profileData?.profile || { profileDetails: PROFILE_DETAILS }}
+      initialValues={
+        profileData?.profile || { profileDetails: PROFILE_DETAILS }
+      }
     >
       <Row gutter={16}>
         <Col span={12}>
@@ -72,7 +80,13 @@ const BasicInfo = ({ profileData }) => {
           <Form.Item
             name="email"
             label="Email"
-            rules={[{ required: true, type: "email", message: "Valid email required" }]}
+            rules={[
+              {
+                required: true,
+                type: "email",
+                message: "Valid email required",
+              },
+            ]}
           >
             <Input placeholder="example@joshsoftware.com" />
           </Form.Item>
@@ -103,22 +117,35 @@ const BasicInfo = ({ profileData }) => {
               { required: true, message: "Experience required" },
               {
                 validator: (_, value) =>
-                  value <= 30 ? Promise.resolve() : Promise.reject("Maximum experience is 30 years."),
+                  value <= 30
+                    ? Promise.resolve()
+                    : Promise.reject("Maximum experience is 30 years."),
               },
             ]}
           >
-            <Input type="number" placeholder="Enter experience (e.g., 2.5, 1)" />
+            <Input
+              type="number"
+              placeholder="Enter experience (e.g., 2.5, 1)"
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item name="designation" label="Designation">
-            <Select placeholder="Select designation" options={DESIGNATION} allowClear />
+            <Select
+              placeholder="Select designation"
+              options={DESIGNATION}
+              allowClear
+            />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name="title" label="Title" rules={[{ required: true, message: "Title required" }]}>
+          <Form.Item
+            name="title"
+            label="Title"
+            rules={[{ required: true, message: "Title required" }]}
+          >
             <Input placeholder="Backend Developer, Data Analyst, etc." />
           </Form.Item>
         </Col>
@@ -137,27 +164,47 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       <Row gutter={16}>
         <Col span={24}>
-          <Form.Item name="description" label="Description" initialValue={PROFILE_DETAILS}>
-            <Input.TextArea maxLength={600} style={{ height: 120, resize: "none" }} />
+          <Form.Item
+            name="description"
+            label="Description"
+            initialValue={PROFILE_DETAILS}
+          >
+            <Input.TextArea
+              maxLength={600}
+              style={{ height: 120, resize: "none" }}
+            />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="primary_skills" label="Primary Skills">
-            <Select mode="multiple" style={{ width: "100%" }} placeholder="Select primary skills" options={SKILLS} />
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              placeholder="Select primary skills"
+              options={SKILLS}
+            />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item name="secondary_skills" label="Secondary Skills">
-            <Select mode="tags" style={{ width: "100%" }} placeholder="Add secondary skills" />
+            <Select
+              mode="tags"
+              style={{ width: "100%" }}
+              placeholder="Add secondary skills"
+            />
           </Form.Item>
         </Col>
       </Row>
       <Row gutter={16}>
         <Col span={24}>
           <Form.Item name="career_objectives" label="Career Objectives">
-            <Input.TextArea placeholder="Provide career objectives" maxLength={300} showCount />
+            <Input.TextArea
+              placeholder="Provide career objectives"
+              maxLength={300}
+              showCount
+            />
           </Form.Item>
         </Col>
       </Row>
