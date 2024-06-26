@@ -11,18 +11,22 @@ export const ROOT_ROUTE = "/";
 export const PROFILE_LIST_ROUTE = "/profiles";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const EDITOR_ROUTE = "/profile-builder";
-export const EDITOR_PROFILE_ROUTE = "/profile-builder/:id";
+export const EDITOR_PROFILE_ROUTE = "/profile-builder/:profile_id";
 export const ERROR_ROUTE = "*";
 
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
-export const CREATE_ACHIEVEMENT_ENDPOINTS = "/api/profiles/:id/achievements";
-export const CREATE_CERTIFICATE_ENDPOINTS = "/api/profiles/:id/certificates";
-export const CREATE_EDUCATION_ENDPOINTS = "/api/profiles/:id/educations";
-export const CREATE_EXPERIENCE_ENDPOINTS = "/api/profiles/:id/experiences";
-export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:id/projects";
+export const CREATE_ACHIEVEMENT_ENDPOINTS =
+  "/api/profiles/:profile_id/achievements";
+export const CREATE_CERTIFICATE_ENDPOINTS =
+  "/api/profiles/:profile_id/certificates";
+export const CREATE_EDUCATION_ENDPOINTS =
+  "/api/profiles/:profile_id/educations";
+export const CREATE_EXPERIENCE_ENDPOINTS =
+  "/api/profiles/:profile_id/experiences";
+export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
 
 // HTTP METHODS
 export const HTTP_METHODS = {

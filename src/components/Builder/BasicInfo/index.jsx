@@ -39,7 +39,7 @@ const BasicInfo = ({ profileData }) => {
       if (response.data?.message) {
         toast.success(response.data?.message);
         navigate(
-          EDITOR_PROFILE_ROUTE.replace(":id", response.data?.profile_id)
+          EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
         );
       }
     } catch (error) {

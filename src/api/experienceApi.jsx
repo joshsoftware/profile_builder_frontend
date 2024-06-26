@@ -14,7 +14,7 @@ export const experienceApi = createApi({
   endpoints: (builder) => ({
     createExperience: builder.mutation({
       query: ({ profile_id, values }) => ({
-        url: CREATE_EXPERIENCE_ENDPOINTS.replace(":id", profile_id),
+        url: CREATE_EXPERIENCE_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: { experiences: values }
       }),

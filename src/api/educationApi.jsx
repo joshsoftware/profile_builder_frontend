@@ -14,7 +14,7 @@ export const educationApi = createApi({
   endpoints: (builder) => ({
     createEducation: builder.mutation({
       query: ({ profile_id, values }) => ({
-        url: CREATE_EDUCATION_ENDPOINTS.replace(":id", profile_id),
+        url: CREATE_EDUCATION_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: { educations: values }
       }),

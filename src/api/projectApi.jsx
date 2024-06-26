@@ -14,7 +14,7 @@ export const projectApi = createApi({
   endpoints: (builder) => ({
     createProject: builder.mutation({
       query: ({ profile_id, values }) => ({
-        url: CREATE_PROJECT_ENDPOINTS.replace(":id", profile_id),
+        url: CREATE_PROJECT_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: { projects: values }
       }),

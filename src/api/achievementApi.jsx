@@ -14,7 +14,7 @@ export const achievementApi = createApi({
   endpoints: (builder) => ({
     createAchievement: builder.mutation({
       query: ({ profile_id, values }) => ({
-        url: CREATE_ACHIEVEMENT_ENDPOINTS.replace(":id", profile_id),
+        url: CREATE_ACHIEVEMENT_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: { achievements: values }
       }),

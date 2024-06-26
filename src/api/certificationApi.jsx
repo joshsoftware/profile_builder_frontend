@@ -14,7 +14,7 @@ export const certificationApi = createApi({
   endpoints: (builder) => ({
     createCertificate: builder.mutation({
       query: ({ profile_id, values }) => ({
-        url: CREATE_CERTIFICATE_ENDPOINTS.replace(":id", profile_id),
+        url: CREATE_CERTIFICATE_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: { certificates: values }
       }),
