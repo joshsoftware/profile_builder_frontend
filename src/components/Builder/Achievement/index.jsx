@@ -1,47 +1,61 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { get, post } from "../../../services/axios";
+import { useCreateAchievementMutation } from "../../../api/achievementApi";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { get } from "../../../services/axios";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-node-key"]
+    });
   const style = {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    cursor: "move",
+    cursor: "move"
   };
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
     ...attributes,
-    ...listeners,
+    ...listeners
   });
 };
 
 const Achievement = () => {
+  const newTabIndex = useRef(1);
+  const { id } = useParams();
+  const [createAchievementService] = useCreateAchievementMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([{ label: "Achievement 1", children: null, key: "0" }]);
-  const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const [items, setItems] = useState([
+    { label: "Achievement 1", children: null, key: "0" }
+  ]);
+
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}/achievements`)
-        .then(response => {
+        .then((response) => {
           const achievements = response.data.achievements || [];
           setInitialState({ ...initialState, achievements });
 
@@ -49,7 +63,7 @@ const Achievement = () => {
             const tabs = achievements.map((achievement, index) => ({
               label: `Achievement ${index + 1}`,
               children: null,
-              key: `${index}`,
+              key: `${index}`
             }));
             setItems(tabs);
             newTabIndex.current = achievements.length;
@@ -57,7 +71,7 @@ const Achievement = () => {
               achievements.reduce((acc, achievement, index) => {
                 acc[`achievement_${index}`] = {
                   name: achievement.name,
-                  description: achievement.description,
+                  description: achievement.description
                 };
                 return acc;
               }, {})
@@ -77,27 +91,40 @@ const Achievement = () => {
     }
   }, [id]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const achievements = items.map((item, index) => ({
       name: values[`achievement_${index}`]?.name,
-      description: values[`achievement_${index}`]?.description,
+      description: values[`achievement_${index}`]?.description
     }));
 
     setInitialState({
       ...initialState,
-      achievements,
+      achievements
     });
-    console.log({ achievements });
 
-    post(`/api/profiles/${id}/achievements`, { achievements })
-    // form.resetFields();
+    if (!validateId(id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createAchievementService({
+        profile_id: id,
+        values: achievements
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      achievements: [],
+      achievements: []
     });
   };
 
@@ -109,7 +136,11 @@ const Achievement = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Achievement ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Achievement ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -118,7 +149,10 @@ const Achievement = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -148,7 +182,10 @@ const Achievement = () => {
         <Button onClick={add}>Add Achievement</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -171,8 +208,8 @@ const Achievement = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required",
-                      },
+                        message: "Name required"
+                      }
                     ]}
                   >
                     <Input placeholder="Achievement name eg. star performer" />
@@ -198,7 +235,7 @@ const Achievement = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
