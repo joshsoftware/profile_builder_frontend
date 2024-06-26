@@ -1,38 +1,52 @@
 import React, { useContext, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
-import PropTypes from "prop-types"; // Import PropTypes
-import { DESIGNATION, GENDER, PROFILE_DETAILS, ROUTES, SKILLS } from "../../../Constants";
+import PropTypes from "prop-types";
+import {
+  DESIGNATION,
+  GENDER,
+  PROFILE_DETAILS,
+  PROFILE_LIST_ENDPOINT,
+  SKILLS,
+} from "../../../Constants";
 import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const BasicInfo = ({ profileData }) => {
-  const [form] = Form.useForm();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const navigate = useNavigate();
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (profileData) {
       form.setFieldsValue(profileData.profile);
     }
-  }, [profileData]);
+  }, [profileData, form]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     if (values.years_of_experience) {
       values.years_of_experience = parseFloat(values.years_of_experience);
     }
 
+    const updatedBasicInfo = {
+      ...initialState.basicInfo,
+      ...values,
+    };
     setInitialState({
       ...initialState,
-      basicInfo: { ...initialState.basicInfo, ...values },
+      basicInfo: updatedBasicInfo,
     });
-    var profile = { profile: { ...initialState.basicInfo, ...values } };
-    console.log(profile);
-    post(ROUTES.profile, profile);
-    navigate(`/profiles`);
+
+    try {
+      await post(PROFILE_LIST_ENDPOINT, { profile: updatedBasicInfo });
+      navigate(PROFILE_LIST_ENDPOINT);
+    } catch (error) {
+      console.error("Error posting basic info:", error);
+    }
   };
 
   const onReset = () => {
+    // Handle form reset
     form.resetFields();
     setInitialState({
       ...initialState,
@@ -43,84 +57,79 @@ const BasicInfo = ({ profileData }) => {
   };
 
   return (
-    <Form layout="vertical" form={form} name="basic-info" onFinish={onFinish}>
-      <Row>
-        <Col span={11}>
+    <Form
+      layout="vertical"
+      form={form}
+      name="basic-info"
+      onFinish={onFinish}
+      initialValues={
+        profileData?.profile || { profileDetails: PROFILE_DETAILS }
+      }
+    >
+      <Row gutter={16}>
+        <Col span={12}>
           <Form.Item
             name="name"
             label="Full Name"
-            rules={[
-              {
-                required: true,
-                message: "Name required",
-              },
-            ]}
+            rules={[{ required: true, message: "Name required" }]}
           >
             <Input placeholder="First Middle Last" />
           </Form.Item>
         </Col>
-        <Col span={11} offset={2}>
+        <Col span={12}>
           <Form.Item
             name="email"
             label="Email"
             rules={[
               {
                 required: true,
-                message: "Email required",
+                type: "email",
+                message: "Valid email required",
               },
             ]}
           >
-            <Input type="email" placeholder="example@joshsoftware.com" />
+            <Input placeholder="example@joshsoftware.com" />
           </Form.Item>
         </Col>
       </Row>
-      <Row>
-        <Col span={11}>
+      <Row gutter={16}>
+        <Col span={12}>
           <Form.Item
             name="mobile"
             label="Mobile"
-            rules={[
-              {
-                required: true,
-                message: "Mobile required",
-              },
-            ]}
+            rules={[{ required: true, message: "Mobile number required" }]}
           >
-            <Input type="tel" placeholder="Enter mobile no" />
+            <Input type="tel" placeholder="Enter mobile number" />
           </Form.Item>
         </Col>
-        <Col span={11} offset={2}>
+        <Col span={12}>
           <Form.Item name="gender" label="Gender">
             <Select placeholder="Select gender" options={GENDER} allowClear />
           </Form.Item>
         </Col>
       </Row>
-      <Row>
-        <Col span={11}>
+      <Row gutter={16}>
+        <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Year Of Experience"
+            label="Years of Experience"
             rules={[
+              { required: true, message: "Experience required" },
               {
-                required: true,
-                message: "Experience required",
+                validator: (_, value) =>
+                  value <= 30
+                    ? Promise.resolve()
+                    : Promise.reject("Maximum experience is 30 years."),
               },
-              ({ getFieldValue }) => ({
-                validator(_, value) {
-                  if (value <= 30) {
-                    return Promise.resolve();
-                  }
-                  return Promise.reject(
-                    new Error("Maximum experience is 30 years.")
-                  );
-                },
-              }),
             ]}
           >
-            <Input type="number" placeholder="Enter experience (eg. 2.5, 1)" />
+            <Input
+              type="number"
+              placeholder="Enter experience (e.g., 2.5, 1)"
+            />
           </Form.Item>
         </Col>
-        <Col span={11} offset={2}>
+        <Col span={12}>
           <Form.Item name="designation" label="Designation">
             <Select
               placeholder="Select designation"
@@ -130,59 +139,75 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
-      <Row>
-        <Col span={11}>
+      <Row gutter={16}>
+        <Col span={12}>
           <Form.Item
             name="title"
             label="Title"
-            rules={[
-              {
-                required: true,
-                message: "Title required",
-              },
-            ]}
+            rules={[{ required: true, message: "Title required" }]}
           >
             <Input placeholder="Backend Developer, Data Analyst, etc." />
           </Form.Item>
         </Col>
-        <Col span={11} offset={2}>
+        <Col span={12}>
           <Form.Item name="linkedin_link" label="LinkedIn Profile Link">
-            <Input placeholder="Enter linkedin profile link" />
+            <Input placeholder="Enter LinkedIn profile link" />
           </Form.Item>
         </Col>
       </Row>
-      <Row>
-        <Col span={11}>
+      <Row gutter={16}>
+        <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">
-            <Input placeholder="Enter github profile link" />
+            <Input placeholder="Enter GitHub profile link" />
           </Form.Item>
         </Col>
       </Row>
-      <Form.Item
-        name="description"
-        label="Description"
-        initialValue={PROFILE_DETAILS}
-      >
-        <Input.TextArea maxLength={600} style={{ height: 120, resize: "none" }} />
-      </Form.Item>
-      <Form.Item
-        name="primary_skills"
-        label="Add Primary Skills"
-        style={{ width: "100%" }}
-      >
-        <Select
-          mode="multiple"
-          style={{ width: "100%" }}
-          placeholder="Please select primary skills"
-          options={SKILLS}
-        />
-      </Form.Item>
-      <Form.Item name="secondary_skills" label="Add Secondary Skills" style={{ width: "100%" }}>
-        <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
-      </Form.Item>
-      <Form.Item name="career_objectives" label="Career Objectives">
-        <Input.TextArea placeholder="Please provide career objectives" showCount maxLength={300} />
-      </Form.Item>
+      <Row gutter={16}>
+        <Col span={24}>
+          <Form.Item
+            name="description"
+            label="Description"
+            initialValue={PROFILE_DETAILS}
+          >
+            <Input.TextArea
+              maxLength={600}
+              style={{ height: 120, resize: "none" }}
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item name="primary_skills" label="Primary Skills">
+            <Select
+              mode="multiple"
+              style={{ width: "100%" }}
+              placeholder="Select primary skills"
+              options={SKILLS}
+            />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item name="secondary_skills" label="Secondary Skills">
+            <Select
+              mode="tags"
+              style={{ width: "100%" }}
+              placeholder="Add secondary skills"
+            />
+          </Form.Item>
+        </Col>
+      </Row>
+      <Row gutter={16}>
+        <Col span={24}>
+          <Form.Item name="career_objectives" label="Career Objectives">
+            <Input.TextArea
+              placeholder="Provide career objectives"
+              maxLength={300}
+              showCount
+            />
+          </Form.Item>
+        </Col>
+      </Row>
       <Form.Item>
         <Space>
           <Button type="primary" htmlType="submit">

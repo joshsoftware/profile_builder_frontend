@@ -1,8 +1,8 @@
 import React, { useEffect,useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
+import { useGetBasicInfoQuery } from "../../api/profileApi";
 import { PROFILES } from "../../Constants";
-import { get } from "../../services/axios";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
 import Achievement from "./Achievement";
@@ -60,20 +60,18 @@ export const Editor = () => {
   const resumeRef = useRef();
   const [profileData, setProfileData] = useState(null);
 
+  const {data} = useGetBasicInfoQuery(id);
+
   useEffect(() => {
     if (id) {
-      get(`/api/profiles/${id}`)
-        .then(response => {
-          setProfileData(response.data);
-          setItems(createPanes(response.data, false));
-        })
-        .catch((error) => {
-          console.log("Failed to fetch profile data due to : ", error);
-        });
+      if(data){
+        setProfileData(data);
+        setItems(createPanes(data, false));
+      }
     } else {
       setItems(createPanes(null, true));
     }
-  }, [id]);
+  }, [id, data]);
 
   const onChange = (key) => {
     console.log(key);

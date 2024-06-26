@@ -9,6 +9,12 @@ export const PROFILES = {
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
+export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
+export const EDUCATION_LIST_ENDPOINT = "/api/profiles/:profile_id/educations";
+export const EXPERIENCE_LIST_ENDPOINT = "/api/profiles/:profile_id/experiences";
+export const ACHIEVEMENT_LIST_ENDPOINT = "/api/profiles/:profile_id/achievements";
+export const CERTIFICATE_LIST_ENDPOINT = "/api/profiles/:profile_id/certificates";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
@@ -57,13 +63,22 @@ export const SKILLS = [
   { label: "VueJs", value: "VueJs" }
 ];
 
-export const ROUTES = {
-  profile: "/api/profiles",
-  project:"/profiles/2/projects",
-  education:"/profiles/2/educations",
-  experience:"/profiles/2/experiences",
-  achievement:"/profiles/2/achievements",
-  certificate:"/profiles/2/certificates"
+export const ReducerPath = {
+  profile: "profileApi",
+  project:"projectApi",
+  education:"educationApi",
+  experience:"experienceApi",
+  achievement:"achievementApi",
+  certificate:"certificateApi"
+};
+
+export const TagTypes = {
+  profile: "profiles",
+  project:"projects",
+  education:"educations",
+  experience:"experiences",
+  achievement:"achievements",
+  certificate:"certificates"
 };
 
 // TODO : Remove once refactor
@@ -117,5 +132,5 @@ export const ROOT_ROUTE = "/";
 export const PROFILE_LIST_ROUTE = "/profiles";
 export const DASHBOARD_ROUTE = "/dashboard";
 export const EDITOR_ROUTE = "/profile-builder";
-export const EDITOR_PROFILE_ROUTE = "/profile-builder/:id";
+export const EDITOR_PROFILE_ROUTE = "/profile-builder/:profile_id";
 export const ERROR_ROUTE = "*";
