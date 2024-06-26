@@ -48,6 +48,10 @@ export const EDUCATION_TAG_TYPES = ["education"];
 export const EXPERIENCE_TAG_TYPES = ["experience"];
 export const PROJECT_TAG_TYPES = ["project"];
 
+// ERRORS
+export const INVALID_ID_ERROR = "Invalid or missing ID";
+export const NETWORK_ERROR = "Network Error";
+
 export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },
