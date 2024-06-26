@@ -1,33 +1,54 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select,Space, Tabs } from "antd";
+import {
+  Button,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Tabs
+} from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import moment from "moment";
-import { get, post } from "../../../services/axios";
+import { useCreateProjectMutation } from "../../../api/projectApi";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { get } from "../../../services/axios";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-node-key"]
+    });
   const style = {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    cursor: "move",
+    cursor: "move"
   };
 
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
     ...attributes,
-    ...listeners,
+    ...listeners
   });
 };
 
 const Project = () => {
+  const [createProjectService] = useCreateProjectMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -37,14 +58,14 @@ const Project = () => {
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}/projects`)
-        .then(response => {
+        .then((response) => {
           const projects = response.data.projects || [];
           setInitialState({ ...initialState, projects });
 
@@ -52,7 +73,7 @@ const Project = () => {
             const tabs = projects.map((project, index) => ({
               label: `Project ${index + 1}`,
               children: null,
-              key: `${index}`,
+              key: `${index}`
             }));
             setItems(tabs);
             newTabIndex.current = projects.length;
@@ -60,8 +81,12 @@ const Project = () => {
               projects.reduce((acc, project, index) => {
                 acc[`project_${index}`] = {
                   ...project,
-                  working_start_date: project.working_start_date ? moment(project.working_start_date) : null,
-                  working_end_date: project.working_end_date ? moment(project.working_end_date, "MMM-YYYY") : null,
+                  working_start_date: project.working_start_date
+                    ? moment(project.working_start_date)
+                    : null,
+                  working_end_date: project.working_end_date
+                    ? moment(project.working_end_date, "MMM-YYYY")
+                    : null
                 };
                 return acc;
               }, {})
@@ -81,10 +106,10 @@ const Project = () => {
     }
   }, [id]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const projects = items.map((item, index) => {
       const project = values[`project_${index}`];
-  
+
       return {
         name: project.name,
         description: project.description,
@@ -92,25 +117,44 @@ const Project = () => {
         responsibilities: project.responsibilities,
         technologies: project.technologies,
         tech_worked_on: project.tech_worked_on,
-        working_start_date: project.working_start_date ? project.working_start_date.format("MMM-YYYY") : null,
-        working_end_date: project.working_end_date ? project.working_end_date.format("MMM-YYYY") : null,
-        duration: project.duration,
+        working_start_date: project.working_start_date
+          ? project.working_start_date.format("MMM-YYYY")
+          : null,
+        working_end_date: project.working_end_date
+          ? project.working_end_date.format("MMM-YYYY")
+          : null,
+        duration: project.duration
       };
     });
-  
+
     setInitialState({
       ...initialState,
-      projects,
+      projects
     });
-    post(`/api/profiles/${id}/projects`, { projects });
-    // form.resetFields();
-  };  
+
+    if (!validateId(id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createProjectService({
+        profile_id: id,
+        values: projects
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+  };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      projects: [],
+      projects: []
     });
   };
 
@@ -122,7 +166,11 @@ const Project = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Project ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Project ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -131,7 +179,10 @@ const Project = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -161,7 +212,10 @@ const Project = () => {
         <Button onClick={add}>Add Project</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -184,8 +238,8 @@ const Project = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required",
-                      },
+                        message: "Name required"
+                      }
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -232,7 +286,11 @@ const Project = () => {
                     name={[`project_${index}`, "technologies"]}
                     label="Technologies"
                   >
-                    <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
+                    <Select
+                      mode="tags"
+                      style={{ width: "100%" }}
+                      placeholder="Tags Mode"
+                    />
                   </Form.Item>
                   <Form.Item
                     name={[`project_${index}`, "tech_worked_on"]}
@@ -240,11 +298,15 @@ const Project = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required",
-                      },
+                        message: "Worked technology is required"
+                      }
                     ]}
                   >
-                    <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
+                    <Select
+                      mode="tags"
+                      style={{ width: "100%" }}
+                      placeholder="Tags Mode"
+                    />
                   </Form.Item>
                   <Row>
                     <Col span={11}>
@@ -275,7 +337,7 @@ const Project = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
