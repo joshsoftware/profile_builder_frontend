@@ -28,7 +28,10 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Handle response errors here
+    error.response?.data?.error_code
+      ? toast.error(error.response?.data?.error_message)
+      : toast.error("Network Error");
+
     return Promise.reject(error);
   }
 );
