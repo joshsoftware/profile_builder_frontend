@@ -1,31 +1,42 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { get, post } from "../../../services/axios";
+import { useCreateEducationMutation } from "../../../api/educationApi";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { get } from "../../../services/axios";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-node-key"]
+    });
   const style = {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    cursor: "move",
+    cursor: "move"
   };
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
     ...attributes,
-    ...listeners,
+    ...listeners
   });
 };
 
 const Education = () => {
+  const [createEducationervice] = useCreateEducationMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -34,14 +45,14 @@ const Education = () => {
   const { id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}/educations`)
-        .then(response => {
+        .then((response) => {
           const educations = response.data.educations || [];
           setInitialState({ ...initialState, educations });
 
@@ -49,7 +60,7 @@ const Education = () => {
             const tabs = educations.map((education, index) => ({
               label: `Education ${index + 1}`,
               children: null,
-              key: `${index}`,
+              key: `${index}`
             }));
             setItems(tabs);
             newTabIndex.current = educations.length;
@@ -74,31 +85,45 @@ const Education = () => {
     }
   }, [id]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const educations = items.map((item, index) => {
       return {
         degree: values[`education_${index}`]?.degree,
         university_name: values[`education_${index}`]?.university_name,
         place: values[`education_${index}`]?.place,
         percent_or_cgpa: values[`education_${index}`]?.percent_or_cgpa,
-        passing_year: values[`education_${index}`]?.passing_year,
+        passing_year: values[`education_${index}`]?.passing_year
       };
     });
 
     setInitialState({
       ...initialState,
-      educations,
+      educations
     });
 
-    post(`/api/profiles/${id}/educations`, { educations: educations })
-    // form.resetFields();
+    if (!validateId(id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createEducationervice({
+        profile_id: id,
+        values: educations
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      educations: [],
+      educations: []
     });
   };
 
@@ -110,7 +135,11 @@ const Education = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Education ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Education ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -119,7 +148,10 @@ const Education = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -149,7 +181,10 @@ const Education = () => {
         <Button onClick={add}>Add Education</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -172,8 +207,8 @@ const Education = () => {
                     rules={[
                       {
                         required: true,
-                        message: "Degree required",
-                      },
+                        message: "Degree required"
+                      }
                     ]}
                   >
                     <Input placeholder="Eg. MCS, BTech in CS" />
@@ -225,7 +260,7 @@ const Education = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
