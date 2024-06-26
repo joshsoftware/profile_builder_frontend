@@ -1,33 +1,54 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select, Space, Tabs } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Tabs
+} from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext, useSortable } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext,
+  useSortable
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import moment from "moment";
-import { DESIGNATION } from "../../../Constants";
-import { get, post } from "../../../services/axios";
+import { useCreateExperienceMutation } from "../../../api/experienceApi";
+import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
+import { get } from "../../../services/axios";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: props["data-node-key"],
-  });
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({
+      id: props["data-node-key"]
+    });
   const style = {
     ...props.style,
     transform: CSS.Translate.toString(transform),
     transition,
-    cursor: "move",
+    cursor: "move"
   };
   return React.cloneElement(props.children, {
     ref: setNodeRef,
     style,
     ...attributes,
-    ...listeners,
+    ...listeners
   });
 };
 
 const Experience = () => {
+  const [createExperienceService] = useCreateExperienceMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -36,14 +57,14 @@ const Experience = () => {
   const { id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}/experiences`)
-        .then(response => {
+        .then((response) => {
           const experiences = response.data.experiences || [];
           setInitialState({ ...initialState, experiences });
 
@@ -51,7 +72,7 @@ const Experience = () => {
             const tabs = experiences.map((experience, index) => ({
               label: `Experience ${index + 1}`,
               children: null,
-              key: `${index}`,
+              key: `${index}`
             }));
             setItems(tabs);
             newTabIndex.current = experiences.length;
@@ -59,8 +80,13 @@ const Experience = () => {
               experiences.reduce((acc, experience, index) => {
                 acc[`experience_${index}`] = {
                   ...experience,
-                  employmentStart: experience.from_date ? moment(experience.from_date, "MMM-YYYY") : null,
-                  employmentEnd: experience.to_date && experience.to_date !== "Present" ? moment(experience.to_date, "MMM-YYYY") : null,
+                  employmentStart: experience.from_date
+                    ? moment(experience.from_date, "MMM-YYYY")
+                    : null,
+                  employmentEnd:
+                    experience.to_date && experience.to_date !== "Present"
+                      ? moment(experience.to_date, "MMM-YYYY")
+                      : null,
                   isCurrentCompany: experience.to_date === "Present"
                 };
                 return acc;
@@ -81,43 +107,60 @@ const Experience = () => {
     }
   }, [id]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const experiences = items.map((item, index) => {
       return {
         designation: values[`experience_${index}`]?.designation,
         company_name: values[`experience_${index}`]?.company_name,
-        from_date: values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
+        from_date:
+          values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
         to_date: values[`experience_${index}`]?.isCurrentCompany
           ? "Present"
-          : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY"),
+          : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY")
       };
     });
 
     setInitialState({
       ...initialState,
-      experiences,
+      experiences
     });
 
-    post(`/api/profiles/${id}/experiences`, { experiences })
-    //form.resetFields();
+    if (!validateId(id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createExperienceService({
+        profile_id: id,
+        values: experiences
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      experiences: [],
+      experiences: []
     });
   };
 
   const onChangeCheckbox = (e, key) => {
     const checked = e.target.checked;
-    setItems(items.map((item) => {
-      if (item.key === key) {
-        return { ...item, isCurrentCompany: checked };
-      }
-      return item;
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.key === key) {
+          return { ...item, isCurrentCompany: checked };
+        }
+        return item;
+      })
+    );
   };
 
   const onChange = (key) => {
@@ -128,7 +171,11 @@ const Experience = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Experience ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Experience ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -137,7 +184,10 @@ const Experience = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -167,7 +217,10 @@ const Experience = () => {
         <Button onClick={add}>Add Experience</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -192,8 +245,8 @@ const Experience = () => {
                         rules={[
                           {
                             required: true,
-                            message: "Designation can not be blank",
-                          },
+                            message: "Designation can not be blank"
+                          }
                         ]}
                       >
                         <Select
@@ -214,7 +267,11 @@ const Experience = () => {
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
                     <Col>
-                      <Form.Item name={[`experience_${index}`, "isCurrentCompany"]} valuePropName="checked" initialValue={false}>
+                      <Form.Item
+                        name={[`experience_${index}`, "isCurrentCompany"]}
+                        valuePropName="checked"
+                        initialValue={false}
+                      >
                         <Checkbox
                           onChange={(e) => onChangeCheckbox(e, item.key)}
                         >
@@ -232,11 +289,11 @@ const Experience = () => {
                           {
                             type: "object",
                             required: true,
-                            message: "Start date can not be blank",
-                          },
+                            message: "Start date can not be blank"
+                          }
                         ]}
                       >
-                        <DatePicker style={{ width: "100%" }} picker="month"/>
+                        <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
@@ -248,11 +305,14 @@ const Experience = () => {
                             {
                               type: "object",
                               required: true,
-                              message: "End date can not be blank",
-                            },
+                              message: "End date can not be blank"
+                            }
                           ]}
                         >
-                          <DatePicker style={{ width: "100%" }} picker="month"/>
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
                         </Form.Item>
                       )}
                     </Col>
@@ -268,7 +328,7 @@ const Experience = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
