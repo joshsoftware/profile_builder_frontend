@@ -1,4 +1,4 @@
-import React, { useEffect,useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { PROFILES } from "../../Constants";
@@ -17,40 +17,40 @@ const createPanes = (profileData, disableTabs) => [
   {
     key: "basic-info",
     label: <b>Basic Info</b>,
-    children: <BasicInfo profileData={profileData} />,
+    children: <BasicInfo profileData={profileData} />
   },
   {
     key: "projects",
     label: <b>Projects</b>,
     children: <Project />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
     key: "education",
     label: <b>Education</b>,
     children: <Education />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
     key: "experience",
     label: <b>Experience</b>,
     children: <Experience />,
-    disabled: disableTabs,
-  },
+    disabled: disableTabs
+  }
 ];
 
 const achievement = (profileData, disableTabs) => ({
   key: "achievement",
   label: <b>Achievement</b>,
   children: <Achievement profileData={profileData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 const certification = (profileData, disableTabs) => ({
   key: "certification",
   label: <b>Certification</b>,
   children: <Certification profileData={profileData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 export const Editor = () => {
@@ -63,7 +63,7 @@ export const Editor = () => {
   useEffect(() => {
     if (id) {
       get(`/api/profiles/${id}`)
-        .then(response => {
+        .then((response) => {
           setProfileData(response.data);
           setItems(createPanes(response.data, false));
         })
@@ -76,7 +76,7 @@ export const Editor = () => {
   }, [id]);
 
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
 
   const onProfileChange = (event) => {
@@ -91,7 +91,12 @@ export const Editor = () => {
 
   const handleTabs = (event, tabName) => {
     const updatedItems = event
-      ? [...items, tabName === "achievement" ? achievement(profileData, !id) : certification(profileData, !id)]
+      ? [
+          ...items,
+          tabName === "achievement"
+            ? achievement(profileData, !id)
+            : certification(profileData, !id)
+        ]
       : items.filter((item) => item.key !== tabName);
 
     setItems(updatedItems);
