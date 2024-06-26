@@ -1,35 +1,50 @@
 import React, { useContext, useEffect } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types"; // Import PropTypes
-import { DESIGNATION, GENDER, PROFILE_DETAILS, ROUTES, SKILLS } from "../../../Constants";
-import { post } from "../../../services/axios";
+import { useCreateProfileMutation } from "../../../api/profileApi";
+import {
+  DESIGNATION,
+  EDITOR_PROFILE_ROUTE,
+  GENDER,
+  PROFILE_DETAILS,
+  SKILLS
+} from "../../../Constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const BasicInfo = ({ profileData }) => {
+  const [createProfileService] = useCreateProfileMutation();
   const [form] = Form.useForm();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const navigate = useNavigate();
-
   useEffect(() => {
     if (profileData) {
       form.setFieldsValue(profileData.profile);
     }
   }, [profileData]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     if (values.years_of_experience) {
       values.years_of_experience = parseFloat(values.years_of_experience);
     }
-
     setInitialState({
       ...initialState,
-      basicInfo: { ...initialState.basicInfo, ...values },
+      basicInfo: { ...initialState.basicInfo, ...values }
     });
     var profile = { profile: { ...initialState.basicInfo, ...values } };
-    console.log(profile);
-    post(ROUTES.profile, profile);
-    navigate(`/profiles`);
+
+    try {
+      const response = await createProfileService(values);
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+        navigate(
+          EDITOR_PROFILE_ROUTE.replace(":id", response.data?.profile_id)
+        );
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
@@ -37,8 +52,8 @@ const BasicInfo = ({ profileData }) => {
     setInitialState({
       ...initialState,
       basicInfo: {
-        profileDetails: PROFILE_DETAILS,
-      },
+        profileDetails: PROFILE_DETAILS
+      }
     });
   };
 
@@ -52,8 +67,8 @@ const BasicInfo = ({ profileData }) => {
             rules={[
               {
                 required: true,
-                message: "Name required",
-              },
+                message: "Name required"
+              }
             ]}
           >
             <Input placeholder="First Middle Last" />
@@ -66,8 +81,8 @@ const BasicInfo = ({ profileData }) => {
             rules={[
               {
                 required: true,
-                message: "Email required",
-              },
+                message: "Email required"
+              }
             ]}
           >
             <Input type="email" placeholder="example@joshsoftware.com" />
@@ -82,8 +97,8 @@ const BasicInfo = ({ profileData }) => {
             rules={[
               {
                 required: true,
-                message: "Mobile required",
-              },
+                message: "Mobile required"
+              }
             ]}
           >
             <Input type="tel" placeholder="Enter mobile no" />
@@ -103,7 +118,7 @@ const BasicInfo = ({ profileData }) => {
             rules={[
               {
                 required: true,
-                message: "Experience required",
+                message: "Experience required"
               },
               ({ getFieldValue }) => ({
                 validator(_, value) {
@@ -113,8 +128,8 @@ const BasicInfo = ({ profileData }) => {
                   return Promise.reject(
                     new Error("Maximum experience is 30 years.")
                   );
-                },
-              }),
+                }
+              })
             ]}
           >
             <Input type="number" placeholder="Enter experience (eg. 2.5, 1)" />
@@ -138,8 +153,8 @@ const BasicInfo = ({ profileData }) => {
             rules={[
               {
                 required: true,
-                message: "Title required",
-              },
+                message: "Title required"
+              }
             ]}
           >
             <Input placeholder="Backend Developer, Data Analyst, etc." />
@@ -163,7 +178,10 @@ const BasicInfo = ({ profileData }) => {
         label="Description"
         initialValue={PROFILE_DETAILS}
       >
-        <Input.TextArea maxLength={600} style={{ height: 120, resize: "none" }} />
+        <Input.TextArea
+          maxLength={600}
+          style={{ height: 120, resize: "none" }}
+        />
       </Form.Item>
       <Form.Item
         name="primary_skills"
@@ -177,11 +195,19 @@ const BasicInfo = ({ profileData }) => {
           options={SKILLS}
         />
       </Form.Item>
-      <Form.Item name="secondary_skills" label="Add Secondary Skills" style={{ width: "100%" }}>
+      <Form.Item
+        name="secondary_skills"
+        label="Add Secondary Skills"
+        style={{ width: "100%" }}
+      >
         <Select mode="tags" style={{ width: "100%" }} placeholder="Tags Mode" />
       </Form.Item>
       <Form.Item name="career_objectives" label="Career Objectives">
-        <Input.TextArea placeholder="Please provide career objectives" showCount maxLength={300} />
+        <Input.TextArea
+          placeholder="Please provide career objectives"
+          showCount
+          maxLength={300}
+        />
       </Form.Item>
       <Form.Item>
         <Space>
@@ -212,9 +238,9 @@ BasicInfo.propTypes = {
       description: PropTypes.string,
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
-      career_objectives: PropTypes.string,
-    }),
-  }),
+      career_objectives: PropTypes.string
+    })
+  })
 };
 
 export default BasicInfo;
