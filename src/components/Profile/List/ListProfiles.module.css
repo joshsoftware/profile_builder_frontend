@@ -9,9 +9,16 @@
   margin-bottom: 20px;
 }
 
+.rowStyle {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 15px;
+}
+
 .profile_header {
-  margin: 0;
-  margin-top: 10px;
 }
 
 .buttonContainer {
@@ -26,6 +33,7 @@
 
 .table {
   overflow-x: auto;
+  padding: 0rem 1rem;
 }
 
 @media (max-width: 768px) {
