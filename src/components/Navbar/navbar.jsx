@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Button, Layout, Menu, Modal } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { logout } from "../../api/store/authSlice";
@@ -10,6 +10,7 @@ import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
 const Navbar = () => {
   const dispatch = useDispatch();
   const { Header } = Layout;
+  const location = useLocation();
   const [isModalVisible, setIsModalVisible] = useState(false);
   const showModal = () => {
     setIsModalVisible(true);
@@ -23,6 +24,14 @@ const Navbar = () => {
   const handleCancel = () => {
     setIsModalVisible(false);
   };
+
+  const selectedKey = location.pathname;
+
+  const getButtonStyle = (route) => ({
+    color: selectedKey === route ? "white" : "#ffffff",
+    border: selectedKey === route ? "2px solid white" : "none",
+    fontSize: "15px"
+  });
 
   return (
     <Layout>
@@ -44,8 +53,8 @@ const Navbar = () => {
         <Link to={PROFILE_LIST_ROUTE}>
           <Button
             type="text"
-            icon=<UserOutlined />
-            style={{ marginRight: "auto", color: "white", fontSize: "20px" }}
+            icon={<UserOutlined />}
+            style={getButtonStyle(PROFILE_LIST_ROUTE)}
           >
             Profiles
           </Button>
@@ -53,20 +62,20 @@ const Navbar = () => {
         <Link to={EDITOR_ROUTE}>
           <Button
             type="text"
-            icon=<EditOutlined />
-            style={{ marginRight: "auto", color: "white", fontSize: "20px" }}
+            icon={<EditOutlined />}
+            style={getButtonStyle(EDITOR_ROUTE)}
           >
             Editor
           </Button>
         </Link>
         <Button
           type="text"
-          icon=<LogoutOutlined />
+          icon={<LogoutOutlined />}
           style={{
             marginRight: "auto",
             paddingTop: "16px",
             color: "white",
-            fontSize: "20px",
+            fontSize: "17px",
             float: "right"
           }}
           onClick={showModal}
@@ -96,4 +105,5 @@ const Navbar = () => {
     </Layout>
   );
 };
+
 export default Navbar;

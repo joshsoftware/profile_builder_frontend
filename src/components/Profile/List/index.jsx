@@ -8,6 +8,7 @@ import {
   SearchOutlined
 } from "@ant-design/icons";
 import { useGetProfileListQuery } from "../../../api/profileApi";
+import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
 
@@ -16,7 +17,6 @@ const ListProfiles = () => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   const navigate = useNavigate();
-
   const { data, isFetching } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -107,7 +107,7 @@ const ListProfiles = () => {
   });
 
   const handleClick = (id) => {
-    navigate(`/profile-builder/${id}`);
+    navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id));
   };
 
   const columns = [
@@ -160,7 +160,7 @@ const ListProfiles = () => {
       title: "Is Current Employee",
       dataIndex: "is_current_employee",
       key: "is_current_employee",
-      render: (is_current_employee) => <strong>{is_current_employee}</strong>,
+      render: (is_current_employee) => is_current_employee,
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
       sortDirections: ["descend", "ascend"]
     },

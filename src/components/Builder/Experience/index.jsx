@@ -17,44 +17,30 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
-  useSortable
+  SortableContext
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import { useCreateExperienceMutation } from "../../../api/experienceApi";
+import {
+  useCreateExperienceMutation,
+  useGetExperiencesQuery
+} from "../../../api/experienceApi";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
-import { get } from "../../../services/axios";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
-
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: props["data-node-key"]
-    });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move"
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners
-  });
-};
 
 const Experience = () => {
   const [createExperienceService] = useCreateExperienceMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([
+    { label: "Experience 1", children: null, key: "0" }
+  ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const { profile_id } = useParams();
+  const { data } = useGetExperiencesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -62,77 +48,66 @@ const Experience = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/experiences`)
-        .then((response) => {
-          const experiences = response.data.experiences || [];
-          setInitialState({ ...initialState, experiences });
+    if (profile_id && data) {
+      setInitialState({ ...initialState, data });
 
-          if (experiences.length > 0) {
-            const tabs = experiences.map((experience, index) => ({
-              label: `Experience ${index + 1}`,
-              children: null,
-              key: `${index}`
-            }));
-            setItems(tabs);
-            newTabIndex.current = experiences.length;
-            form.setFieldsValue(
-              experiences.reduce((acc, experience, index) => {
-                acc[`experience_${index}`] = {
-                  ...experience,
-                  employmentStart: experience.from_date
-                    ? moment(experience.from_date, "MMM-YYYY")
-                    : null,
-                  employmentEnd:
-                    experience.to_date && experience.to_date !== "Present"
-                      ? moment(experience.to_date, "MMM-YYYY")
-                      : null,
-                  isCurrentCompany: experience.to_date === "Present"
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Experience 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Experience 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data.length > 0) {
+        const tabs = data.map((experience, index) => ({
+          label: `Experience ${index + 1}`,
+          children: null,
+          key: `${index}`
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, experience, index) => {
+            acc[`experience_${index}`] = {
+              ...experience,
+              employmentStart: experience.from_date
+                ? moment(experience.from_date, "MMM-YYYY")
+                : null,
+              employmentEnd:
+                experience.to_date && experience.to_date !== "Present"
+                  ? moment(experience.to_date, "MMM-YYYY")
+                  : null,
+              isCurrentCompany: experience.to_date === "Present"
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Experience 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [profile_id, data]);
 
   const onFinish = async (values) => {
-    const experiences = items.map((item, index) => {
-      return {
-        designation: values[`experience_${index}`]?.designation,
-        company_name: values[`experience_${index}`]?.company_name,
-        from_date:
-          values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
-        to_date: values[`experience_${index}`]?.isCurrentCompany
-          ? "Present"
-          : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY")
-      };
-    });
+    const experiences = items.map((item, index) => ({
+      designation: values[`experience_${index}`]?.designation,
+      company_name: values[`experience_${index}`]?.company_name,
+      from_date:
+        values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
+      to_date: values[`experience_${index}`]?.isCurrentCompany
+        ? "Present"
+        : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY")
+    }));
 
     setInitialState({
       ...initialState,
       experiences
     });
 
-    if (!validateId(id)) {
+    if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
     }
 
     try {
       const response = await createExperienceService({
-        profile_id: id,
+        profile_id: profile_id,
         values: experiences
       });
       if (response.data?.message) {
@@ -212,95 +187,80 @@ const Experience = () => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Experience</Button>
-      </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`experience_${item.key}`}
-                  onFinish={onFinish}
-                  key={item.key}
-                >
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`experience_${index}`, "designation"]}
-                        label="Designation"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Designation can not be blank"
-                          }
-                        ]}
-                      >
-                        <Select
-                          placeholder="Select designation"
-                          options={DESIGNATION}
-                          allowClear
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`experience_${index}`, "company_name"]}
-                        label="Company Name"
-                      >
-                        <Input placeholder="Enter Company Name eg. Amazon" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row style={{ margin: "10px 0px 10px 0px" }}>
-                    <Col>
-                      <Form.Item
-                        name={[`experience_${index}`, "isCurrentCompany"]}
-                        valuePropName="checked"
-                        initialValue={false}
-                      >
-                        <Checkbox
-                          onChange={(e) => onChangeCheckbox(e, item.key)}
-                        >
-                          Is This A Current Company?
-                        </Checkbox>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`experience_${index}`, "employmentStart"]}
-                        label="Employment Start Date"
-                        rules={[
-                          {
-                            type: "object",
-                            required: true,
-                            message: "Start date can not be blank"
-                          }
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      {!item.isCurrentCompany && (
+    <>
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Experience</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`experience_${item.key}`}
+                    onFinish={onFinish}
+                    key={item.key}
+                  >
+                    <Row>
+                      <Col span={11}>
                         <Form.Item
-                          name={[`experience_${index}`, "employmentEnd"]}
-                          label="Employment End Date"
+                          name={[`experience_${index}`, "designation"]}
+                          label="Designation"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Designation can not be blank"
+                            }
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select designation"
+                            options={DESIGNATION}
+                            allowClear
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`experience_${index}`, "company_name"]}
+                          label="Company Name"
+                        >
+                          <Input placeholder="Enter Company Name eg. Amazon" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row style={{ margin: "10px 0px 10px 0px" }}>
+                      <Col>
+                        <Form.Item
+                          name={[`experience_${index}`, "isCurrentCompany"]}
+                          valuePropName="checked"
+                          initialValue={false}
+                        >
+                          <Checkbox
+                            onChange={(e) => onChangeCheckbox(e, item.key)}
+                          >
+                            Is This A Current Company?
+                          </Checkbox>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`experience_${index}`, "employmentStart"]}
+                          label="Employment Start Date"
                           rules={[
                             {
                               type: "object",
@@ -314,35 +274,55 @@ const Experience = () => {
                             picker="month"
                           />
                         </Form.Item>
-                      )}
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button type="primary" htmlType="submit">
-                        Save
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              )
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        {!item.isCurrentCompany && (
+                          <Form.Item
+                            name={[`experience_${index}`, "employmentEnd"]}
+                            label="Employment End Date"
+                            rules={[
+                              {
+                                type: "object",
+                                required: true,
+                                message: "End date can not be blank"
+                              }
+                            ]}
+                          >
+                            <DatePicker
+                              style={{ width: "100%" }}
+                              picker="month"
+                            />
+                          </Form.Item>
+                        )}
+                      </Col>
+                    </Row>
+                    <Form.Item>
+                      <Space>
+                        <Button type="primary" htmlType="submit">
+                          Save
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                )
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
+      </div>
+    </>
   );
 };
 

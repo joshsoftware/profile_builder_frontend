@@ -29,6 +29,7 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    console.log("error in response interceptor", error);
     error.response?.data?.error_code
       ? toast.error(error.response?.data?.error_message)
       : toast.error(NETWORK_ERROR);

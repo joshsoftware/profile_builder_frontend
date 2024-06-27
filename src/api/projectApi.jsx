@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_PROJECT_ENDPOINTS,
   HTTP_METHODS,
+  PROJECT_LIST_ENDPOINT,
   PROJECT_REDUCER_PATH,
   PROJECT_TAG_TYPES
 } from "../Constants";
@@ -20,8 +21,15 @@ export const projectApi = createApi({
       }),
       invalidatesTags: PROJECT_TAG_TYPES,
       transformResponse: (response) => response.data
+    }),
+    getProject: builder.query({
+      query: (profile_id) => ({
+        url: PROJECT_LIST_ENDPOINT.replace(":profile_id", profile_id)
+      }),
+      providesTags: PROJECT_TAG_TYPES,
+      transformResponse: (response) => response.data.projects
     })
   })
 });
 
-export const { useCreateProjectMutation } = projectApi;
+export const { useCreateProjectMutation, useGetProjectQuery } = projectApi;

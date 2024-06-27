@@ -6,38 +6,18 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
-  useSortable
+  SortableContext
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetAchievementsQuery } from "../../../api/achievementApi";
 import { useCreateAchievementMutation } from "../../../api/achievementApi";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { get } from "../../../services/axios";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: props["data-node-key"]
-    });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move"
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners
-  });
-};
-
 const Achievement = () => {
-  const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
@@ -45,6 +25,8 @@ const Achievement = () => {
   const [items, setItems] = useState([
     { label: "Achievement 1", children: null, key: "0" }
   ]);
+  const newTabIndex = useRef(1);
+  const { data } = useGetAchievementsQuery(profile_id ?? skipToken);
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -53,43 +35,37 @@ const Achievement = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/achievements`)
-        .then((response) => {
-          const achievements = response.data.achievements || [];
-          setInitialState({ ...initialState, achievements });
-
-          if (achievements.length > 0) {
-            const tabs = achievements.map((achievement, index) => ({
-              label: `Achievement ${index + 1}`,
-              children: null,
-              key: `${index}`
-            }));
-            setItems(tabs);
-            newTabIndex.current = achievements.length;
-            form.setFieldsValue(
-              achievements.reduce((acc, achievement, index) => {
-                acc[`achievement_${index}`] = {
-                  name: achievement.name,
-                  description: achievement.description
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+    if (profile_id && data) {
+      setInitialState({ ...initialState, data });
+      if (data.length > 0) {
+        const tabs = data.map((achievement, index) => ({
+          label: `Achievement ${index + 1}`,
+          children: null,
+          key: `${index}`
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, achievement, index) => {
+            acc[`achievement_${index}`] = {
+              name: achievement.name,
+              description: achievement.description
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        resetItems();
+      }
     }
-  }, [id]);
+  }, [profile_id, data]);
+
+  const resetItems = () => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  };
 
   const onFinish = async (values) => {
     const achievements = items.map((item, index) => ({
@@ -97,19 +73,20 @@ const Achievement = () => {
       description: values[`achievement_${index}`]?.description
     }));
 
+    setInitialState({ ...initialState, achievements });
     setInitialState({
       ...initialState,
       achievements
     });
 
-    if (!validateId(id)) {
+    if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
     }
 
     try {
       const response = await createAchievementService({
-        profile_id: id,
+        profile_id: profile_id,
         values: achievements
       });
       if (response.data?.message) {
@@ -126,6 +103,7 @@ const Achievement = () => {
       ...initialState,
       achievements: []
     });
+    setInitialState({ ...initialState, achievements: [] });
   };
 
   const onChange = (key) => {
@@ -146,16 +124,11 @@ const Achievement = () => {
   };
 
   const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
+    const newItems = items.filter((item) => item.key !== targetKey);
+    setItems(newItems);
+    if (newItems.length && targetKey === activeKey) {
+      setActiveKey(newItems[0].key);
     }
-    setItems(newPanes);
   };
 
   const onEdit = (targetKey, action) => {
@@ -205,12 +178,7 @@ const Achievement = () => {
                   <Form.Item
                     name={[`achievement_${index}`, "name"]}
                     label="Achievement Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Name required"
-                      }
-                    ]}
+                    rules={[{ required: true, message: "Name required" }]}
                   >
                     <Input placeholder="Achievement name eg. star performer" />
                   </Form.Item>

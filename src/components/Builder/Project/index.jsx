@@ -16,36 +16,18 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
-  useSortable
+  SortableContext
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { skipToken } from "@tanstack/react-query";
 import moment from "moment";
-import { useCreateProjectMutation } from "../../../api/projectApi";
+import {
+  useCreateProjectMutation,
+  useGetProjectQuery
+} from "../../../api/projectApi";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { get } from "../../../services/axios";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
-
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: props["data-node-key"]
-    });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move"
-  };
-
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners
-  });
-};
 
 const Project = () => {
   const [createProjectService] = useCreateProjectMutation();
@@ -54,7 +36,8 @@ const Project = () => {
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const { profile_id } = useParams();
+  const { data } = useGetProjectQuery(profile_id ?? skipToken);
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -63,48 +46,41 @@ const Project = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/projects`)
-        .then((response) => {
-          const projects = response.data.projects || [];
-          setInitialState({ ...initialState, projects });
+    if (profile_id) {
+      if (data) {
+        setInitialState({ ...initialState, data });
+      }
 
-          if (projects.length > 0) {
-            const tabs = projects.map((project, index) => ({
-              label: `Project ${index + 1}`,
-              children: null,
-              key: `${index}`
-            }));
-            setItems(tabs);
-            newTabIndex.current = projects.length;
-            form.setFieldsValue(
-              projects.reduce((acc, project, index) => {
-                acc[`project_${index}`] = {
-                  ...project,
-                  working_start_date: project.working_start_date
-                    ? moment(project.working_start_date)
-                    : null,
-                  working_end_date: project.working_end_date
-                    ? moment(project.working_end_date, "MMM-YYYY")
-                    : null
-                };
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Project 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Project 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data?.length > 0) {
+        const tabs = data.map((project, index) => ({
+          label: `Project ${index + 1}`,
+          children: null,
+          key: `${index}`
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, project, index) => {
+            acc[`project_${index}`] = {
+              ...project,
+              working_start_date: project.working_start_date
+                ? moment(project.working_start_date)
+                : null,
+              working_end_date: project.working_end_date
+                ? moment(project.working_end_date, "MMM-YYYY")
+                : null
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Project 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [profile_id, data]);
 
   const onFinish = async (values) => {
     const projects = items.map((item, index) => {
@@ -132,14 +108,14 @@ const Project = () => {
       projects
     });
 
-    if (!validateId(id)) {
+    if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
     }
 
     try {
       const response = await createProjectService({
-        profile_id: id,
+        profile_id: profile_id,
         values: projects
       });
       if (response.data?.message) {

@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_EXPERIENCE_ENDPOINTS,
+  EXPERIENCE_LIST_ENDPOINT,
   EXPERIENCE_REDUCER_PATH,
   EXPERIENCE_TAG_TYPES,
   HTTP_METHODS
@@ -20,8 +21,16 @@ export const experienceApi = createApi({
       }),
       invalidatesTags: EXPERIENCE_TAG_TYPES,
       transformResponse: (response) => response.data
+    }),
+    getExperiences: builder.query({
+      query: (profile_id) => ({
+        url: EXPERIENCE_LIST_ENDPOINT.replace(":profile_id", profile_id)
+      }),
+      providesTags: EXPERIENCE_TAG_TYPES,
+      transformResponse: (response) => response.data.experiences
     })
   })
 });
 
-export const { useCreateExperienceMutation } = experienceApi;
+export const { useCreateExperienceMutation, useGetExperiencesQuery } =
+  experienceApi;

@@ -17,6 +17,7 @@ export const ERROR_ROUTE = "*";
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
 export const CREATE_ACHIEVEMENT_ENDPOINTS =
   "/api/profiles/:profile_id/achievements";
@@ -27,6 +28,15 @@ export const CREATE_EDUCATION_ENDPOINTS =
 export const CREATE_EXPERIENCE_ENDPOINTS =
   "/api/profiles/:profile_id/experiences";
 export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
+
+export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
+export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
+export const EDUCATION_LIST_ENDPOINT = "/api/profiles/:profile_id/educations";
+export const EXPERIENCE_LIST_ENDPOINT = "/api/profiles/:profile_id/experiences";
+export const ACHIEVEMENT_LIST_ENDPOINT =
+  "/api/profiles/:profile_id/achievements";
+export const CERTIFICATE_LIST_ENDPOINT =
+  "/api/profiles/:profile_id/certificates";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
@@ -95,15 +105,6 @@ export const SKILLS = [
   { label: "UI/UX", value: "UI/UX" },
   { label: "VueJs", value: "VueJs" }
 ];
-
-export const ROUTES = {
-  profile: "/api/profiles",
-  project: "/profiles/2/projects",
-  education: "/profiles/2/educations",
-  experience: "/profiles/2/experiences",
-  achievement: "/profiles/2/achievements",
-  certificate: "/profiles/2/certificates"
-};
 
 // TODO : Remove once refactor
 export const getMonthString = (num) => {

@@ -2,6 +2,7 @@ import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_PROFILE_ENDPOINT,
   HTTP_METHODS,
+  PROFILE_GET_ENDPOINT,
   PROFILE_LIST_ENDPOINT,
   PROFILE_REDUCER_PATH,
   PROFILE_TAG_TYPES
@@ -13,13 +14,6 @@ export const profileApi = createApi({
   baseQuery: axiosBaseQuery(),
   tagTypes: PROFILE_TAG_TYPES,
   endpoints: (builder) => ({
-    getProfileList: builder.query({
-      query: () => ({
-        url: PROFILE_LIST_ENDPOINT
-      }),
-      providesTags: PROFILE_TAG_TYPES,
-      transformResponse: (response) => response.data
-    }),
     createProfile: builder.mutation({
       query: (values) => ({
         url: CREATE_PROFILE_ENDPOINT,
@@ -29,9 +23,28 @@ export const profileApi = createApi({
         }
       }),
       invalidatesTags: PROFILE_TAG_TYPES,
+      providesTags: PROFILE_TAG_TYPES,
+      transformResponse: (response) => response.data
+    }),
+    getProfileList: builder.query({
+      query: () => ({
+        url: PROFILE_LIST_ENDPOINT
+      }),
+      providesTags: PROFILE_TAG_TYPES,
+      transformResponse: (response) => response.data
+    }),
+    getBasicInfo: builder.query({
+      query: (profile_id) => ({
+        url: PROFILE_GET_ENDPOINT.replace(":profile_id", profile_id)
+      }),
+      providesTags: PROFILE_TAG_TYPES,
       transformResponse: (response) => response.data
     })
   })
 });
 
-export const { useGetProfileListQuery, useCreateProfileMutation } = profileApi;
+export const {
+  useGetProfileListQuery,
+  useCreateProfileMutation,
+  useGetBasicInfoQuery
+} = profileApi;

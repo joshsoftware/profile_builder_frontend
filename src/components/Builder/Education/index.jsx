@@ -6,43 +6,31 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
-  useSortable
+  SortableContext
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetEducationsQuery } from "../../../api/educationApi";
 import { useCreateEducationMutation } from "../../../api/educationApi";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { get } from "../../../services/axios";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
-
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: props["data-node-key"]
-    });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move"
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners
-  });
-};
 
 const Education = () => {
   const [createEducationervice] = useCreateEducationMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([
+    {
+      label: "Education 1",
+      children: null,
+      key: "0"
+    }
+  ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const { profile_id } = useParams();
+  const { data } = useGetEducationsQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -50,40 +38,30 @@ const Education = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/educations`)
-        .then((response) => {
-          const educations = response.data.educations || [];
-          setInitialState({ ...initialState, educations });
-
-          if (educations.length > 0) {
-            const tabs = educations.map((education, index) => ({
-              label: `Education ${index + 1}`,
-              children: null,
-              key: `${index}`
-            }));
-            setItems(tabs);
-            newTabIndex.current = educations.length;
-            form.setFieldsValue(
-              educations.reduce((acc, education, index) => {
-                acc[`education_${index}`] = education;
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Education 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Education 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+    if (profile_id && data) {
+      setInitialState({ ...initialState, data });
+      if (data.length > 0) {
+        const tabs = data.map((education, index) => ({
+          label: `Education ${index + 1}`,
+          children: null,
+          key: `${index}`
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, education, index) => {
+            acc[`education_${index}`] = education;
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Education 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [profile_id, data]);
 
   const onFinish = async (values) => {
     const educations = items.map((item, index) => {
@@ -101,14 +79,14 @@ const Education = () => {
       educations
     });
 
-    if (!validateId(id)) {
+    if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
     }
 
     try {
       const response = await createEducationervice({
-        profile_id: id,
+        profile_id: profile_id,
         values: educations
       });
       if (response.data?.message) {
@@ -141,7 +119,6 @@ const Education = () => {
         key: newActiveKey
       }
     ]);
-    setActiveKey(newActiveKey);
   };
 
   const remove = (targetKey) => {

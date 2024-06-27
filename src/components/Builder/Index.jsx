@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetBasicInfoQuery } from "../../api/profileApi";
 import { PROFILES } from "../../Constants";
-import { get } from "../../services/axios";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
 import Achievement from "./Achievement";
@@ -54,26 +55,24 @@ const certification = (profileData, disableTabs) => ({
 });
 
 export const Editor = () => {
-  const { id } = useParams();
-  const [items, setItems] = useState(createPanes(null, !id));
+  const { profile_id } = useParams();
+  const [items, setItems] = useState(createPanes(null, !profile_id));
   const [profile, setProfile] = useState(PROFILES.internal);
   const resumeRef = useRef();
   const [profileData, setProfileData] = useState(null);
 
+  const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
+
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}`)
-        .then((response) => {
-          setProfileData(response.data);
-          setItems(createPanes(response.data, false));
-        })
-        .catch((error) => {
-          console.log("Failed to fetch profile data due to : ", error);
-        });
+    if (profile_id) {
+      if (data) {
+        setProfileData(data);
+        setItems(createPanes(data, false));
+      }
     } else {
       setItems(createPanes(null, true));
     }
-  }, [id]);
+  }, [profile_id, data]);
 
   const onChange = (key) => {
     // console.log(key);
@@ -94,8 +93,8 @@ export const Editor = () => {
       ? [
           ...items,
           tabName === "achievement"
-            ? achievement(profileData, !id)
-            : certification(profileData, !id)
+            ? achievement(profileData, !profile_id)
+            : certification(profileData, !profile_id)
         ]
       : items.filter((item) => item.key !== tabName);
 

@@ -6,35 +6,18 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
-  useSortable
+  SortableContext
 } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
+import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import { useCreateCertificateMutation } from "../../../api/certificationApi";
+import {
+  useCreateCertificateMutation,
+  useGetCertificatesQuery
+} from "../../../api/certificationApi";
+import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { get } from "../../../services/axios";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
-
-const DraggableTabNode = ({ ...props }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({
-      id: props["data-node-key"]
-    });
-  const style = {
-    ...props.style,
-    transform: CSS.Translate.toString(transform),
-    transition,
-    cursor: "move"
-  };
-  return React.cloneElement(props.children, {
-    ref: setNodeRef,
-    style,
-    ...attributes,
-    ...listeners
-  });
-};
 
 const Certification = () => {
   const [createCertificateService] = useCreateCertificateMutation();
@@ -45,7 +28,8 @@ const Certification = () => {
     { label: "Certification 1", children: null, key: "0" }
   ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
+  const { profile_id } = useParams();
+  const { data } = useGetCertificatesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -53,76 +37,67 @@ const Certification = () => {
   });
 
   useEffect(() => {
-    if (id) {
-      get(`/api/profiles/${id}/certificates`)
-        .then((response) => {
-          const certificates = response.data.certificates || [];
-          setInitialState({ ...initialState, certificates });
+    if (profile_id && data) {
+      setInitialState({ ...initialState, data });
 
-          if (certificates.length > 0) {
-            const tabs = certificates.map((certificate, index) => ({
-              label: `Certification ${index + 1}`,
-              children: null,
-              key: `${index}`
-            }));
-            setItems(tabs);
-            newTabIndex.current = certificates.length;
-            form.setFieldsValue(
-              certificates.reduce((acc, certificate, index) => {
-                acc[`name_${index}`] = certificate.name;
-                acc[`organization_name_${index}`] =
-                  certificate.organization_name;
-                acc[`description_${index}`] = certificate.description;
-                acc[`issued_date_${index}`] = certificate.issued_date
-                  ? moment(certificate.issued_date, "MMM-YYYY")
-                  : null;
-                acc[`from_date_${index}`] = certificate.from_date
-                  ? moment(certificate.from_date, "MMM-YYYY")
-                  : null;
-                acc[`to_date_${index}`] = certificate.to_date
-                  ? moment(certificate.to_date, "MMM-YYYY")
-                  : null;
-                return acc;
-              }, {})
-            );
-            setActiveKey("0");
-          } else {
-            setItems([{ label: "Certification 1", children: null, key: "0" }]);
-            newTabIndex.current = 1;
-            form.setFieldsValue({});
-          }
-        })
-        .catch(() => {
-          setItems([{ label: "Certification 1", children: null, key: "0" }]);
-          newTabIndex.current = 1;
-          form.setFieldsValue({});
-        });
+      if (data.length > 0) {
+        const tabs = data.map((certificate, index) => ({
+          label: `Certification ${index + 1}`,
+          children: null,
+          key: `${index}`
+        }));
+        setItems(tabs);
+        newTabIndex.current = data.length;
+        form.setFieldsValue(
+          data.reduce((acc, certificate, index) => {
+            acc[`certificate_${index}`] = {
+              name: certificate.name,
+              organization_name: certificate.organization_name,
+              description: certificate.description,
+              issued_date: certificate.issued_date
+                ? moment(certificate.issued_date, "MMM-YYYY")
+                : null,
+              from_date: certificate.from_date
+                ? moment(certificate.from_date, "MMM-YYYY")
+                : null,
+              to_date: certificate.to_date
+                ? moment(certificate.to_date, "MMM-YYYY")
+                : null
+            };
+            return acc;
+          }, {})
+        );
+        setActiveKey("0");
+      } else {
+        setItems([{ label: "Certification 1", children: null, key: "0" }]);
+        newTabIndex.current = 1;
+        form.setFieldsValue({});
+      }
     }
-  }, [id]);
+  }, [profile_id, data]);
 
   const onFinish = async (values) => {
     const certificates = items.map((item, index) => ({
-      name: values[`name_${index}`],
-      organization_name: values[`organization_name_${index}`],
-      description: values[`description_${index}`],
-      issued_date: values[`issued_date_${index}`]?.format("MMM-YYYY"),
-      from_date: values[`from_date_${index}`]?.format("MMM-YYYY"),
-      to_date: values[`to_date_${index}`]?.format("MMM-YYYY")
+      name: values[`certificate_${index}`]?.name,
+      organization_name: values[`certificate_${index}`]?.organization_name,
+      description: values[`certificate_${index}`]?.description,
+      issued_date:
+        values[`certificate_${index}`]?.issued_date?.format("MMM-YYYY"),
+      from_date: values[`certificate_${index}`]?.from_date?.format("MMM-YYYY"),
+      to_date: values[`certificate_${index}`]?.to_date?.format("MMM-YYYY")
     }));
-
     setInitialState({
       ...initialState,
       certificates
     });
 
-    if (!validateId(id)) {
+    if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
     }
-
     try {
       const response = await createCertificateService({
-        profile_id: id,
+        profile_id: profile_id,
         values: certificates
       });
       if (response.data?.message) {
@@ -131,14 +106,12 @@ const Certification = () => {
     } catch (error) {
       toast.error(error.response?.data?.error_message);
     }
+    setInitialState({ ...initialState, certificates });
   };
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      certificates: []
-    });
+    setInitialState({ ...initialState, certificates: [] });
   };
 
   const onChange = (key) => {
@@ -218,28 +191,26 @@ const Certification = () => {
                   <Row>
                     <Col span={11}>
                       <Form.Item
-                        name={`name_${index}`}
+                        name={[`certificate_${index}`, "name"]}
                         label="Certificate Name"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Name required"
-                          }
-                        ]}
+                        rules={[{ required: true, message: "Name required" }]}
                       >
                         <Input placeholder="Enter certificate name" />
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
                       <Form.Item
-                        name={`organization_name_${index}`}
+                        name={[`certificate_${index}`, "organization_name"]}
                         label="Organization Name"
                       >
                         <Input placeholder="Enter organization name" />
                       </Form.Item>
                     </Col>
                   </Row>
-                  <Form.Item name={`description_${index}`} label="Description">
+                  <Form.Item
+                    name={[`certificate_${index}`, "description"]}
+                    label="Description"
+                  >
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above certificate"
                       showCount
@@ -249,7 +220,7 @@ const Certification = () => {
                   <Row>
                     <Col span={11}>
                       <Form.Item
-                        name={`issued_date_${index}`}
+                        name={[`certificate_${index}`, "issued_date"]}
                         label="Certificate Issued Date"
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -257,7 +228,7 @@ const Certification = () => {
                     </Col>
                     <Col span={11} offset={2}>
                       <Form.Item
-                        name={`from_date_${index}`}
+                        name={[`certificate_${index}`, "from_date"]}
                         label="Certification Start Date"
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -267,7 +238,7 @@ const Certification = () => {
                   <Row>
                     <Col span={11}>
                       <Form.Item
-                        name={`to_date_${index}`}
+                        name={[`certificate_${index}`, "to_date"]}
                         label="Certification End Date"
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />

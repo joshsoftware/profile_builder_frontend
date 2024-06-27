@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_EDUCATION_ENDPOINTS,
+  EDUCATION_LIST_ENDPOINT,
   EDUCATION_REDUCER_PATH,
   EDUCATION_TAG_TYPES,
   HTTP_METHODS
@@ -20,8 +21,16 @@ export const educationApi = createApi({
       }),
       invalidatesTags: EDUCATION_TAG_TYPES,
       transformResponse: (response) => response.data
+    }),
+    getEducations: builder.query({
+      query: (profile_id) => ({
+        url: EDUCATION_LIST_ENDPOINT.replace(":profile_id", profile_id)
+      }),
+      providesTags: EDUCATION_TAG_TYPES,
+      transformResponse: (response) => response.data.educations
     })
   })
 });
 
-export const { useCreateEducationMutation } = educationApi;
+export const { useCreateEducationMutation, useGetEducationsQuery } =
+  educationApi;
