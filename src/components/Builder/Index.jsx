@@ -3,7 +3,20 @@ import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetBasicInfoQuery } from "../../api/profileApi";
-import { PROFILES } from "../../Constants";
+import {
+  ACHIEVEMENT_KEY,
+  ACHIEVEMENT_LABEL,
+  BASIC_INFO_KEY,
+  BASIC_INFO_LABEL,
+  CERTIFICATION_KEY,
+  EDUCATION_KEY,
+  EDUCATION_LABEL,
+  EXPERIENCE_KEY,
+  EXPERIENCE_LABEL,
+  PROFILES,
+  PROJECTS_KEY,
+  PROJECTS_LABEL
+} from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
 import Achievement from "./Achievement";
@@ -16,39 +29,39 @@ import Project from "./Project";
 
 const createPanes = (profileData, disableTabs) => [
   {
-    key: "basic-info",
-    label: <b>Basic Info</b>,
+    key: BASIC_INFO_KEY,
+    label: BASIC_INFO_LABEL,
     children: <BasicInfo profileData={profileData} />
   },
   {
-    key: "projects",
-    label: <b>Projects</b>,
+    key: PROJECTS_KEY,
+    label: PROJECTS_LABEL,
     children: <Project />,
     disabled: disableTabs
   },
   {
-    key: "education",
-    label: <b>Education</b>,
+    key: EDUCATION_KEY,
+    label: EDUCATION_LABEL,
     children: <Education />,
     disabled: disableTabs
   },
   {
-    key: "experience",
-    label: <b>Experience</b>,
+    key: EXPERIENCE_KEY,
+    label: EXPERIENCE_LABEL,
     children: <Experience />,
     disabled: disableTabs
   }
 ];
 
 const achievement = (profileData, disableTabs) => ({
-  key: "achievement",
-  label: <b>Achievement</b>,
+  key: ACHIEVEMENT_KEY,
+  label: ACHIEVEMENT_LABEL,
   children: <Achievement profileData={profileData} />,
   disabled: disableTabs
 });
 
 const certification = (profileData, disableTabs) => ({
-  key: "certification",
+  key: CERTIFICATION_KEY,
   label: <b>Certification</b>,
   children: <Certification profileData={profileData} />,
   disabled: disableTabs
@@ -92,7 +105,7 @@ export const Editor = () => {
     const updatedItems = event
       ? [
           ...items,
-          tabName === "achievement"
+          tabName === ACHIEVEMENT_KEY
             ? achievement(profileData, !profile_id)
             : certification(profileData, !profile_id)
         ]
@@ -102,11 +115,11 @@ export const Editor = () => {
   };
 
   const handleAchievement = (event) => {
-    handleTabs(event, "achievement");
+    handleTabs(event, ACHIEVEMENT_KEY);
   };
 
   const handleCertification = (event) => {
-    handleTabs(event, "certification");
+    handleTabs(event, CERTIFICATION_KEY);
   };
 
   return (
