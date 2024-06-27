@@ -30,7 +30,7 @@ const Navbar = () => {
   const getButtonStyle = (route) => ({
     color: selectedKey === route ? "white" : "#ffffff",
     border: selectedKey === route ? "2px solid white" : "none",
-    fontSize:"15px"
+    fontSize: "15px"
   });
 
   return (
@@ -42,7 +42,7 @@ const Navbar = () => {
           zIndex: 100,
           width: "100%",
           display: "block",
-          alignItems: "center",
+          alignItems: "center"
         }}
       >
         <img

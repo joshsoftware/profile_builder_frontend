@@ -1,8 +1,22 @@
-import React, { useEffect,useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
+import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetBasicInfoQuery } from "../../api/profileApi";
-import { PROFILES } from "../../Constants";
+import {
+  ACHIEVEMENT_KEY,
+  ACHIEVEMENT_LABEL,
+  BASIC_INFO_KEY,
+  BASIC_INFO_LABEL,
+  CERTIFICATION_KEY,
+  EDUCATION_KEY,
+  EDUCATION_LABEL,
+  EXPERIENCE_KEY,
+  EXPERIENCE_LABEL,
+  PROFILES,
+  PROJECTS_KEY,
+  PROJECTS_LABEL
+} from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
 import Achievement from "./Achievement";
@@ -15,66 +29,66 @@ import Project from "./Project";
 
 const createPanes = (profileData, disableTabs) => [
   {
-    key: "basic-info",
-    label: <b>Basic Info</b>,
-    children: <BasicInfo profileData={profileData} />,
+    key: BASIC_INFO_KEY,
+    label: BASIC_INFO_LABEL,
+    children: <BasicInfo profileData={profileData} />
   },
   {
-    key: "projects",
-    label: <b>Projects</b>,
+    key: PROJECTS_KEY,
+    label: PROJECTS_LABEL,
     children: <Project />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
-    key: "education",
-    label: <b>Education</b>,
+    key: EDUCATION_KEY,
+    label: EDUCATION_LABEL,
     children: <Education />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
-    key: "experience",
-    label: <b>Experience</b>,
+    key: EXPERIENCE_KEY,
+    label: EXPERIENCE_LABEL,
     children: <Experience />,
-    disabled: disableTabs,
-  },
+    disabled: disableTabs
+  }
 ];
 
 const achievement = (profileData, disableTabs) => ({
-  key: "achievement",
-  label: <b>Achievement</b>,
+  key: ACHIEVEMENT_KEY,
+  label: ACHIEVEMENT_LABEL,
   children: <Achievement profileData={profileData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 const certification = (profileData, disableTabs) => ({
-  key: "certification",
+  key: CERTIFICATION_KEY,
   label: <b>Certification</b>,
   children: <Certification profileData={profileData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 export const Editor = () => {
-  const { id } = useParams();
-  const [items, setItems] = useState(createPanes(null, !id));
+  const { profile_id } = useParams();
+  const [items, setItems] = useState(createPanes(null, !profile_id));
   const [profile, setProfile] = useState(PROFILES.internal);
   const resumeRef = useRef();
   const [profileData, setProfileData] = useState(null);
 
-  const {data} = useGetBasicInfoQuery(id);
+  const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
 
   useEffect(() => {
-    if (id) {
-      if(data){
+    if (profile_id) {
+      if (data) {
         setProfileData(data);
         setItems(createPanes(data, false));
       }
     } else {
       setItems(createPanes(null, true));
     }
-  }, [id, data]);
+  }, [profile_id, data]);
 
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
 
   const onProfileChange = (event) => {
@@ -89,18 +103,23 @@ export const Editor = () => {
 
   const handleTabs = (event, tabName) => {
     const updatedItems = event
-      ? [...items, tabName === "achievement" ? achievement(profileData, !id) : certification(profileData, !id)]
+      ? [
+          ...items,
+          tabName === ACHIEVEMENT_KEY
+            ? achievement(profileData, !profile_id)
+            : certification(profileData, !profile_id)
+        ]
       : items.filter((item) => item.key !== tabName);
 
     setItems(updatedItems);
   };
 
   const handleAchievement = (event) => {
-    handleTabs(event, "achievement");
+    handleTabs(event, ACHIEVEMENT_KEY);
   };
 
   const handleCertification = (event) => {
-    handleTabs(event, "certification");
+    handleTabs(event, CERTIFICATION_KEY);
   };
 
   return (

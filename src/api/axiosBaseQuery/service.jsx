@@ -1,16 +1,16 @@
 import axiosInstance from "../../services/axios";
 
 const axiosBaseQuery =
-  ({ baseUrl } = { baseUrl: "" }) =>
+  () =>
   async ({ url, method, data, params, headers, body }) => {
     try {
       const result = await axiosInstance({
-        url: baseUrl + url,
+        url: url,
         method,
         data,
         params,
         headers,
-        body,
+        body
       });
       return Promise.resolve(result);
     } catch (axiosError) {

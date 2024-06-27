@@ -1,6 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { achievementApi } from "../achievementApi";
-import { certificateApi } from "../certificateApi";
+import { certificationApi } from "../certificationApi";
 import { educationApi } from "../educationApi";
 import { experienceApi } from "../experienceApi";
 import { loginApi } from "../loginApi";
@@ -17,11 +17,11 @@ const preloadedState = {
 const rootReducer = combineReducers({
   [loginApi.reducerPath]: loginApi.reducer,
   [profileApi.reducerPath]: profileApi.reducer,
-  [projectApi.reducerPath]: projectApi.reducer,
+  [achievementApi.reducerPath]: achievementApi.reducer,
+  [certificationApi.reducerPath]: certificationApi.reducer,
   [educationApi.reducerPath]: educationApi.reducer,
   [experienceApi.reducerPath]: experienceApi.reducer,
-  [achievementApi.reducerPath]:achievementApi.reducer,
-  [certificateApi.reducerPath]:certificateApi.reducer,
+  [projectApi.reducerPath]: projectApi.reducer,
   auth: authReducer
 });
 
@@ -29,7 +29,15 @@ const store = configureStore({
   reducer: rootReducer,
   preloadedState,
   middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(loginApi.middleware, profileApi.middleware, projectApi.middleware, educationApi.middleware, experienceApi.middleware, achievementApi.middleware, certificateApi.middleware)
+    getDefaultMiddleware().concat(
+      loginApi.middleware,
+      profileApi.middleware,
+      achievementApi.middleware,
+      certificationApi.middleware,
+      educationApi.middleware,
+      experienceApi.middleware,
+      projectApi.middleware
+    )
 });
 
 export default store;

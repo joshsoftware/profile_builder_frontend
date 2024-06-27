@@ -1,22 +1,35 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
-import { PROJECT_LIST_ENDPOINT, ReducerPath, TagTypes } from "../Constants";
+import {
+  CREATE_PROJECT_ENDPOINTS,
+  HTTP_METHODS,
+  PROJECT_LIST_ENDPOINT,
+  PROJECT_REDUCER_PATH,
+  PROJECT_TAG_TYPES
+} from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const projectApi = createApi({
-  reducerPath: ReducerPath.project,
+  reducerPath: PROJECT_REDUCER_PATH,
   baseQuery: axiosBaseQuery(),
-  tagTypes: [TagTypes.project],
+  tagTypes: PROJECT_TAG_TYPES,
   endpoints: (builder) => ({
-
-    getProject: builder.query({
-      query: (profile_id)=>({
-        url: PROJECT_LIST_ENDPOINT.replace(":profile_id", profile_id),
+    createProject: builder.mutation({
+      query: ({ profile_id, values }) => ({
+        url: CREATE_PROJECT_ENDPOINTS.replace(":profile_id", profile_id),
+        method: HTTP_METHODS.POST,
+        data: { projects: values }
       }),
-      providesTags: [TagTypes.project],
+      invalidatesTags: PROJECT_TAG_TYPES,
+      transformResponse: (response) => response.data
+    }),
+    getProject: builder.query({
+      query: (profile_id) => ({
+        url: PROJECT_LIST_ENDPOINT.replace(":profile_id", profile_id)
+      }),
+      providesTags: PROJECT_TAG_TYPES,
       transformResponse: (response) => response.data.projects
     })
-
   })
 });
 
-export const { useGetProjectQuery } = projectApi;
+export const { useCreateProjectMutation, useGetProjectQuery } = projectApi;

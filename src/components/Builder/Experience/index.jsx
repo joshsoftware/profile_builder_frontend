@@ -1,38 +1,61 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Checkbox, Col, DatePicker, Form, Input, Row, Select, Space, Tabs } from "antd";
+import {
+  Button,
+  Checkbox,
+  Col,
+  DatePicker,
+  Form,
+  Input,
+  Row,
+  Select,
+  Space,
+  Tabs
+} from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext
+} from "@dnd-kit/sortable";
+import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import { useGetExperiencesQuery } from "../../../api/experienceApi";
+import {
+  useCreateExperienceMutation,
+  useGetExperiencesQuery
+} from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { DESIGNATION } from "../../../Constants";
-import { post } from "../../../services/axios";
+import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Experience = () => {
+  const [createExperienceService] = useCreateExperienceMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([
+    { label: "Experience 1", children: null, key: "0" }
+  ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
-  const { data } = useGetExperiencesQuery(id);
+  const { profile_id } = useParams();
+  const { data } = useGetExperiencesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
-    if (id && data) {
+    if (profile_id && data) {
       setInitialState({ ...initialState, data });
 
       if (data.length > 0) {
         const tabs = data.map((experience, index) => ({
           label: `Experience ${index + 1}`,
           children: null,
-          key: `${index}`,
+          key: `${index}`
         }));
         setItems(tabs);
         newTabIndex.current = data.length;
@@ -40,8 +63,13 @@ const Experience = () => {
           data.reduce((acc, experience, index) => {
             acc[`experience_${index}`] = {
               ...experience,
-              employmentStart: experience.from_date ? moment(experience.from_date, "MMM-YYYY") : null,
-              employmentEnd: experience.to_date && experience.to_date !== "Present" ? moment(experience.to_date, "MMM-YYYY") : null,
+              employmentStart: experience.from_date
+                ? moment(experience.from_date, "MMM-YYYY")
+                : null,
+              employmentEnd:
+                experience.to_date && experience.to_date !== "Present"
+                  ? moment(experience.to_date, "MMM-YYYY")
+                  : null,
               isCurrentCompany: experience.to_date === "Present"
             };
             return acc;
@@ -54,43 +82,60 @@ const Experience = () => {
         form.setFieldsValue({});
       }
     }
-  }, [id, data]);
+  }, [profile_id, data]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const experiences = items.map((item, index) => ({
       designation: values[`experience_${index}`]?.designation,
       company_name: values[`experience_${index}`]?.company_name,
-      from_date: values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
+      from_date:
+        values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
       to_date: values[`experience_${index}`]?.isCurrentCompany
         ? "Present"
-        : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY"),
+        : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY")
     }));
 
     setInitialState({
       ...initialState,
-      experiences,
+      experiences
     });
 
-    post(`/api/profiles/${id}/experiences`, { experiences })
-    // form.resetFields();
+    if (!validateId(profile_id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createExperienceService({
+        profile_id: profile_id,
+        values: experiences
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      experiences: [],
+      experiences: []
     });
   };
 
   const onChangeCheckbox = (e, key) => {
     const checked = e.target.checked;
-    setItems(items.map((item) => {
-      if (item.key === key) {
-        return { ...item, isCurrentCompany: checked };
-      }
-      return item;
-    }));
+    setItems(
+      items.map((item) => {
+        if (item.key === key) {
+          return { ...item, isCurrentCompany: checked };
+        }
+        return item;
+      })
+    );
   };
 
   const onChange = (key) => {
@@ -101,7 +146,11 @@ const Experience = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
       ...items,
-      { label: `Experience ${newTabIndex.current}`, children: null, key: newActiveKey },
+      {
+        label: `Experience ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -110,7 +159,10 @@ const Experience = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -141,7 +193,10 @@ const Experience = () => {
           <Button onClick={add}>Add Experience</Button>
         </div>
         <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-          <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
             <Tabs
               hideAdd
               onChange={onChange}
@@ -166,8 +221,8 @@ const Experience = () => {
                           rules={[
                             {
                               required: true,
-                              message: "Designation can not be blank",
-                            },
+                              message: "Designation can not be blank"
+                            }
                           ]}
                         >
                           <Select
@@ -188,7 +243,11 @@ const Experience = () => {
                     </Row>
                     <Row style={{ margin: "10px 0px 10px 0px" }}>
                       <Col>
-                        <Form.Item name={[`experience_${index}`, "isCurrentCompany"]} valuePropName="checked" initialValue={false}>
+                        <Form.Item
+                          name={[`experience_${index}`, "isCurrentCompany"]}
+                          valuePropName="checked"
+                          initialValue={false}
+                        >
                           <Checkbox
                             onChange={(e) => onChangeCheckbox(e, item.key)}
                           >
@@ -206,11 +265,14 @@ const Experience = () => {
                             {
                               type: "object",
                               required: true,
-                              message: "Start date can not be blank",
-                            },
+                              message: "End date can not be blank"
+                            }
                           ]}
                         >
-                          <DatePicker style={{ width: "100%" }} picker="month"/>
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
                         </Form.Item>
                       </Col>
                       <Col span={11} offset={2}>
@@ -222,11 +284,14 @@ const Experience = () => {
                               {
                                 type: "object",
                                 required: true,
-                                message: "End date can not be blank",
-                              },
+                                message: "End date can not be blank"
+                              }
                             ]}
                           >
-                            <DatePicker style={{ width: "100%" }} picker="month"/>
+                            <DatePicker
+                              style={{ width: "100%" }}
+                              picker="month"
+                            />
                           </Form.Item>
                         )}
                       </Col>
@@ -242,7 +307,7 @@ const Experience = () => {
                       </Space>
                     </Form.Item>
                   </Form>
-                ),
+                )
               }))}
               renderTabBar={(tabBarProps, DefaultTabBar) => (
                 <DefaultTabBar {...tabBarProps}>

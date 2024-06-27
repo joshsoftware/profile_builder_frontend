@@ -160,9 +160,7 @@ const ListProfiles = () => {
       title: "Is Current Employee",
       dataIndex: "is_current_employee",
       key: "is_current_employee",
-      render: (is_current_employee) => (
-        is_current_employee
-      ),
+      render: (is_current_employee) => is_current_employee,
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
       sortDirections: ["descend", "ascend"]
     },
@@ -181,23 +179,22 @@ const ListProfiles = () => {
   return (
     <>
       <Navbar />
-      <div className={styles.content}>
-        <div className={styles.header}>
-          <Typography.Title level={1} className={styles.profile_header}>
-            Profiles
-          </Typography.Title>
-          <Link to={EDITOR_ROUTE}>
-            <Button type="primary" className={styles.button}>+ New</Button>
-          </Link>
-        </div>
-        <Table
-          columns={columns}
-          dataSource={data?.profiles}
-          className={styles.table}
-          bordered={true}
-          loading={isFetching}
-        />
-      </div>
+      <Typography.Title level={1} className={styles.profile_header}>
+        Profiles
+        <Link to={EDITOR_ROUTE}>
+          <Button type="primary" className={styles.button}>
+            {" "}
+            + New{" "}
+          </Button>
+        </Link>
+      </Typography.Title>
+      <Table
+        columns={columns}
+        dataSource={data?.profiles}
+        className={styles.table}
+        bordered={true}
+        loading={isFetching}
+      />
     </>
   );
 };

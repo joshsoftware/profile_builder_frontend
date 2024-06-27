@@ -1,18 +1,20 @@
 import React, { useContext, useEffect } from "react";
+import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
-import PropTypes from "prop-types";
+import PropTypes from "prop-types"; // Import PropTypes
+import { useCreateProfileMutation } from "../../../api/profileApi";
 import {
   DESIGNATION,
+  EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
-  PROFILE_LIST_ENDPOINT,
-  SKILLS,
+  SKILLS
 } from "../../../Constants";
-import { post } from "../../../services/axios";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const BasicInfo = ({ profileData }) => {
+  const [createProfileService] = useCreateProfileMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -30,29 +32,34 @@ const BasicInfo = ({ profileData }) => {
 
     const updatedBasicInfo = {
       ...initialState.basicInfo,
-      ...values,
+      ...values
     };
     setInitialState({
       ...initialState,
-      basicInfo: updatedBasicInfo,
+      basicInfo: { ...initialState.basicInfo, ...values }
     });
+    var profile = { profile: { ...initialState.basicInfo, ...values } };
 
     try {
-      await post(PROFILE_LIST_ENDPOINT, { profile: updatedBasicInfo });
-      navigate(PROFILE_LIST_ENDPOINT);
+      const response = await createProfileService(values);
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+        navigate(
+          EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
+        );
+      }
     } catch (error) {
-      console.error("Error posting basic info:", error);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
   const onReset = () => {
-    // Handle form reset
     form.resetFields();
     setInitialState({
       ...initialState,
       basicInfo: {
-        profileDetails: PROFILE_DETAILS,
-      },
+        profileDetails: PROFILE_DETAILS
+      }
     });
   };
 
@@ -84,8 +91,8 @@ const BasicInfo = ({ profileData }) => {
               {
                 required: true,
                 type: "email",
-                message: "Valid email required",
-              },
+                message: "Valid email required"
+              }
             ]}
           >
             <Input placeholder="example@joshsoftware.com" />
@@ -119,8 +126,8 @@ const BasicInfo = ({ profileData }) => {
                 validator: (_, value) =>
                   value <= 30
                     ? Promise.resolve()
-                    : Promise.reject("Maximum experience is 30 years."),
-              },
+                    : Promise.reject("Maximum experience is 30 years.")
+              }
             ]}
           >
             <Input
@@ -237,9 +244,9 @@ BasicInfo.propTypes = {
       description: PropTypes.string,
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
-      career_objectives: PropTypes.string,
-    }),
-  }),
+      career_objectives: PropTypes.string
+    })
+  })
 };
 
 export default BasicInfo;

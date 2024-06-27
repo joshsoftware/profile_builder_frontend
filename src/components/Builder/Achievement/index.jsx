@@ -1,31 +1,47 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext
+} from "@dnd-kit/sortable";
+import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetAchievementsQuery } from "../../../api/achievementApi";
+import { useCreateAchievementMutation } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { post } from "../../../services/axios";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Achievement = () => {
+  const { profile_id } = useParams();
+  const [createAchievementService] = useCreateAchievementMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([{ label: "Achievement 1", children: null, key: "0" }]);
+  const [items, setItems] = useState([
+    { label: "Achievement 1", children: null, key: "0" }
+  ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
-  const { data } = useGetAchievementsQuery(id);
-  const sensor = useSensor(PointerSensor, { activationConstraint: { distance: 10 } });
+  const { data } = useGetAchievementsQuery(profile_id ?? skipToken);
+
+  const sensor = useSensor(PointerSensor, {
+    activationConstraint: {
+      distance: 10
+    }
+  });
 
   useEffect(() => {
-    if (id && data) {
+    if (profile_id && data) {
       setInitialState({ ...initialState, data });
       if (data.length > 0) {
         const tabs = data.map((achievement, index) => ({
           label: `Achievement ${index + 1}`,
           children: null,
-          key: `${index}`,
+          key: `${index}`
         }));
         setItems(tabs);
         newTabIndex.current = data.length;
@@ -33,7 +49,7 @@ const Achievement = () => {
           data.reduce((acc, achievement, index) => {
             acc[`achievement_${index}`] = {
               name: achievement.name,
-              description: achievement.description,
+              description: achievement.description
             };
             return acc;
           }, {})
@@ -43,7 +59,7 @@ const Achievement = () => {
         resetItems();
       }
     }
-  }, [id, data]);
+  }, [profile_id, data]);
 
   const resetItems = () => {
     setItems([{ label: "Achievement 1", children: null, key: "0" }]);
@@ -51,18 +67,42 @@ const Achievement = () => {
     form.resetFields();
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const achievements = items.map((item, index) => ({
       name: values[`achievement_${index}`]?.name,
-      description: values[`achievement_${index}`]?.description,
+      description: values[`achievement_${index}`]?.description
     }));
 
     setInitialState({ ...initialState, achievements });
-    post(`/api/profiles/${id}/achievements`, { achievements });
+    setInitialState({
+      ...initialState,
+      achievements
+    });
+
+    if (!validateId(profile_id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
+    try {
+      const response = await createAchievementService({
+        profile_id: profile_id,
+        values: achievements
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
   };
 
   const onReset = () => {
     form.resetFields();
+    setInitialState({
+      ...initialState,
+      achievements: []
+    });
     setInitialState({ ...initialState, achievements: [] });
   };
 
@@ -72,7 +112,14 @@ const Achievement = () => {
 
   const add = () => {
     const newActiveKey = `${newTabIndex.current++}`;
-    setItems([...items, { label: `Achievement ${newTabIndex.current}`, children: null, key: newActiveKey }]);
+    setItems([
+      ...items,
+      {
+        label: `Achievement ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
+    ]);
     setActiveKey(newActiveKey);
   };
 
@@ -108,7 +155,10 @@ const Achievement = () => {
         <Button onClick={add}>Add Achievement</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -118,7 +168,13 @@ const Achievement = () => {
             items={items.map((item, index) => ({
               ...item,
               children: (
-                <Form layout="vertical" form={form} name={`achievement_${item.key}`} onFinish={onFinish} key={item.key}>
+                <Form
+                  layout="vertical"
+                  form={form}
+                  name={`achievement_${item.key}`}
+                  onFinish={onFinish}
+                  key={item.key}
+                >
                   <Form.Item
                     name={[`achievement_${index}`, "name"]}
                     label="Achievement Name"
@@ -126,7 +182,10 @@ const Achievement = () => {
                   >
                     <Input placeholder="Achievement name eg. star performer" />
                   </Form.Item>
-                  <Form.Item name={[`achievement_${index}`, "description"]} label="Description">
+                  <Form.Item
+                    name={[`achievement_${index}`, "description"]}
+                    label="Description"
+                  >
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above achievement"
                       showCount
@@ -144,7 +203,7 @@ const Achievement = () => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>

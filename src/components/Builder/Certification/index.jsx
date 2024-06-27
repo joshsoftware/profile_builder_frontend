@@ -1,35 +1,50 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
-import { arrayMove, horizontalListSortingStrategy, SortableContext } from "@dnd-kit/sortable";
+import {
+  arrayMove,
+  horizontalListSortingStrategy,
+  SortableContext
+} from "@dnd-kit/sortable";
+import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import { useGetCertificatesQuery } from "../../../api/certificateApi";
+import {
+  useCreateCertificateMutation,
+  useGetCertificatesQuery
+} from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { post } from "../../../services/axios";
+import { INVALID_ID_ERROR } from "../../../Constants";
+import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Certification = () => {
-  const { initialState, setInitialState } = useContext(ResumeContext);
+  const [createCertificateService] = useCreateCertificateMutation();
   const [form] = Form.useForm();
+  const { initialState, setInitialState } = useContext(ResumeContext);
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([{ label: "Certification 1", children: null, key: "0" }]);
+  const [items, setItems] = useState([
+    { label: "Certification 1", children: null, key: "0" }
+  ]);
   const newTabIndex = useRef(1);
-  const { id } = useParams();
-  const { data } = useGetCertificatesQuery(id);
+  const { profile_id } = useParams();
+  const { data } = useGetCertificatesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: {
+      distance: 10
+    }
   });
 
   useEffect(() => {
-    if (id && data) {
+    if (profile_id && data) {
       setInitialState({ ...initialState, data });
 
       if (data.length > 0) {
         const tabs = data.map((certificate, index) => ({
           label: `Certification ${index + 1}`,
           children: null,
-          key: `${index}`,
+          key: `${index}`
         }));
         setItems(tabs);
         newTabIndex.current = data.length;
@@ -39,9 +54,15 @@ const Certification = () => {
               name: certificate.name,
               organization_name: certificate.organization_name,
               description: certificate.description,
-              issued_date: certificate.issued_date ? moment(certificate.issued_date, "MMM-YYYY") : null,
-              from_date: certificate.from_date ? moment(certificate.from_date, "MMM-YYYY") : null,
-              to_date: certificate.to_date ? moment(certificate.to_date, "MMM-YYYY") : null,
+              issued_date: certificate.issued_date
+                ? moment(certificate.issued_date, "MMM-YYYY")
+                : null,
+              from_date: certificate.from_date
+                ? moment(certificate.from_date, "MMM-YYYY")
+                : null,
+              to_date: certificate.to_date
+                ? moment(certificate.to_date, "MMM-YYYY")
+                : null
             };
             return acc;
           }, {})
@@ -53,21 +74,39 @@ const Certification = () => {
         form.setFieldsValue({});
       }
     }
-  }, [id, data]);
+  }, [profile_id, data]);
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const certificates = items.map((item, index) => ({
       name: values[`certificate_${index}`]?.name,
       organization_name: values[`certificate_${index}`]?.organization_name,
       description: values[`certificate_${index}`]?.description,
-      issued_date: values[`certificate_${index}`]?.issued_date?.format("MMM-YYYY"),
+      issued_date:
+        values[`certificate_${index}`]?.issued_date?.format("MMM-YYYY"),
       from_date: values[`certificate_${index}`]?.from_date?.format("MMM-YYYY"),
-      to_date: values[`certificate_${index}`]?.to_date?.format("MMM-YYYY"),
+      to_date: values[`certificate_${index}`]?.to_date?.format("MMM-YYYY")
     }));
+    setInitialState({
+      ...initialState,
+      certificates
+    });
 
+    if (!validateId(profile_id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+    try {
+      const response = await createCertificateService({
+        profile_id: profile_id,
+        values: certificates
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
     setInitialState({ ...initialState, certificates });
-
-    post(`/api/profiles/${id}/certificates`, { certificates });
   };
 
   const onReset = () => {
@@ -81,7 +120,14 @@ const Certification = () => {
 
   const add = () => {
     const newActiveKey = `${newTabIndex.current++}`;
-    setItems([...items, { label: `Certification ${newTabIndex.current}`, children: null, key: newActiveKey }]);
+    setItems([
+      ...items,
+      {
+        label: `Certification ${newTabIndex.current}`,
+        children: null,
+        key: newActiveKey
+      }
+    ]);
     setActiveKey(newActiveKey);
   };
 
@@ -89,7 +135,10 @@ const Certification = () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
     if (newPanes.length && targetKey === activeKey) {
-      const { key } = newPanes[targetIndex === newPanes.length ? targetIndex - 1 : targetIndex];
+      const { key } =
+        newPanes[
+          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+        ];
       setActiveKey(key);
     }
     setItems(newPanes);
@@ -119,7 +168,10 @@ const Certification = () => {
         <Button onClick={add}>Add Certification</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext items={items.map((i) => i.key)} strategy={horizontalListSortingStrategy}>
+        <SortableContext
+          items={items.map((i) => i.key)}
+          strategy={horizontalListSortingStrategy}
+        >
           <Tabs
             hideAdd
             onChange={onChange}
@@ -195,12 +247,16 @@ const Certification = () => {
                   </Row>
                   <Form.Item>
                     <Space>
-                      <Button type="primary" htmlType="submit">Save</Button>
-                      <Button htmlType="button" onClick={onReset}>Reset</Button>
+                      <Button type="primary" htmlType="submit">
+                        Save
+                      </Button>
+                      <Button htmlType="button" onClick={onReset}>
+                        Reset
+                      </Button>
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>

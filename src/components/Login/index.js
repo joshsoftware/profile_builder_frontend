@@ -20,7 +20,6 @@ const Login = () => {
         const response = await loginService(accessToken);
         const token = response?.data?.token;
         if (token) {
-          console.log(token);
           dispatch(loginAction({ token }));
           window.localStorage.setItem("token", token);
           navigate(PROFILE_LIST_ROUTE);
