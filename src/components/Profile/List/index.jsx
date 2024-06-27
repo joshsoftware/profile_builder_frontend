@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Space, Table, Tag, Typography } from "antd";
+import { Button, Input, Row, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -126,7 +126,7 @@ const ListProfiles = () => {
       ...getColumnSearchProps("email")
     },
     {
-      title: "Years of Experience",
+      title: "Years Of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
@@ -179,16 +179,21 @@ const ListProfiles = () => {
   return (
     <>
       <Navbar />
-      <Typography.Title level={1} className={styles.profile_header}>
-        Profiles
+      <Row className={styles.rowStyle}>
+        <Typography.Title level={1} className={styles.profile_header}>
+          Profiles
+        </Typography.Title>
         <Link to={EDITOR_ROUTE}>
           <Button type="primary" className={styles.button}>
             {" "}
             + New{" "}
           </Button>
         </Link>
-      </Typography.Title>
+      </Row>
+
       <Table
+        tableLayout="fixed"
+        size="small"
         columns={columns}
         dataSource={data?.profiles}
         className={styles.table}

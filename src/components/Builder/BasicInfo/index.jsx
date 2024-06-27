@@ -119,7 +119,7 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Years of Experience"
+            label="Years Of Experience"
             rules={[
               { required: true, message: "Experience required" },
               {
