@@ -7,6 +7,7 @@ import Login from "../components/Login";
 import ListProfiles from "../components/Profile/List";
 import {
   DASHBOARD_ROUTE,
+  EDITOR_PROFILE_ROUTE,
   EDITOR_ROUTE,
   ERROR_ROUTE,
   PROFILE_LIST_ROUTE,
@@ -29,6 +30,10 @@ const Router = () => {
         />
         <Route
           path={EDITOR_ROUTE}
+          element={<ProtectedRoutes Component={Editor} />}
+        />
+        <Route
+          path={EDITOR_PROFILE_ROUTE}
           element={<ProtectedRoutes Component={Editor} />}
         />
         <Route path={ERROR_ROUTE} element={<Error />} />

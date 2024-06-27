@@ -3,6 +3,5 @@
 .App {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   font-family: container;
 }

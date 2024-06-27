@@ -6,9 +6,36 @@ export const PROFILES = {
   external: { title: "EXTERNAL", color: "#062e38" }
 };
 
+// ROUTES
+export const ROOT_ROUTE = "/";
+export const PROFILE_LIST_ROUTE = "/profiles";
+export const DASHBOARD_ROUTE = "/dashboard";
+export const EDITOR_ROUTE = "/profile-builder";
+export const EDITOR_PROFILE_ROUTE = "/profile-builder/:profile_id";
+export const ERROR_ROUTE = "*";
+
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
-export const PROFILE_LIST_ENDPOINT = "/api/list_profiles";
+export const PROFILE_LIST_ENDPOINT = "/api/profiles";
+export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
+export const CREATE_ACHIEVEMENT_ENDPOINTS =
+  "/api/profiles/:profile_id/achievements";
+export const CREATE_CERTIFICATE_ENDPOINTS =
+  "/api/profiles/:profile_id/certificates";
+export const CREATE_EDUCATION_ENDPOINTS =
+  "/api/profiles/:profile_id/educations";
+export const CREATE_EXPERIENCE_ENDPOINTS =
+  "/api/profiles/:profile_id/experiences";
+export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
+
+export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
+export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
+export const EDUCATION_LIST_ENDPOINT = "/api/profiles/:profile_id/educations";
+export const EXPERIENCE_LIST_ENDPOINT = "/api/profiles/:profile_id/experiences";
+export const ACHIEVEMENT_LIST_ENDPOINT =
+  "/api/profiles/:profile_id/achievements";
+export const CERTIFICATE_LIST_ENDPOINT =
+  "/api/profiles/:profile_id/certificates";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
@@ -16,6 +43,43 @@ export const HTTP_METHODS = {
   GET: "GET",
   PUT: "PUT"
 };
+// Redux Toolkit Query
+export const LOGIN_REDUCER_PATH = "loginApi";
+export const PROFILE_REDUCER_PATH = "profileApi";
+export const ACHIEVEMENT_REDUCER_PATH = "achievementApi";
+export const CERTIFICATE_REDUCER_PATH = "certificateApi";
+export const EDUCATION_REDUCER_PATH = "educationApi";
+export const EXPERIENCE_REDUCER_PATH = "experienceApi";
+export const PROJECT_REDUCER_PATH = "projectApi";
+
+// Redux Tag Types
+export const LOGIN_TAG_TYPES = ["login"];
+export const PROFILE_TAG_TYPES = ["profile"];
+export const ACHIEVEMENT_TAG_TYPES = ["achievement"];
+export const CERTIFICATE_TAG_TYPES = ["certificate"];
+export const EDUCATION_TAG_TYPES = ["education"];
+export const EXPERIENCE_TAG_TYPES = ["experience"];
+export const PROJECT_TAG_TYPES = ["project"];
+
+// ERRORS
+export const INVALID_ID_ERROR = "Invalid or missing ID";
+export const NETWORK_ERROR = "Network Error";
+
+// Keywords
+export const BASIC_INFO_KEY = "basic-info";
+export const PROJECTS_KEY = "projects";
+export const EDUCATION_KEY = "education";
+export const EXPERIENCE_KEY = "experience";
+export const ACHIEVEMENT_KEY = "achievement";
+export const CERTIFICATION_KEY = "certification";
+
+// Keywords
+export const BASIC_INFO_LABEL = "Basic Info";
+export const PROJECTS_LABEL = "projects";
+export const EDUCATION_LABEL = "education";
+export const EXPERIENCE_LABEL = "experience";
+export const ACHIEVEMENT_LABEL = "achievement";
+export const CERTIFICATION_LABEL = "certification";
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
@@ -56,10 +120,6 @@ export const SKILLS = [
   { label: "UI/UX", value: "UI/UX" },
   { label: "VueJs", value: "VueJs" }
 ];
-
-export const ROUTES = {
-  profile: "/api/profile/"
-};
 
 // TODO : Remove once refactor
 export const getMonthString = (num) => {
@@ -106,10 +166,3 @@ export const getMonthString = (num) => {
   }
   return month;
 };
-
-// ROUTES
-export const ROOT_ROUTE = "/";
-export const PROFILE_LIST_ROUTE = "/profiles";
-export const DASHBOARD_ROUTE = "/dashboard";
-export const EDITOR_ROUTE = "/profile-builder";
-export const ERROR_ROUTE = "*";

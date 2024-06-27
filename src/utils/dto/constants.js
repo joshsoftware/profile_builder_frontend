@@ -1,27 +1,32 @@
+import React from "react";
 import { Space, Tag } from "antd";
+
+export const validateId = (id) => {
+  return id && typeof id === "string" && id.trim() !== "";
+};
 
 export const columns = [
   {
     title: "ID",
     dataIndex: "id",
     key: "id",
-    render: (text) => <a>{text}</a>,
+    render: (text) => <a>{text}</a>
   },
   {
     title: "Name",
     dataIndex: "name",
     key: "name",
-    render: (text) => <a>{text}</a>,
+    render: (text) => <a>{text}</a>
   },
   {
     title: "Email",
     dataIndex: "email",
-    key: "email",
+    key: "email"
   },
   {
     title: "Years of Experience",
     dataIndex: "years_of_experience",
-    key: "years_of_experience",
+    key: "years_of_experience"
   },
   {
     title: "Primary Skills",
@@ -41,7 +46,7 @@ export const columns = [
           );
         })}
       </>
-    ),
+    )
   },
   {
     title: "Is Current Employee",
@@ -49,7 +54,7 @@ export const columns = [
     key: "is_current_employee",
     render: (is_current_employee) => (
       <strong>{is_current_employee === 1 ? "YES" : "NO"}</strong>
-    ),
+    )
   },
   {
     title: "Action",
@@ -59,6 +64,6 @@ export const columns = [
         <a>Edit</a>
         <a>Delete</a>
       </Space>
-    ),
-  },
+    )
+  }
 ];

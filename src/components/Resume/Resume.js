@@ -2,6 +2,7 @@ import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Calendar } from "react-feather";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 import { genderOptions, getMonthString } from "../../Constants";
+import jsonData from "./jsonData.json"
 import styles from "./Resume.module.css";
 //we cannt pass ref directly to component so we should wrap a component in forwardRef.
 const Resume = forwardRef((props, ref) => {

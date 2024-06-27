@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
+import { Button, Form, Input, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -9,28 +9,25 @@ import {
   SortableContext
 } from "@dnd-kit/sortable";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetEducationsQuery } from "../../../api/educationApi";
-import { useCreateEducationMutation } from "../../../api/educationApi";
+import { useGetAchievementsQuery } from "../../../api/achievementApi";
+import { useCreateAchievementMutation } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
-const Education = () => {
-  const [createEducationervice] = useCreateEducationMutation();
+const Achievement = () => {
+  const { profile_id } = useParams();
+  const [createAchievementService] = useCreateAchievementMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
-    {
-      label: "Education 1",
-      children: null,
-      key: "0"
-    }
+    { label: "Achievement 1", children: null, key: "0" }
   ]);
   const newTabIndex = useRef(1);
-  const { profile_id } = useParams();
-  const { data } = useGetEducationsQuery(profile_id ?? skipToken);
+  const { data } = useGetAchievementsQuery(profile_id ?? skipToken);
+
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -41,42 +38,45 @@ const Education = () => {
     if (profile_id && data) {
       setInitialState({ ...initialState, data });
       if (data.length > 0) {
-        const tabs = data.map((education, index) => ({
-          label: `Education ${index + 1}`,
+        const tabs = data.map((achievement, index) => ({
+          label: `Achievement ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
         newTabIndex.current = data.length;
         form.setFieldsValue(
-          data.reduce((acc, education, index) => {
-            acc[`education_${index}`] = education;
+          data.reduce((acc, achievement, index) => {
+            acc[`achievement_${index}`] = {
+              name: achievement.name,
+              description: achievement.description
+            };
             return acc;
           }, {})
         );
         setActiveKey("0");
       } else {
-        setItems([{ label: "Education 1", children: null, key: "0" }]);
-        newTabIndex.current = 1;
-        form.setFieldsValue({});
+        resetItems();
       }
     }
   }, [profile_id, data]);
 
-  const onFinish = async (values) => {
-    const educations = items.map((item, index) => {
-      return {
-        degree: values[`education_${index}`]?.degree,
-        university_name: values[`education_${index}`]?.university_name,
-        place: values[`education_${index}`]?.place,
-        percent_or_cgpa: values[`education_${index}`]?.percent_or_cgpa,
-        passing_year: values[`education_${index}`]?.passing_year
-      };
-    });
+  const resetItems = () => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  };
 
+  const onFinish = async (values) => {
+    const achievements = items.map((item, index) => ({
+      name: values[`achievement_${index}`]?.name,
+      description: values[`achievement_${index}`]?.description
+    }));
+
+    setInitialState({ ...initialState, achievements });
     setInitialState({
       ...initialState,
-      educations
+      achievements
     });
 
     if (!validateId(profile_id)) {
@@ -85,9 +85,9 @@ const Education = () => {
     }
 
     try {
-      const response = await createEducationervice({
+      const response = await createAchievementService({
         profile_id: profile_id,
-        values: educations
+        values: achievements
       });
       if (response.data?.message) {
         toast.success(response.data?.message);
@@ -101,8 +101,9 @@ const Education = () => {
     form.resetFields();
     setInitialState({
       ...initialState,
-      educations: []
+      achievements: []
     });
+    setInitialState({ ...initialState, achievements: [] });
   };
 
   const onChange = (key) => {
@@ -114,24 +115,20 @@ const Education = () => {
     setItems([
       ...items,
       {
-        label: `Education ${newTabIndex.current}`,
+        label: `Achievement ${newTabIndex.current}`,
         children: null,
         key: newActiveKey
       }
     ]);
+    setActiveKey(newActiveKey);
   };
 
   const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
+    const newItems = items.filter((item) => item.key !== targetKey);
+    setItems(newItems);
+    if (newItems.length && targetKey === activeKey) {
+      setActiveKey(newItems[0].key);
     }
-    setItems(newPanes);
   };
 
   const onEdit = (targetKey, action) => {
@@ -155,7 +152,7 @@ const Education = () => {
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Education</Button>
+        <Button onClick={add}>Add Achievement</Button>
       </div>
       <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
         <SortableContext
@@ -174,58 +171,27 @@ const Education = () => {
                 <Form
                   layout="vertical"
                   form={form}
-                  name={`education_${item.key}`}
+                  name={`achievement_${item.key}`}
                   onFinish={onFinish}
                   key={item.key}
                 >
                   <Form.Item
-                    name={[`education_${index}`, "degree"]}
-                    label="Degree"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Degree required"
-                      }
-                    ]}
+                    name={[`achievement_${index}`, "name"]}
+                    label="Achievement Name"
+                    rules={[{ required: true, message: "Name required" }]}
                   >
-                    <Input placeholder="Eg. MCS, BTech in CS" />
+                    <Input placeholder="Achievement name eg. star performer" />
                   </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`education_${index}`, "university_name"]}
-                        label="University Name"
-                      >
-                        <Input placeholder="Eg. Savitribai Phule Pune University" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`education_${index}`, "place"]}
-                        label="Place"
-                      >
-                        <Input placeholder="Eg. Pune" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`education_${index}`, "percent_or_cgpa"]}
-                        label="CGPA/Percentage (%)"
-                      >
-                        <Input placeholder="9.2 or 92%" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`education_${index}`, "passing_year"]}
-                        label="Passout Year"
-                      >
-                        <Input placeholder="2024" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
+                  <Form.Item
+                    name={[`achievement_${index}`, "description"]}
+                    label="Description"
+                  >
+                    <Input.TextArea
+                      placeholder="Please provide a basic overview of the above achievement"
+                      showCount
+                      maxLength={300}
+                    />
+                  </Form.Item>
                   <Form.Item>
                     <Space>
                       <Button type="primary" htmlType="submit">
@@ -255,4 +221,4 @@ const Education = () => {
   );
 };
 
-export default Education;
+export default Achievement;

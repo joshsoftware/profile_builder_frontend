@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import { ROOT_ROUTE } from "../Constants";
 
 const ProtectedRoutes = (props) => {
   const navigate = useNavigate();
@@ -10,7 +11,7 @@ const ProtectedRoutes = (props) => {
   const { Component } = props;
   useEffect(() => {
     if (!token) {
-      navigate("/");
+      navigate(ROOT_ROUTE);
     }
   });
 
@@ -18,7 +19,7 @@ const ProtectedRoutes = (props) => {
 };
 
 ProtectedRoutes.propTypes = {
-  Component: PropTypes.func.isRequired,
+  Component: PropTypes.func.isRequired
 };
 
 export default ProtectedRoutes;

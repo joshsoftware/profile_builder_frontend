@@ -1,12 +1,54 @@
-.table {
-  padding-left: 70px;
-  padding-right: 70px;
+.content {
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.rowStyle {
+  margin-top: 5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-left: 20px;
+  margin-right: 15px;
 }
 
 .profile_header {
-  background-clip: text;
-  background-image: linear-gradient(to right, #239ce2, #1369b9);
-  color: transparent;
-  padding-left: 20px;
 }
 
+.buttonContainer {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+.button {
+  margin-left: 0;
+}
+
+.table {
+  overflow-x: auto;
+  padding: 0rem 1rem;
+}
+
+@media (max-width: 768px) {
+  .header {
+    flex-direction: column;
+    align-items: flex-end;
+  }
+
+  .table {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .table {
+    font-size: 12px;
+  }
+}

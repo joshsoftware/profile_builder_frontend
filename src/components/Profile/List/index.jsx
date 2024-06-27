@@ -1,12 +1,14 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
-import { Button, Input, Space, Table, Tag, Typography } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { Button, Input, Row, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
   SearchOutlined
 } from "@ant-design/icons";
 import { useGetProfileListQuery } from "../../../api/profileApi";
+import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
 
@@ -14,7 +16,7 @@ const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
-
+  const navigate = useNavigate();
   const { data, isFetching } = useGetProfileListQuery();
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -104,6 +106,10 @@ const ListProfiles = () => {
       )
   });
 
+  const handleClick = (id) => {
+    navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id));
+  };
+
   const columns = [
     {
       title: "Name",
@@ -120,7 +126,7 @@ const ListProfiles = () => {
       ...getColumnSearchProps("email")
     },
     {
-      title: "Years of Experience",
+      title: "Years Of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
@@ -130,6 +136,7 @@ const ListProfiles = () => {
       title: "Primary Skills",
       key: "primary_skills",
       dataIndex: "primary_skills",
+      ...getColumnSearchProps("primary_skills"),
       render: (_, { primary_skills }) => (
         <>
           {primary_skills.map((tag, index) => {
@@ -153,18 +160,16 @@ const ListProfiles = () => {
       title: "Is Current Employee",
       dataIndex: "is_current_employee",
       key: "is_current_employee",
-      render: (is_current_employee) => (
-        <strong>{is_current_employee === 1 ? "YES" : "NO"}</strong>
-      ),
+      render: (is_current_employee) => is_current_employee,
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
       sortDirections: ["descend", "ascend"]
     },
     {
       title: "Action",
       key: "action",
-      render: () => (
+      render: (_, record) => (
         <Space size="middle">
-          <EditOutlined />
+          <EditOutlined onClick={() => handleClick(record.id)} />
           <DeleteOutlined />
         </Space>
       )
@@ -174,10 +179,21 @@ const ListProfiles = () => {
   return (
     <>
       <Navbar />
-      <Typography.Title level={1} className={styles.profile_header}>
-        Profiles
-      </Typography.Title>
+      <Row className={styles.rowStyle}>
+        <Typography.Title level={1} className={styles.profile_header}>
+          Profiles
+        </Typography.Title>
+        <Link to={EDITOR_ROUTE}>
+          <Button type="primary" className={styles.button}>
+            {" "}
+            + New{" "}
+          </Button>
+        </Link>
+      </Row>
+
       <Table
+        tableLayout="fixed"
+        size="small"
         columns={columns}
         dataSource={data?.profiles}
         className={styles.table}

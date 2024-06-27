@@ -1,59 +1,94 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
-import { PROFILES } from "../../Constants";
+import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetBasicInfoQuery } from "../../api/profileApi";
+import {
+  ACHIEVEMENT_KEY,
+  ACHIEVEMENT_LABEL,
+  BASIC_INFO_KEY,
+  BASIC_INFO_LABEL,
+  CERTIFICATION_KEY,
+  EDUCATION_KEY,
+  EDUCATION_LABEL,
+  EXPERIENCE_KEY,
+  EXPERIENCE_LABEL,
+  PROFILES,
+  PROJECTS_KEY,
+  PROJECTS_LABEL
+} from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
+import Achievement from "./Achievement";
 import BasicInfo from "./BasicInfo";
 import styles from "./Builder.module.css";
 import Certification from "./Certification";
 import Education from "./Education";
 import Experience from "./Experience";
 import Project from "./Project";
-import Skills from "./Skills";
 
-const defaultPanes = [
+const createPanes = (profileData, disableTabs) => [
   {
-    key: "basic-info",
-    label: <b>Basic Info</b>,
-    children: <BasicInfo />
+    key: BASIC_INFO_KEY,
+    label: BASIC_INFO_LABEL,
+    children: <BasicInfo profileData={profileData} />
   },
   {
-    key: "projects",
-    label: <b>Projects</b>,
-    children: <Project />
+    key: PROJECTS_KEY,
+    label: PROJECTS_LABEL,
+    children: <Project />,
+    disabled: disableTabs
   },
   {
-    key: "education",
-    label: <b>Education</b>,
-    children: <Education />
+    key: EDUCATION_KEY,
+    label: EDUCATION_LABEL,
+    children: <Education />,
+    disabled: disableTabs
   },
   {
-    key: "skills",
-    label: <b>Skills</b>,
-    children: <Skills />
+    key: EXPERIENCE_KEY,
+    label: EXPERIENCE_LABEL,
+    children: <Experience />,
+    disabled: disableTabs
   }
 ];
 
-const experience = {
-  key: "experience",
-  label: <b>Experience</b>,
-  children: <Experience />
-};
+const achievement = (profileData, disableTabs) => ({
+  key: ACHIEVEMENT_KEY,
+  label: ACHIEVEMENT_LABEL,
+  children: <Achievement profileData={profileData} />,
+  disabled: disableTabs
+});
 
-const certification = {
-  key: "certification",
+const certification = (profileData, disableTabs) => ({
+  key: CERTIFICATION_KEY,
   label: <b>Certification</b>,
-  children: <Certification />
-};
+  children: <Certification profileData={profileData} />,
+  disabled: disableTabs
+});
 
 export const Editor = () => {
-  const [items, setItems] = useState(defaultPanes);
+  const { profile_id } = useParams();
+  const [items, setItems] = useState(createPanes(null, !profile_id));
   const [profile, setProfile] = useState(PROFILES.internal);
-
   const resumeRef = useRef();
+  const [profileData, setProfileData] = useState(null);
+
+  const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
+
+  useEffect(() => {
+    if (profile_id) {
+      if (data) {
+        setProfileData(data);
+        setItems(createPanes(data, false));
+      }
+    } else {
+      setItems(createPanes(null, true));
+    }
+  }, [profile_id, data]);
 
   const onChange = (key) => {
-    console.log(key);
+    // console.log(key);
   };
 
   const onProfileChange = (event) => {
@@ -68,18 +103,23 @@ export const Editor = () => {
 
   const handleTabs = (event, tabName) => {
     const updatedItems = event
-      ? [...items, tabName === "experience" ? experience : certification]
+      ? [
+          ...items,
+          tabName === ACHIEVEMENT_KEY
+            ? achievement(profileData, !profile_id)
+            : certification(profileData, !profile_id)
+        ]
       : items.filter((item) => item.key !== tabName);
 
     setItems(updatedItems);
   };
 
-  const handleExperience = (event) => {
-    handleTabs(event, "experience");
+  const handleAchievement = (event) => {
+    handleTabs(event, ACHIEVEMENT_KEY);
   };
 
   const handleCertification = (event) => {
-    handleTabs(event, "certification");
+    handleTabs(event, CERTIFICATION_KEY);
   };
 
   return (
@@ -128,9 +168,9 @@ export const Editor = () => {
           <hr />
           <Space direction="vertical">
             <Space>
-              <Switch size="small" onChange={handleExperience} />
+              <Switch size="small" onChange={handleAchievement} />
               <Typography.Text>
-                Do you want to include work experience?
+                Do you want to include achievements?
               </Typography.Text>
             </Space>
             <Space>
@@ -168,3 +208,5 @@ export const Editor = () => {
     </>
   );
 };
+
+export default Editor;
