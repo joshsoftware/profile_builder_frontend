@@ -17,7 +17,6 @@ export const ERROR_ROUTE = "*";
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
-
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
 export const CREATE_ACHIEVEMENT_ENDPOINTS =
   "/api/profiles/:profile_id/achievements";
@@ -65,6 +64,22 @@ export const PROJECT_TAG_TYPES = ["project"];
 // ERRORS
 export const INVALID_ID_ERROR = "Invalid or missing ID";
 export const NETWORK_ERROR = "Network Error";
+
+// Keywords
+export const BASIC_INFO_KEY = "basic-info";
+export const PROJECTS_KEY = "projects";
+export const EDUCATION_KEY = "education";
+export const EXPERIENCE_KEY = "experience";
+export const ACHIEVEMENT_KEY = "achievement";
+export const CERTIFICATION_KEY = "certification";
+
+// Keywords
+export const BASIC_INFO_LABEL = "Basic Info";
+export const PROJECTS_LABEL = "projects";
+export const EDUCATION_LABEL = "education";
+export const EXPERIENCE_LABEL = "experience";
+export const ACHIEVEMENT_LABEL = "achievement";
+export const CERTIFICATION_LABEL = "certification";
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
