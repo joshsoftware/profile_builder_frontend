@@ -181,7 +181,7 @@ const ListProfiles = () => {
       <Navbar />
       <Typography.Title level={1} className={styles.profile_header}>
         Profiles
-        <Link to={`/profile-builder`}>
+        <Link to={EDITOR_ROUTE}>
           <Button type="primary" className={styles.button}>
             {" "}
             + New{" "}
