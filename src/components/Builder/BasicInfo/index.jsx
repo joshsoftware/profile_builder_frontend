@@ -217,8 +217,8 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       <Form.Item>
         <Space>
-          <Button type="primary" htmlType="submit">
-            Save
+          <Button type="primary" htmlType="submit" disabled={!!profileData}>
+            Create
           </Button>
           <Button htmlType="button" onClick={onReset}>
             Reset

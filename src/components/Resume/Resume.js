@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button } from "antd";
+import { Button, Radio } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -13,10 +13,11 @@ import {
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString } from "../../Constants";
+import { genderOptions, getMonthString, PROFILES } from "../../Constants";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const [profileType, setProfileType] = useState(PROFILES.internal);
   Resume.propTypes = {
     data: PropTypes.object.isRequired
   };
@@ -35,6 +36,16 @@ const Resume = forwardRef(({ data }, ref) => {
   const hadlePrint = useReactToPrint({
     content: () => ref.current
   });
+
+  const onProfileChange = (event) => {
+    const selectedProfile = Object.values(PROFILES).find(
+      (profile) => profile.title === event.target.value
+    );
+
+    if (selectedProfile) {
+      setProfileType(selectedProfile);
+    }
+  };
 
   const getFormattedDate = (value) => {
     if (!value) {
@@ -372,11 +383,11 @@ const Resume = forwardRef(({ data }, ref) => {
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
     const container = containerRef.current;
-    if (!profiles?.color || !container) {
+    if (!profileType?.color || !container) {
       return;
     }
-    container.style.setProperty("--color", profiles?.color);
-  }, [profiles]);
+    container.style.setProperty("--color", profileType?.color);
+  }, [profileType]);
 
   const getPageMargins = () => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
@@ -391,6 +402,20 @@ const Resume = forwardRef(({ data }, ref) => {
       >
         Download
       </Button>
+      <Radio.Group
+            defaultValue={profiles.title}
+            onChange={onProfileChange}
+            buttonStyle="solid"
+            style={{ marginLeft:"220px" }}
+          >
+            <Radio.Button value={PROFILES.internal.title}>
+              Internal Profile
+            </Radio.Button>
+            <Radio.Button value={PROFILES.external.title}>
+              External Profile
+            </Radio.Button>
+          </Radio.Group>
+
       <div ref={ref}>
         <style>{getPageMargins()}</style>
         {/* No we have to change color of text so we are taking container ref.

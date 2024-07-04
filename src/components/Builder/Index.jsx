@@ -1,13 +1,32 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
+import { Col, Row, Space, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetAchievementsQuery } from "../../api/achievementApi";
-import { useGetCertificatesQuery } from "../../api/certificationApi";
-import { useGetEducationsQuery } from "../../api/educationApi";
-import { useGetExperiencesQuery } from "../../api/experienceApi";
-import { useGetBasicInfoQuery } from "../../api/profileApi";
-import { useGetProjectQuery } from "../../api/projectApi";
+import {
+  achievementApi,
+  useGetAchievementsQuery,
+} from "../../api/achievementApi";
+import {
+  certificationApi,
+  useGetCertificatesQuery,
+} from "../../api/certificationApi";
+import {
+  educationsApi,
+  useGetEducationsQuery,
+} from "../../api/educationApi";
+import {
+  experiencesApi,
+  useGetExperiencesQuery,
+} from "../../api/experienceApi";
+import {
+  profileApi,
+  useGetBasicInfoQuery,
+} from "../../api/profileApi";
+import {
+  projectsApi,
+  useGetProjectQuery,
+} from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
   ACHIEVEMENT_LABEL,
@@ -21,7 +40,7 @@ import {
   EXPERIENCE_LABEL,
   PROFILES,
   PROJECTS_KEY,
-  PROJECTS_LABEL
+  PROJECTS_LABEL,
 } from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume/Resume";
@@ -43,46 +62,47 @@ const createPanes = (
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
-    children: <BasicInfo profileData={profileData} />
+    children: <BasicInfo profileData={profileData} />,
   },
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
     children: <Project projectData={projectData} />,
-    disabled: disableTabs
+    disabled: disableTabs,
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
     children: <Education educationData={educationData} />,
-    disabled: disableTabs
+    disabled: disableTabs,
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
     children: <Experience experienceData={experienceData} />,
-    disabled: disableTabs
-  }
+    disabled: disableTabs,
+  },
 ];
 
 const achievement = (achievementData, disableTabs) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
   children: <Achievement achievementData={achievementData} />,
-  disabled: disableTabs
+  disabled: disableTabs,
 });
 
 const certification = (certificationData, disableTabs) => ({
   key: CERTIFICATION_KEY,
   label: CERTIFICATION_LABEL,
   children: <Certification certificationData={certificationData} />,
-  disabled: disableTabs
+  disabled: disableTabs,
 });
 
 export const Editor = () => {
   const resumeRef = useRef();
   const { profile_id } = useParams();
-  const [items, setItems] = useState(createPanes(null, !profile_id));
+  const dispatch = useDispatch();
+  const [items, setItems] = useState(createPanes(null, null, null, null, true));
   const [profiles, setProfiles] = useState(PROFILES.internal);
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
@@ -110,12 +130,21 @@ export const Editor = () => {
         );
       }
     } else {
-      setItems(createPanes(null, true));
+      setItems(createPanes(null, null, null, null, true));
     }
   }, [profile_id, data, projectData, experienceData, educationData]);
 
+  useEffect(() => {
+    if (showAchievement) {
+      dispatch(achievementApi.util.invalidateTags(["Achievements"]));
+    }
+    if (showCertification) {
+      dispatch(certificationApi.util.invalidateTags(["Certificates"]));
+    }
+  }, [dispatch, showAchievement, showCertification]);
+
   const onChange = (key) => {
-    // console.log(key);
+    console.log(key);
   };
 
   const onProfileChange = (event) => {
@@ -165,11 +194,11 @@ export const Editor = () => {
           lg={{ span: 12 }}
           className={styles["hide-scrollbar"]}
           style={{
-            minheight: "98vh",
+            minHeight: "98vh",
             maxHeight: "98vh",
             overflow: "auto",
             padding: "2rem",
-            top: "2rem"
+            top: "2rem",
           }}
         >
           <Typography.Title
@@ -177,27 +206,13 @@ export const Editor = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              marginTop: "10px"
+              marginTop: "10px",
             }}
           >
             Resume Builder
           </Typography.Title>
           <hr />
-          <Radio.Group
-            defaultValue={profiles.title}
-            onChange={onProfileChange}
-            buttonStyle="solid"
-            style={{ display: "flex", justifyContent: "center" }}
-          >
-            <Radio.Button value={PROFILES.internal.title}>
-              Internal Profile
-            </Radio.Button>
-            <Radio.Button value={PROFILES.external.title}>
-              External Profile
-            </Radio.Button>
-          </Radio.Group>
 
-          <hr />
           <Space direction="vertical">
             <Space>
               <Switch size="small" onChange={handleAchievement} />
@@ -231,7 +246,7 @@ export const Editor = () => {
             minHeight: "98vh",
             maxHeight: "98vh",
             padding: "2rem",
-            top: "2rem"
+            top: "2rem",
           }}
         >
           <Resume
@@ -242,7 +257,7 @@ export const Editor = () => {
               educationData,
               achievementData: showAchievement ? achievementData : null,
               certificationData: showCertification ? certificationData : null,
-              profiles
+              profiles,
             }}
             ref={resumeRef}
           />
