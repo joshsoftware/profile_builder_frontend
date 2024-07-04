@@ -1,10 +1,87 @@
 export const isFieldInValid = (value) => {
   if (value.trim() === "") {
     return true;
-  } else {return false;}
+  } else {
+    return false;
+  }
 };
 
 export const formatDate = (dateString) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+};
+
+export const filterSection = (values) => {
+  return Object.entries(values).reduce((acc, [, section]) => {
+    if (!section?.id) {
+      acc.push(section);
+    }
+    return acc;
+  }, []);
+};
+
+// Format the project data
+export const formatProjectsFields = (projects) => {
+  return projects.map((project) => ({
+    name: project.name,
+    description: project.description,
+    role: project.role,
+    responsibilities: project.responsibilities,
+    technologies: project.technologies,
+    tech_worked_on: project.tech_worked_on,
+    working_start_date: project.working_start_date
+      ? project.working_start_date.format("MMM-YYYY")
+      : null,
+    working_end_date: project.working_end_date
+      ? project.working_end_date.format("MMM-YYYY")
+      : null,
+    duration: project.duration
+  }));
+};
+
+// Format the experience data
+export const formatExperienceFields = (experiences) => {
+  return experiences.map((experience) => ({
+    designation: experience?.designation,
+    company_name: experience?.company_name,
+    from_date: experience?.employmentStart?.format("MMM-YYYY"),
+    to_date: experience?.isCurrentCompany
+      ? "Present"
+      : experience?.employmentEnd?.format("MMM-YYYY")
+  }));
+};
+
+// Format the education data
+export const formatEducationFields = (educations) => {
+  return educations.map((education) => ({
+    degree: education?.degree,
+    university_name: education?.university_name,
+    place: education?.place,
+    percent_or_cgpa: education?.percent_or_cgpa,
+    passing_year: education?.passing_year
+  }));
+};
+
+// format the certification data
+export const formatCertificationFields = (certifications) => {
+  return certifications.map((certificate) => ({
+    name: certificate?.name,
+    organization_name: certificate?.organization_name,
+    description: certificate?.description,
+    issued_date: certificate?.issued_date?.format("MMM-YYYY"),
+    from_date: certificate?.from_date?.format("MMM-YYYY"),
+    to_date: certificate?.to_date?.format("MMM-YYYY")
+  }));
+};
+
+// format the achievement data
+export const formatAchievementFields = (achievements) => {
+  return achievements.map((achievement) => ({
+    name: achievement?.name,
+    description: achievement?.description
+  }));
 };
