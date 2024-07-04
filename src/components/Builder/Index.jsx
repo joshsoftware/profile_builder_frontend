@@ -2,13 +2,19 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Col, Radio, Row, Space, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
+import { useGetAchievementsQuery } from "../../api/achievementApi";
+import { useGetCertificatesQuery } from "../../api/certificationApi";
+import { useGetEducationsQuery } from "../../api/educationApi";
+import { useGetExperiencesQuery } from "../../api/experienceApi";
 import { useGetBasicInfoQuery } from "../../api/profileApi";
+import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
   ACHIEVEMENT_LABEL,
   BASIC_INFO_KEY,
   BASIC_INFO_LABEL,
   CERTIFICATION_KEY,
+  CERTIFICATION_LABEL,
   EDUCATION_KEY,
   EDUCATION_LABEL,
   EXPERIENCE_KEY,
@@ -27,7 +33,13 @@ import Education from "./Education";
 import Experience from "./Experience";
 import Project from "./Project";
 
-const createPanes = (profileData, disableTabs) => [
+const createPanes = (
+  profileData,
+  projectData,
+  experienceData,
+  educationData,
+  disableTabs
+) => [
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
@@ -36,56 +48,71 @@ const createPanes = (profileData, disableTabs) => [
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
-    children: <Project />,
+    children: <Project projectData={projectData} />,
     disabled: disableTabs
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
-    children: <Education />,
+    children: <Education educationData={educationData} />,
     disabled: disableTabs
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
-    children: <Experience />,
+    children: <Experience experienceData={experienceData} />,
     disabled: disableTabs
   }
 ];
 
-const achievement = (profileData, disableTabs) => ({
+const achievement = (achievementData, disableTabs) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
-  children: <Achievement profileData={profileData} />,
+  children: <Achievement achievementData={achievementData} />,
   disabled: disableTabs
 });
 
-const certification = (profileData, disableTabs) => ({
+const certification = (certificationData, disableTabs) => ({
   key: CERTIFICATION_KEY,
-  label: <b>Certification</b>,
-  children: <Certification profileData={profileData} />,
+  label: CERTIFICATION_LABEL,
+  children: <Certification certificationData={certificationData} />,
   disabled: disableTabs
 });
 
 export const Editor = () => {
+  const resumeRef = useRef();
   const { profile_id } = useParams();
   const [items, setItems] = useState(createPanes(null, !profile_id));
-  const [profile, setProfile] = useState(PROFILES.internal);
-  const resumeRef = useRef();
-  const [profileData, setProfileData] = useState(null);
+  const [profiles, setProfiles] = useState(PROFILES.internal);
+  const [showCertification, setShowCertification] = useState(false);
+  const [showAchievement, setShowAchievement] = useState(false);
 
   const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
+  const { data: projectData } = useGetProjectQuery(profile_id ?? skipToken);
+  const { data: experienceData } = useGetExperiencesQuery(
+    profile_id ?? skipToken
+  );
+  const { data: educationData } = useGetEducationsQuery(
+    profile_id ?? skipToken
+  );
+  const { data: achievementData } = useGetAchievementsQuery(
+    profile_id ?? skipToken
+  );
+  const { data: certificationData } = useGetCertificatesQuery(
+    profile_id ?? skipToken
+  );
 
   useEffect(() => {
     if (profile_id) {
       if (data) {
-        setProfileData(data);
-        setItems(createPanes(data, false));
+        setItems(
+          createPanes(data, projectData, experienceData, educationData, false)
+        );
       }
     } else {
       setItems(createPanes(null, true));
     }
-  }, [profile_id, data]);
+  }, [profile_id, data, projectData, experienceData, educationData]);
 
   const onChange = (key) => {
     // console.log(key);
@@ -97,19 +124,24 @@ export const Editor = () => {
     );
 
     if (selectedProfile) {
-      setProfile(selectedProfile);
+      setProfiles(selectedProfile);
     }
   };
 
   const handleTabs = (event, tabName) => {
-    const updatedItems = event
-      ? [
-          ...items,
-          tabName === ACHIEVEMENT_KEY
-            ? achievement(profileData, !profile_id)
-            : certification(profileData, !profile_id)
-        ]
-      : items.filter((item) => item.key !== tabName);
+    let updatedItems;
+
+    if (tabName === ACHIEVEMENT_KEY) {
+      setShowAchievement(event);
+      updatedItems = event
+        ? [...items, achievement(achievementData, !profile_id)]
+        : items.filter((item) => item.key !== ACHIEVEMENT_KEY);
+    } else if (tabName === CERTIFICATION_KEY) {
+      setShowCertification(event);
+      updatedItems = event
+        ? [...items, certification(certificationData, !profile_id)]
+        : items.filter((item) => item.key !== CERTIFICATION_KEY);
+    }
 
     setItems(updatedItems);
   };
@@ -137,7 +169,7 @@ export const Editor = () => {
             maxHeight: "98vh",
             overflow: "auto",
             padding: "2rem",
-            top: "3rem"
+            top: "2rem"
           }}
         >
           <Typography.Title
@@ -152,7 +184,7 @@ export const Editor = () => {
           </Typography.Title>
           <hr />
           <Radio.Group
-            defaultValue={profile.title}
+            defaultValue={profiles.title}
             onChange={onProfileChange}
             buttonStyle="solid"
             style={{ display: "flex", justifyContent: "center" }}
@@ -199,10 +231,21 @@ export const Editor = () => {
             minHeight: "98vh",
             maxHeight: "98vh",
             padding: "2rem",
-            top: "4rem"
+            top: "2rem"
           }}
         >
-          <Resume ref={resumeRef} />
+          <Resume
+            data={{
+              data,
+              projectData,
+              experienceData,
+              educationData,
+              achievementData: showAchievement ? achievementData : null,
+              certificationData: showCertification ? certificationData : null,
+              profiles
+            }}
+            ref={resumeRef}
+          />
         </Col>
       </Row>
     </>
