@@ -21,7 +21,7 @@ const BasicInfo = ({ profileData }) => {
 
   useEffect(() => {
     if (profileData) {
-      form.setFieldsValue(profileData.profile);
+      form.setFieldsValue(profileData);
     }
   }, [profileData, form]);
 

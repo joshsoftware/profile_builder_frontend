@@ -8,18 +8,20 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import {
-  useCreateCertificateMutation,
-  useGetCertificatesQuery
-} from "../../../api/certificationApi";
+import PropTypes from "prop-types";
+import { useCreateCertificateMutation } from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
+import { filterSection, formatCertificationFields } from "../../../helpers";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
-const Certification = () => {
+const Certification = ({ certificationData }) => {
+  Certification.propTypes = {
+    certificationData: PropTypes.object.isRequired
+  };
+
   const [createCertificateService] = useCreateCertificateMutation();
   const [form] = Form.useForm();
   const { initialState, setInitialState } = useContext(ResumeContext);
@@ -29,7 +31,6 @@ const Certification = () => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const { data } = useGetCertificatesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -37,20 +38,21 @@ const Certification = () => {
   });
 
   useEffect(() => {
-    if (profile_id && data) {
-      setInitialState({ ...initialState, data });
+    if (profile_id && certificationData) {
+      setInitialState({ ...initialState, certificationData });
 
-      if (data.length > 0) {
-        const tabs = data.map((certificate, index) => ({
+      if (certificationData?.length > 0) {
+        const tabs = certificationData?.map((certificate, index) => ({
           label: `Certification ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
-        newTabIndex.current = data.length;
+        newTabIndex.current = certificationData?.length;
         form.setFieldsValue(
-          data.reduce((acc, certificate, index) => {
+          certificationData.reduce((acc, certificate, index) => {
             acc[`certificate_${index}`] = {
+              id: certificate.id,
               name: certificate.name,
               organization_name: certificate.organization_name,
               description: certificate.description,
@@ -74,18 +76,12 @@ const Certification = () => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, data]);
+  }, [profile_id, certificationData]);
 
   const onFinish = async (values) => {
-    const certificates = items.map((item, index) => ({
-      name: values[`certificate_${index}`]?.name,
-      organization_name: values[`certificate_${index}`]?.organization_name,
-      description: values[`certificate_${index}`]?.description,
-      issued_date:
-        values[`certificate_${index}`]?.issued_date?.format("MMM-YYYY"),
-      from_date: values[`certificate_${index}`]?.from_date?.format("MMM-YYYY"),
-      to_date: values[`certificate_${index}`]?.to_date?.format("MMM-YYYY")
-    }));
+    const filteredCertificates = filterSection(values);
+    const certificates = formatCertificationFields(filteredCertificates);
+
     setInitialState({
       ...initialState,
       certificates
@@ -190,6 +186,9 @@ const Certification = () => {
                 >
                   <Row>
                     <Col span={11}>
+                      <Form.Item name={[`certificate_${index}`, "id"]} hidden>
+                        <Input />
+                      </Form.Item>
                       <Form.Item
                         name={[`certificate_${index}`, "name"]}
                         label="Certificate Name"

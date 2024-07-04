@@ -18,18 +18,20 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import { skipToken } from "@tanstack/react-query";
+import axios from "axios";
 import moment from "moment";
-import {
-  useCreateProjectMutation,
-  useGetProjectQuery
-} from "../../../api/projectApi";
+import PropTypes from "prop-types";
+import { useCreateProjectMutation } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
+import { filterSection, formatProjectsFields } from "../../../helpers";
 import { validateId } from "../../../utils/dto/constants";
 import { ResumeContext } from "../../../utils/ResumeContext";
 
-const Project = () => {
+const Project = ({ projectData }) => {
+  Project.propTypes = {
+    projectData: PropTypes.object.isRequired
+  };
   const [createProjectService] = useCreateProjectMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
@@ -37,7 +39,6 @@ const Project = () => {
   const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const { data } = useGetProjectQuery(profile_id ?? skipToken);
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -47,22 +48,22 @@ const Project = () => {
 
   useEffect(() => {
     if (profile_id) {
-      if (data) {
-        setInitialState({ ...initialState, data });
+      if (projectData) {
+        setInitialState({ ...initialState, projectData });
       }
-
-      if (data?.length > 0) {
-        const tabs = data.map((project, index) => ({
+      if (projectData?.length > 0) {
+        const tabs = projectData.map((project, index) => ({
           label: `Project ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
-        newTabIndex.current = data.length;
+        newTabIndex.current = projectData.length;
         form.setFieldsValue(
-          data.reduce((acc, project, index) => {
+          projectData.reduce((acc, project, index) => {
             acc[`project_${index}`] = {
               ...project,
+              id: project.id,
               working_start_date: project.working_start_date
                 ? moment(project.working_start_date)
                 : null,
@@ -80,28 +81,11 @@ const Project = () => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, data]);
+  }, [profile_id, projectData]);
 
   const onFinish = async (values) => {
-    const projects = items.map((item, index) => {
-      const project = values[`project_${index}`];
-
-      return {
-        name: project.name,
-        description: project.description,
-        role: project.role,
-        responsibilities: project.responsibilities,
-        technologies: project.technologies,
-        tech_worked_on: project.tech_worked_on,
-        working_start_date: project.working_start_date
-          ? project.working_start_date.format("MMM-YYYY")
-          : null,
-        working_end_date: project.working_end_date
-          ? project.working_end_date.format("MMM-YYYY")
-          : null,
-        duration: project.duration
-      };
-    });
+    const filteredProjects = filterSection(values);
+    const projects = formatProjectsFields(filteredProjects);
 
     setInitialState({
       ...initialState,
@@ -208,6 +192,9 @@ const Project = () => {
                   onFinish={onFinish}
                   key={item.key}
                 >
+                  <Form.Item name={[`project_${index}`, "id"]} hidden>
+                    <Input />
+                  </Form.Item>
                   <Form.Item
                     name={[`project_${index}`, "name"]}
                     label="Project Name"
