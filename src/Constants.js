@@ -36,6 +36,7 @@ export const ACHIEVEMENT_LIST_ENDPOINT =
   "/api/profiles/:profile_id/achievements";
 export const CERTIFICATE_LIST_ENDPOINT =
   "/api/profiles/:profile_id/certificates";
+export const SKILL_LIST_ENDPOINT = "/api/skills";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
@@ -60,7 +61,6 @@ export const CERTIFICATE_TAG_TYPES = ["certificate"];
 export const EDUCATION_TAG_TYPES = ["education"];
 export const EXPERIENCE_TAG_TYPES = ["experience"];
 export const PROJECT_TAG_TYPES = ["project"];
-
 // ERRORS
 export const INVALID_ID_ERROR = "Invalid or missing ID";
 export const NETWORK_ERROR = "Network Error";
@@ -75,11 +75,11 @@ export const CERTIFICATION_KEY = "certification";
 
 // Keywords
 export const BASIC_INFO_LABEL = "Basic Info";
-export const PROJECTS_LABEL = "projects";
-export const EDUCATION_LABEL = "education";
-export const EXPERIENCE_LABEL = "experience";
-export const ACHIEVEMENT_LABEL = "achievement";
-export const CERTIFICATION_LABEL = "certification";
+export const PROJECTS_LABEL = "Projects";
+export const EDUCATION_LABEL = "Education";
+export const EXPERIENCE_LABEL = "Experience";
+export const ACHIEVEMENT_LABEL = "Achievement";
+export const CERTIFICATION_LABEL = "Certification";
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
