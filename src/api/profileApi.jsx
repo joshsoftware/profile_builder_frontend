@@ -38,7 +38,7 @@ export const profileApi = createApi({
         url: PROFILE_GET_ENDPOINT.replace(":profile_id", profile_id)
       }),
       providesTags: PROFILE_TAG_TYPES,
-      transformResponse: (response) => response.data
+      transformResponse: (response) => response.data.profile
     })
   })
 });
