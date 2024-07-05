@@ -111,20 +111,15 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.content}>
           {experiences?.map((item) => (
             <div className={styles.item} key={item.id}>
-              {item?.designation ? (
+              {item?.designation && (
                 <div className={styles.title}>{item.designation}</div>
-              ) : (
-                <span />
               )}
-
-              {item?.company_name ? (
+              {item?.company_name && (
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
                   | <CalendarOutlined /> {getMonthYear(item.from_date)} -
                   {getMonthYear(item.to_date)}
                 </div>
-              ) : (
-                <span />
               )}
             </div>
           ))}
@@ -143,77 +138,61 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.content}>
           {projects?.map((item) => (
             <div className={styles.item} key={item.id}>
-              {item?.name ? (
+              {item?.name && (
                 <h2 className={styles.title}>
                   <b className={styles.underline}>{item.name}</b>
-                  {item?.working_start_date && item?.working_end_date ? (
+                  {item?.working_start_date && item?.working_end_date && (
                     <span className="px-2">
                       | {getMonthYear(item.working_start_date)} -
                       {getMonthYear(item.working_end_date)}
                     </span>
-                  ) : (
-                    <span />
                   )}
                 </h2>
-              ) : (
-                <span />
               )}
 
-              {item?.duration ? (
+              {item?.duration && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Duration : </b>
                   {item.duration}
                 </span>
-              ) : (
-                <span />
               )}
 
-              {item?.description ? (
+              {item?.description && (
                 <div>
                   <span className={styles.duration}>
                     <b className={styles.overview}>Project Description : </b>
                     {item.description}
                   </span>
                 </div>
-              ) : (
-                <span />
               )}
-              {item?.role ? (
+              {item?.role && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Role : </b>
                   {item.role}
                 </span>
-              ) : (
-                <span />
               )}
-              {item?.responsibilities ? (
+              {item?.responsibilities && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Responsibility : </b>
                   {item.responsibilities}
                 </span>
-              ) : (
-                <span />
               )}
 
-              {item?.technologies ? (
+              {item?.technologies && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Project Techstack : </b>
                   {Array.isArray(item.technologies)
                     ? item.technologies.join(", ")
                     : item.technologies}
                 </span>
-              ) : (
-                <span />
               )}
-              {item?.tech_worked_on ? (
+              {item?.tech_worked_on && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>My Contribution : </b>
                   {Array.isArray(item.tech_worked_on)
                     ? item.tech_worked_on.join(", ")
                     : item.tech_worked_on}
                 </span>
-              ) : (
-                <span />
               )}
             </div>
           ))}
@@ -232,9 +211,7 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.title} style={{ textAlign: "right" }}>
           <ul className={styles.achievement}>
             {achievements?.map((item) => (
-              <li key={item.id}>
-                {item?.name ? <span>• {item.name}</span> : <span />}
-              </li>
+              <li key={item.id}>{item?.name && <span>• {item.name}</span>}</li>
             ))}
           </ul>
         </div>
@@ -252,31 +229,23 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.content}>
           {educations?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
-              {item?.degree ? (
+              {item?.degree && (
                 <p className={styles.subtitleHeading}>{item.degree}</p>
-              ) : (
-                <span />
               )}
-              {item?.university_name || item?.place ? (
+              {(item?.university_name || item?.place) && (
                 <div className={styles.subtitle}>
                   {item.university_name} , {item.place}
                 </div>
-              ) : (
-                <span />
               )}
-              {item?.passing_year ? (
+              {item?.passing_year && (
                 <div className={styles.passingDate}>
                   Passing Year : {new Date(item.passing_year).getFullYear()}
                 </div>
-              ) : (
-                ""
               )}
-              {item?.percent_or_cgpa ? (
+              {item?.percent_or_cgpa && (
                 <div className={styles.passingDate}>
                   CGPA / Percentage : {item.percent_or_cgpa}
                 </div>
-              ) : (
-                ""
               )}
             </div>
           ))}
@@ -296,7 +265,7 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.leftSection}>Skills</div>
         <div className={styles.content}>
           <div className={styles.educationItem}>
-            {profile?.primary_skills?.length > 0 ? (
+            {profile?.primary_skills?.length > 0 && (
               <div>
                 <div className={styles.subtitleHeading}>Primary Skills</div>
                 <ul className={styles.skillNumbered}>
@@ -307,10 +276,8 @@ const Resume = forwardRef(({ data }, ref) => {
                   ))}
                 </ul>
               </div>
-            ) : (
-              <span />
             )}
-            {profile?.secondary_skills?.length > 0 ? (
+            {profile?.secondary_skills?.length > 0 && (
               <div>
                 <div className={styles.subtitleHeading}>Secondary Skills</div>
                 <ul className={styles.skillNumbered}>
@@ -324,8 +291,6 @@ const Resume = forwardRef(({ data }, ref) => {
                   ))}
                 </ul>
               </div>
-            ) : (
-              <span />
             )}
           </div>
         </div>
@@ -343,22 +308,16 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.content}>
           {certifications?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
-              {item?.name ? (
+              {item?.name && (
                 <p className={styles.subtitleHeading}>{item.name}</p>
-              ) : (
-                <span />
               )}
-              {item?.organization_name ? (
+              {item?.organization_name && (
                 <div className={styles.subtitle}>{item.organization_name}</div>
-              ) : (
-                <span />
               )}
-              {item?.issued_date ? (
+              {item?.issued_date && (
                 <div className={styles.passingDate}>
                   Issue Date : {item.issued_date}
                 </div>
-              ) : (
-                ""
               )}
             </div>
           ))}
@@ -403,18 +362,18 @@ const Resume = forwardRef(({ data }, ref) => {
         Download
       </Button>
       <Radio.Group
-            defaultValue={profiles.title}
-            onChange={onProfileChange}
-            buttonStyle="solid"
-            style={{ marginLeft:"220px" }}
-          >
-            <Radio.Button value={PROFILES.internal.title}>
-              Internal Profile
-            </Radio.Button>
-            <Radio.Button value={PROFILES.external.title}>
-              External Profile
-            </Radio.Button>
-          </Radio.Group>
+        defaultValue={profiles.title}
+        onChange={onProfileChange}
+        buttonStyle="solid"
+        style={{ marginLeft: "220px" }}
+      >
+        <Radio.Button value={PROFILES.internal.title}>
+          Internal Profile
+        </Radio.Button>
+        <Radio.Button value={PROFILES.external.title}>
+          External Profile
+        </Radio.Button>
+      </Radio.Group>
 
       <div ref={ref}>
         <style>{getPageMargins()}</style>
@@ -432,13 +391,17 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
             </div>
             <div className={styles.experienceHeading}>
-              <div>
-                <CheckSquareOutlined /> {profile?.years_of_experience}
-                <span> Year of Experience</span>
-              </div>
-              <div>
-                <MailOutlined /> {profile?.email}
-              </div>
+              {profile?.years_of_experience && (
+                <div>
+                  <CheckSquareOutlined /> {profile?.years_of_experience}
+                  <span> Year of Experience</span>
+                </div>
+              )}
+              {profile?.email && (
+                <div>
+                  <MailOutlined /> {profile?.email}
+                </div>
+              )}
               {profile?.mobile && (
                 <div>
                   <MobileOutlined /> {profile?.mobile}
@@ -478,18 +441,22 @@ const Resume = forwardRef(({ data }, ref) => {
                 {columns[0].map((item) => sectionDiv[item])}
               </div>
               <div className="col-8 mr-5">
-                <div>
-                  <h4>
-                    <b
-                      className={`${styles.paddingLeft} ${styles.sectionTitle}`}
-                    >
-                      Profile
-                    </b>
-                  </h4>
-                </div>
-                <div className={`${styles.profiledetails} pb-3`}>
-                  {profile?.description}
-                </div>
+                {profile?.description && (
+                  <div>
+                    <div>
+                      <h4>
+                        <b
+                          className={`${styles.paddingLeft} ${styles.sectionTitle}`}
+                        >
+                          Profile
+                        </b>
+                      </h4>
+                    </div>
+                    <div className={`${styles.profiledetails} pb-3`}>
+                      {profile?.description}
+                    </div>
+                  </div>
+                )}
                 {columns[1].map((item) => sectionDiv[item])}
               </div>
             </div>
