@@ -36,7 +36,6 @@ export const ACHIEVEMENT_LIST_ENDPOINT =
   "/api/profiles/:profile_id/achievements";
 export const CERTIFICATE_LIST_ENDPOINT =
   "/api/profiles/:profile_id/certificates";
-export const SKILL_LIST_ENDPOINT = "/api/skills";
 
 // HTTP METHODS
 export const HTTP_METHODS = {
