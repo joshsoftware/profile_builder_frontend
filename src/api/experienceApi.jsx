@@ -3,7 +3,6 @@ import {
   CREATE_EXPERIENCE_ENDPOINTS,
   EXPERIENCE_LIST_ENDPOINT,
   EXPERIENCE_REDUCER_PATH,
-  EXPERIENCE_TAG_TYPES,
   HTTP_METHODS
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
@@ -11,7 +10,7 @@ import axiosBaseQuery from "./axiosBaseQuery/service";
 export const experienceApi = createApi({
   reducerPath: EXPERIENCE_REDUCER_PATH,
   baseQuery: axiosBaseQuery(),
-  tagTypes: EXPERIENCE_TAG_TYPES,
+  tagTypes: ["experience"],
   endpoints: (builder) => ({
     createExperience: builder.mutation({
       query: ({ profile_id, values }) => ({
@@ -19,14 +18,14 @@ export const experienceApi = createApi({
         method: HTTP_METHODS.POST,
         data: { experiences: values }
       }),
-      invalidatesTags: EXPERIENCE_TAG_TYPES,
+      invalidatesTags: ["experience"],
       transformResponse: (response) => response.data
     }),
     getExperiences: builder.query({
       query: (profile_id) => ({
         url: EXPERIENCE_LIST_ENDPOINT.replace(":profile_id", profile_id)
       }),
-      providesTags: EXPERIENCE_TAG_TYPES,
+      providesTags: ["experience"],
       transformResponse: (response) => response.data.experiences
     })
   })
