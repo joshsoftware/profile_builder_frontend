@@ -18,7 +18,7 @@ import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Achievement = ({ achievementData }) => {
   Achievement.propTypes = {
-    achievementData: PropTypes.object.isRequired
+    achievementData: PropTypes.object
   };
   const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();

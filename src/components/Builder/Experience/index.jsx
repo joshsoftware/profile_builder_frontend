@@ -30,7 +30,7 @@ import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Experience = ({ experienceData }) => {
   Experience.propTypes = {
-    experienceData: PropTypes.object.isRequired
+    experienceData: PropTypes.object
   };
   const [createExperienceService] = useCreateExperienceMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);

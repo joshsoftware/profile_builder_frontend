@@ -19,7 +19,7 @@ import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Certification = ({ certificationData }) => {
   Certification.propTypes = {
-    certificationData: PropTypes.object.isRequired
+    certificationData: PropTypes.object
   };
 
   const [createCertificateService] = useCreateCertificateMutation();

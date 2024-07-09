@@ -18,8 +18,9 @@ import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Education = ({ educationData }) => {
   Education.propTypes = {
-    educationData: PropTypes.object.isRequired
+    educationData: PropTypes.object
   };
+
   const [createEducationervice] = useCreateEducationMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();

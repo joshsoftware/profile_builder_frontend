@@ -18,7 +18,6 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import axios from "axios";
 import moment from "moment";
 import PropTypes from "prop-types";
 import { useCreateProjectMutation } from "../../../api/projectApi";
@@ -30,7 +29,7 @@ import { ResumeContext } from "../../../utils/ResumeContext";
 
 const Project = ({ projectData }) => {
   Project.propTypes = {
-    projectData: PropTypes.object.isRequired
+    projectData: PropTypes.object
   };
   const [createProjectService] = useCreateProjectMutation();
   const { initialState, setInitialState } = useContext(ResumeContext);

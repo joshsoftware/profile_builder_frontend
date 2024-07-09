@@ -19,7 +19,6 @@ const Login = () => {
         const accessToken = tokenResponse.access_token;
         const response = await loginService(accessToken);
         const token = response?.data?.token;
-        console.log(token);
         if (token) {
           dispatch(loginAction({ token }));
           window.localStorage.setItem("token", token);

@@ -1,16 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Col, Row, Space, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
-import {
-  achievementApi,
-  useGetAchievementsQuery
-} from "../../api/achievementApi";
-import {
-  certificationApi,
-  useGetCertificatesQuery
-} from "../../api/certificationApi";
+import { useGetAchievementsQuery } from "../../api/achievementApi";
+import { useGetCertificatesQuery } from "../../api/certificationApi";
 import { useGetEducationsQuery } from "../../api/educationApi";
 import { useGetExperiencesQuery } from "../../api/experienceApi";
 import { useGetBasicInfoQuery } from "../../api/profileApi";
@@ -18,10 +11,8 @@ import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
   ACHIEVEMENT_LABEL,
-  ACHIEVEMENT_TAG_TYPES,
   BASIC_INFO_KEY,
   BASIC_INFO_LABEL,
-  CERTIFICATE_TAG_TYPES,
   CERTIFICATION_KEY,
   CERTIFICATION_LABEL,
   EDUCATION_KEY,
@@ -91,7 +82,6 @@ const certification = (certificationData, disableTabs) => ({
 export const Editor = () => {
   const resumeRef = useRef();
   const { profile_id } = useParams();
-  const dispatch = useDispatch();
   const [items, setItems] = useState(createPanes(null, null, null, null, true));
   const [profiles, setProfiles] = useState(PROFILES.internal);
   const [showCertification, setShowCertification] = useState(false);
@@ -123,19 +113,6 @@ export const Editor = () => {
       setItems(createPanes(null, null, null, null, true));
     }
   }, [profile_id, data, projectData, experienceData, educationData]);
-
-  useEffect(() => {
-    if (showAchievement) {
-      dispatch(achievementApi.util.invalidateTags(ACHIEVEMENT_TAG_TYPES));
-    }
-    if (showCertification) {
-      dispatch(certificationApi.util.invalidateTags(CERTIFICATE_TAG_TYPES));
-    }
-  }, [dispatch, showAchievement, showCertification]);
-
-  const onChange = (key) => {
-    console.log(key);
-  };
 
   const onProfileChange = (event) => {
     const selectedProfile = Object.values(PROFILES).find(
@@ -218,12 +195,7 @@ export const Editor = () => {
             </Space>
           </Space>
           <hr />
-          <Tabs
-            size="small"
-            defaultActiveKey="basic-info"
-            items={items}
-            onChange={onChange}
-          />
+          <Tabs size="small" defaultActiveKey="basic-info" items={items} />
         </Col>
         <Col
           xs={{ span: 24 }}
