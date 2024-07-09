@@ -52,14 +52,6 @@ export const EDUCATION_REDUCER_PATH = "educationApi";
 export const EXPERIENCE_REDUCER_PATH = "experienceApi";
 export const PROJECT_REDUCER_PATH = "projectApi";
 
-// Redux Tag Types
-export const LOGIN_TAG_TYPES = ["login"];
-export const PROFILE_TAG_TYPES = ["profile"];
-export const ACHIEVEMENT_TAG_TYPES = ["achievement"];
-export const CERTIFICATE_TAG_TYPES = ["certificate"];
-export const EDUCATION_TAG_TYPES = ["education"];
-export const EXPERIENCE_TAG_TYPES = ["experience"];
-export const PROJECT_TAG_TYPES = ["project"];
 // ERRORS
 export const INVALID_ID_ERROR = "Invalid or missing ID";
 export const NETWORK_ERROR = "Network Error";
