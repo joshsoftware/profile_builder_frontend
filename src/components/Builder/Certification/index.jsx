@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs } from "antd";
@@ -13,9 +13,11 @@ import PropTypes from "prop-types";
 import { useCreateCertificateMutation } from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { filterSection, formatCertificationFields } from "../../../helpers";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatCertificationFields,
+  validateId
+} from "../../../helpers";
 
 const Certification = ({ certificationData }) => {
   Certification.propTypes = {
@@ -24,7 +26,6 @@ const Certification = ({ certificationData }) => {
 
   const [createCertificateService] = useCreateCertificateMutation();
   const [form] = Form.useForm();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     { label: "Certification 1", children: null, key: "0" }
@@ -39,8 +40,6 @@ const Certification = ({ certificationData }) => {
 
   useEffect(() => {
     if (profile_id && certificationData) {
-      setInitialState({ ...initialState, certificationData });
-
       if (certificationData?.length > 0) {
         const tabs = certificationData?.map((certificate, index) => ({
           label: `Certification ${index + 1}`,
@@ -82,11 +81,6 @@ const Certification = ({ certificationData }) => {
     const filteredCertificates = filterSection(values);
     const certificates = formatCertificationFields(filteredCertificates);
 
-    setInitialState({
-      ...initialState,
-      certificates
-    });
-
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
@@ -102,12 +96,10 @@ const Certification = ({ certificationData }) => {
     } catch (error) {
       toast.error(error.response?.data?.error_message);
     }
-    setInitialState({ ...initialState, certificates });
   };
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({ ...initialState, certificates: [] });
   };
 
   const onChange = (key) => {

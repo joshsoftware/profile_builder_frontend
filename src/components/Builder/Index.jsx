@@ -19,7 +19,6 @@ import {
   EDUCATION_LABEL,
   EXPERIENCE_KEY,
   EXPERIENCE_LABEL,
-  PROFILES,
   PROJECTS_KEY,
   PROJECTS_LABEL
 } from "../../Constants";
@@ -83,11 +82,10 @@ export const Editor = () => {
   const resumeRef = useRef();
   const { profile_id } = useParams();
   const [items, setItems] = useState(createPanes(null, null, null, null, true));
-  const [profiles, setProfiles] = useState(PROFILES.internal);
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
-  const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
+  const { data: profileData } = useGetBasicInfoQuery(profile_id ?? skipToken);
   const { data: projectData } = useGetProjectQuery(profile_id ?? skipToken);
   const { data: experienceData } = useGetExperiencesQuery(
     profile_id ?? skipToken
@@ -104,25 +102,19 @@ export const Editor = () => {
 
   useEffect(() => {
     if (profile_id) {
-      if (data) {
-        setItems(
-          createPanes(data, projectData, experienceData, educationData, false)
-        );
-      }
+      setItems(
+        createPanes(
+          profileData,
+          projectData,
+          experienceData,
+          educationData,
+          false
+        )
+      );
     } else {
       setItems(createPanes(null, null, null, null, true));
     }
-  }, [profile_id, data, projectData, experienceData, educationData]);
-
-  const onProfileChange = (event) => {
-    const selectedProfile = Object.values(PROFILES).find(
-      (profile) => profile.title === event.target.value
-    );
-
-    if (selectedProfile) {
-      setProfiles(selectedProfile);
-    }
-  };
+  }, [profile_id, profileData, projectData, experienceData, educationData]);
 
   const handleTabs = (event, tabName) => {
     let updatedItems;
@@ -213,13 +205,12 @@ export const Editor = () => {
         >
           <Resume
             data={{
-              data,
+              profileData,
               projectData,
               experienceData,
               educationData,
               achievementData: showAchievement ? achievementData : null,
-              certificationData: showCertification ? certificationData : null,
-              profiles
+              certificationData: showCertification ? certificationData : null
             }}
             ref={resumeRef}
           />

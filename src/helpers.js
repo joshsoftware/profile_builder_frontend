@@ -1,20 +1,3 @@
-export const isFieldInValid = (value) => {
-  if (value.trim() === "") {
-    return true;
-  } else {
-    return false;
-  }
-};
-
-export const formatDate = (dateString) => {
-  const date = new Date(dateString);
-  return date.toLocaleDateString("en-IN", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-};
-
 export const filterSection = (values) => {
   return Object.entries(values).reduce((acc, [, section]) => {
     if (!section?.id) {
@@ -84,4 +67,8 @@ export const formatAchievementFields = (achievements) => {
     name: achievement?.name,
     description: achievement?.description
   }));
+};
+
+export const validateId = (id) => {
+  return id && typeof id === "string" && id.trim() !== "";
 };

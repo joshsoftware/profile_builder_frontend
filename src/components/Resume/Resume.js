@@ -13,7 +13,7 @@ import {
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { genderOptions, getMonthString, PROFILES } from "../../Constants";
+import { getMonthString, PROFILES } from "../../Constants";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
@@ -22,13 +22,12 @@ const Resume = forwardRef(({ data }, ref) => {
     data: PropTypes.object.isRequired
   };
   const {
-    data: profile,
+    profileData: profile,
     projectData: projects,
     experienceData: experiences,
     educationData: educations,
     achievementData: achievements,
-    certificationData: certifications,
-    profiles
+    certificationData: certifications
   } = data;
 
   const containerRef = useRef();
@@ -45,38 +44,6 @@ const Resume = forwardRef(({ data }, ref) => {
     if (selectedProfile) {
       setProfileType(selectedProfile);
     }
-  };
-
-  const getFormattedDate = (value) => {
-    if (!value) {
-      return "";
-    }
-    const date = new Date(value);
-    const todayDate = new Date();
-
-    const givenDate = date.getDate();
-    const givenMonth = date.getMonth() + 1;
-    const givenYear = date.getFullYear();
-    if (
-      todayDate.getDate() === givenDate &&
-      todayDate.getMonth() + 1 === givenMonth &&
-      todayDate.getFullYear() === givenYear
-    ) {
-      return "Present";
-    } else {
-      return `${givenDate}/${givenMonth}/${givenYear}`;
-    }
-  };
-
-  const getPassingYear = (value) => {
-    if (!value) {
-      return "";
-    }
-    const date = new Date(value);
-
-    const givenYear = date.getFullYear();
-
-    return givenYear;
   };
 
   const getMonthYear = (value) => {
@@ -362,7 +329,7 @@ const Resume = forwardRef(({ data }, ref) => {
         Download
       </Button>
       <Radio.Group
-        defaultValue={profiles.title}
+        defaultValue={PROFILES.internal.title}
         onChange={onProfileChange}
         buttonStyle="solid"
         style={{ marginLeft: "220px" }}

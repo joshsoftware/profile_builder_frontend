@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
@@ -11,11 +11,8 @@ import {
   PROFILE_DETAILS,
   SKILLS
 } from "../../../Constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
-
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
@@ -29,16 +26,6 @@ const BasicInfo = ({ profileData }) => {
     if (values.years_of_experience) {
       values.years_of_experience = parseFloat(values.years_of_experience);
     }
-
-    const updatedBasicInfo = {
-      ...initialState.basicInfo,
-      ...values
-    };
-    setInitialState({
-      ...initialState,
-      basicInfo: { ...initialState.basicInfo, ...values }
-    });
-    var profile = { profile: { ...initialState.basicInfo, ...values } };
 
     try {
       const response = await createProfileService(values);
@@ -55,12 +42,6 @@ const BasicInfo = ({ profileData }) => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      basicInfo: {
-        profileDetails: PROFILE_DETAILS
-      }
-    });
   };
 
   return (
