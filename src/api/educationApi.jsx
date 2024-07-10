@@ -3,7 +3,6 @@ import {
   CREATE_EDUCATION_ENDPOINTS,
   EDUCATION_LIST_ENDPOINT,
   EDUCATION_REDUCER_PATH,
-  EDUCATION_TAG_TYPES,
   HTTP_METHODS
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
@@ -11,7 +10,7 @@ import axiosBaseQuery from "./axiosBaseQuery/service";
 export const educationApi = createApi({
   reducerPath: EDUCATION_REDUCER_PATH,
   baseQuery: axiosBaseQuery(),
-  tagTypes: EDUCATION_TAG_TYPES,
+  tagTypes: ["education"],
   endpoints: (builder) => ({
     createEducation: builder.mutation({
       query: ({ profile_id, values }) => ({
@@ -19,14 +18,14 @@ export const educationApi = createApi({
         method: HTTP_METHODS.POST,
         data: { educations: values }
       }),
-      invalidatesTags: EDUCATION_TAG_TYPES,
+      invalidatesTags: ["education"],
       transformResponse: (response) => response.data
     }),
     getEducations: builder.query({
       query: (profile_id) => ({
         url: EDUCATION_LIST_ENDPOINT.replace(":profile_id", profile_id)
       }),
-      providesTags: EDUCATION_TAG_TYPES,
+      providesTags: ["education"],
       transformResponse: (response) => response.data.educations
     })
   })

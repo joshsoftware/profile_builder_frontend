@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import {
@@ -19,20 +19,22 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import { skipToken } from "@reduxjs/toolkit/query";
 import moment from "moment";
-import {
-  useCreateExperienceMutation,
-  useGetExperiencesQuery
-} from "../../../api/experienceApi";
+import PropTypes from "prop-types";
+import { useCreateExperienceMutation } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatExperienceFields,
+  validateId
+} from "../../../helpers";
 
-const Experience = () => {
+const Experience = ({ experienceData }) => {
+  Experience.propTypes = {
+    experienceData: PropTypes.object
+  };
   const [createExperienceService] = useCreateExperienceMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -40,7 +42,6 @@ const Experience = () => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const { data } = useGetExperiencesQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -48,21 +49,20 @@ const Experience = () => {
   });
 
   useEffect(() => {
-    if (profile_id && data) {
-      setInitialState({ ...initialState, data });
-
-      if (data.length > 0) {
-        const tabs = data.map((experience, index) => ({
+    if (profile_id && experienceData) {
+      if (experienceData?.length > 0) {
+        const tabs = experienceData?.map((experience, index) => ({
           label: `Experience ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
-        newTabIndex.current = data.length;
+        newTabIndex.current = experienceData?.length;
         form.setFieldsValue(
-          data.reduce((acc, experience, index) => {
+          experienceData.reduce((acc, experience, index) => {
             acc[`experience_${index}`] = {
               ...experience,
+              id: experience?.id,
               employmentStart: experience.from_date
                 ? moment(experience.from_date, "MMM-YYYY")
                 : null,
@@ -82,23 +82,11 @@ const Experience = () => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, data]);
+  }, [profile_id, experienceData]);
 
   const onFinish = async (values) => {
-    const experiences = items.map((item, index) => ({
-      designation: values[`experience_${index}`]?.designation,
-      company_name: values[`experience_${index}`]?.company_name,
-      from_date:
-        values[`experience_${index}`]?.employmentStart?.format("MMM-YYYY"),
-      to_date: values[`experience_${index}`]?.isCurrentCompany
-        ? "Present"
-        : values[`experience_${index}`]?.employmentEnd?.format("MMM-YYYY")
-    }));
-
-    setInitialState({
-      ...initialState,
-      experiences
-    });
+    const filteredExperiences = filterSection(values);
+    const experiences = formatExperienceFields(filteredExperiences);
 
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
@@ -120,10 +108,6 @@ const Experience = () => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      experiences: []
-    });
   };
 
   const onChangeCheckbox = (e, key) => {
@@ -215,6 +199,9 @@ const Experience = () => {
                   >
                     <Row>
                       <Col span={11}>
+                        <Form.Item name={[`experience_${index}`, "id"]} hidden>
+                          <Input />
+                        </Form.Item>{" "}
                         <Form.Item
                           name={[`experience_${index}`, "designation"]}
                           label="Designation"

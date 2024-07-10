@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
@@ -8,17 +8,22 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetEducationsQuery } from "../../../api/educationApi";
+import PropTypes from "prop-types";
 import { useCreateEducationMutation } from "../../../api/educationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatEducationFields,
+  validateId
+} from "../../../helpers";
 
-const Education = () => {
+const Education = ({ educationData }) => {
+  Education.propTypes = {
+    educationData: PropTypes.object
+  };
+
   const [createEducationervice] = useCreateEducationMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -30,7 +35,6 @@ const Education = () => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const { data } = useGetEducationsQuery(profile_id ?? skipToken);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -38,19 +42,21 @@ const Education = () => {
   });
 
   useEffect(() => {
-    if (profile_id && data) {
-      setInitialState({ ...initialState, data });
-      if (data.length > 0) {
-        const tabs = data.map((education, index) => ({
+    if (profile_id && educationData) {
+      if (educationData?.length > 0) {
+        const tabs = educationData.map((education, index) => ({
           label: `Education ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
-        newTabIndex.current = data.length;
+        newTabIndex.current = educationData.length;
         form.setFieldsValue(
-          data.reduce((acc, education, index) => {
-            acc[`education_${index}`] = education;
+          educationData.reduce((acc, education, index) => {
+            acc[`education_${index}`] = {
+              ...education,
+              id: education?.id
+            };
             return acc;
           }, {})
         );
@@ -61,23 +67,11 @@ const Education = () => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, data]);
+  }, [profile_id, educationData]);
 
   const onFinish = async (values) => {
-    const educations = items.map((item, index) => {
-      return {
-        degree: values[`education_${index}`]?.degree,
-        university_name: values[`education_${index}`]?.university_name,
-        place: values[`education_${index}`]?.place,
-        percent_or_cgpa: values[`education_${index}`]?.percent_or_cgpa,
-        passing_year: values[`education_${index}`]?.passing_year
-      };
-    });
-
-    setInitialState({
-      ...initialState,
-      educations
-    });
+    const filteredEducation = filterSection(values);
+    const educations = formatEducationFields(filteredEducation);
 
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
@@ -99,10 +93,6 @@ const Education = () => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      educations: []
-    });
   };
 
   const onChange = (key) => {
@@ -119,6 +109,7 @@ const Education = () => {
         key: newActiveKey
       }
     ]);
+    setActiveKey(newActiveKey);
   };
 
   const remove = (targetKey) => {
@@ -178,6 +169,9 @@ const Education = () => {
                   onFinish={onFinish}
                   key={item.key}
                 >
+                  <Form.Item name={[`education_${index}`, "id"]} hidden>
+                    <Input />
+                  </Form.Item>
                   <Form.Item
                     name={[`education_${index}`, "degree"]}
                     label="Degree"

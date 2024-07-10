@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, Space, Tabs } from "antd";
@@ -8,25 +8,28 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import { skipToken } from "@reduxjs/toolkit/query";
-import { useGetAchievementsQuery } from "../../../api/achievementApi";
+import PropTypes from "prop-types";
 import { useCreateAchievementMutation } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatAchievementFields,
+  validateId
+} from "../../../helpers";
 
-const Achievement = () => {
+const Achievement = ({ achievementData }) => {
+  Achievement.propTypes = {
+    achievementData: PropTypes.object
+  };
   const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     { label: "Achievement 1", children: null, key: "0" }
   ]);
   const newTabIndex = useRef(1);
-  const { data } = useGetAchievementsQuery(profile_id ?? skipToken);
 
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
@@ -35,19 +38,19 @@ const Achievement = () => {
   });
 
   useEffect(() => {
-    if (profile_id && data) {
-      setInitialState({ ...initialState, data });
-      if (data.length > 0) {
-        const tabs = data.map((achievement, index) => ({
+    if (profile_id && achievementData) {
+      if (achievementData?.length > 0) {
+        const tabs = achievementData?.map((achievement, index) => ({
           label: `Achievement ${index + 1}`,
           children: null,
           key: `${index}`
         }));
         setItems(tabs);
-        newTabIndex.current = data.length;
+        newTabIndex.current = achievementData?.length;
         form.setFieldsValue(
-          data.reduce((acc, achievement, index) => {
+          achievementData.reduce((acc, achievement, index) => {
             acc[`achievement_${index}`] = {
+              id: achievement.id,
               name: achievement.name,
               description: achievement.description
             };
@@ -59,7 +62,7 @@ const Achievement = () => {
         resetItems();
       }
     }
-  }, [profile_id, data]);
+  }, [profile_id, achievementData]);
 
   const resetItems = () => {
     setItems([{ label: "Achievement 1", children: null, key: "0" }]);
@@ -68,16 +71,8 @@ const Achievement = () => {
   };
 
   const onFinish = async (values) => {
-    const achievements = items.map((item, index) => ({
-      name: values[`achievement_${index}`]?.name,
-      description: values[`achievement_${index}`]?.description
-    }));
-
-    setInitialState({ ...initialState, achievements });
-    setInitialState({
-      ...initialState,
-      achievements
-    });
+    const filteredAchievements = filterSection(values);
+    const achievements = formatAchievementFields(filteredAchievements);
 
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
@@ -99,11 +94,6 @@ const Achievement = () => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      achievements: []
-    });
-    setInitialState({ ...initialState, achievements: [] });
   };
 
   const onChange = (key) => {
@@ -175,6 +165,9 @@ const Achievement = () => {
                   onFinish={onFinish}
                   key={item.key}
                 >
+                  <Form.Item name={[`achievement_${index}`, "id"]} hidden>
+                    <Input />
+                  </Form.Item>
                   <Form.Item
                     name={[`achievement_${index}`, "name"]}
                     label="Achievement Name"
