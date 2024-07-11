@@ -7,48 +7,54 @@ import {
   DatePicker,
   Form,
   Input,
+  Modal,
   Row,
   Select,
   Space,
-  Tabs,
+  Tabs
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateExperienceMutation,
-  useUpdateExperienceMutation,
+  useDeleteExperienceMutation,
+  useUpdateExperienceMutation
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { DESIGNATION, INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
-  filterSection,
-  validateId
-} from "../../../helpers";
+  DESIGNATION,
+  INVALID_ID_ERROR,
+  SUCCESS_TOASTER
+} from "../../../Constants";
+import { filterSection, validateId } from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
+  const [deleteExperienceService] = useDeleteExperienceMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [targetKey, setTargetKey] = useState(null);
   const [items, setItems] = useState([
     {
       label: "Experience 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: { distance: 10 }
   });
 
   useEffect(() => {
@@ -58,7 +64,7 @@ const Experience = ({ experienceData }) => {
           label: `Experience ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: experience.isExisting,
+          isExisting: experience.isExisting
         }));
 
         setItems(tabs);
@@ -71,7 +77,7 @@ const Experience = ({ experienceData }) => {
               from_date: experience.from_date
                 ? moment(experience.from_date)
                 : null,
-              to_date: experience.to_date ? moment(experience.to_date) : null,
+              to_date: experience.to_date ? moment(experience.to_date) : null
             };
             return acc;
           }, {})
@@ -89,7 +95,7 @@ const Experience = ({ experienceData }) => {
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -102,11 +108,11 @@ const Experience = ({ experienceData }) => {
   const handleUpdate = async (values) => {
     try {
       for (const experience of values) {
-        if (experience.id) {
+        if (experience?.id) {
           const response = await updateExperienceService({
             profile_id: profile_id,
             experience_id: experience.id,
-            values: experience,
+            values: experience
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -151,15 +157,42 @@ const Experience = ({ experienceData }) => {
       {
         label: `Experience ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
+    form.resetFields([`experience_${newActiveKey}`]); // Reset form fields for the new tab
   };
 
-  const remove = (targetKey) => {
+  const showModal = (targetKey) => {
+    setIsModalVisible(true);
+    setTargetKey(targetKey);
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false);
+    setTargetKey(null);
+  };
+
+  const remove = async () => {
     const targetIndex = items.findIndex((pane) => pane.key === targetKey);
     const newPanes = items.filter((pane) => pane.key !== targetKey);
+    try {
+      if (experienceData[targetKey]?.id) {
+        const response = await deleteExperienceService({
+          profile_id: profile_id,
+          experience_id: experienceData[targetKey]?.id
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      console.log("error in experience delete", error);
+      toast.error(error.response?.data?.error_message);
+    }
+    form.resetFields([`experience_${targetKey}`]);
     if (newPanes.length && targetKey === activeKey) {
       const { key } =
         newPanes[
@@ -168,13 +201,14 @@ const Experience = ({ experienceData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setIsModalVisible(false);
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -198,7 +232,7 @@ const Experience = ({ experienceData }) => {
           : null,
         to_date: experience.to_date
           ? experience.to_date.format("YYYY-MM-DD")
-          : null,
+          : null
       };
     });
   };
@@ -240,8 +274,8 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Designation is required",
-                          },
+                            message: "Designation is required"
+                          }
                         ]}
                       >
                         <Select
@@ -268,7 +302,7 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Start date is required",
+                            message: "Start date is required"
                           },
                           {
                             validator: (_, value) =>
@@ -278,8 +312,8 @@ const Experience = ({ experienceData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -293,8 +327,8 @@ const Experience = ({ experienceData }) => {
                           {
                             type: "object",
                             required: true,
-                            message: "End date cannot be blank",
-                          },
+                            message: "End date cannot be blank"
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -325,7 +359,7 @@ const Experience = ({ experienceData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -339,12 +373,26 @@ const Experience = ({ experienceData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modal
+        title="Confirm Delete"
+        centered
+        open={isModalVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+        okText="Yes"
+        cancelText="No"
+        okButtonProps={{
+          style: { backgroundColor: "red" }
+        }}
+      >
+        Are you sure you want to delete?
+      </Modal>
     </div>
   );
 };
 
 Experience.propTypes = {
-  experienceData: PropTypes.object.isRequired,
+  experienceData: PropTypes.object
 };
 
 export default Experience;
