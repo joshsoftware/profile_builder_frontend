@@ -3,34 +3,54 @@ import {
   CREATE_EDUCATION_ENDPOINTS,
   EDUCATION_LIST_ENDPOINT,
   EDUCATION_REDUCER_PATH,
-  EDUCATION_TAG_TYPES,
-  HTTP_METHODS
+  HTTP_METHODS,
+  UPDATE_EDUCATION_ENDPOINT,
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const educationApi = createApi({
   reducerPath: EDUCATION_REDUCER_PATH,
   baseQuery: axiosBaseQuery(),
-  tagTypes: EDUCATION_TAG_TYPES,
+  tagTypes: ["education"],
   endpoints: (builder) => ({
     createEducation: builder.mutation({
       query: ({ profile_id, values }) => ({
         url: CREATE_EDUCATION_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
-        data: { educations: values }
+        data: { educations: values },
       }),
-      invalidatesTags: EDUCATION_TAG_TYPES,
-      transformResponse: (response) => response.data
+      invalidatesTags: ["education"],
+      transformResponse: (response) => response.data,
     }),
     getEducations: builder.query({
       query: (profile_id) => ({
-        url: EDUCATION_LIST_ENDPOINT.replace(":profile_id", profile_id)
+        url: EDUCATION_LIST_ENDPOINT.replace(":profile_id", profile_id),
       }),
-      providesTags: EDUCATION_TAG_TYPES,
-      transformResponse: (response) => response.data.educations
-    })
-  })
+      providesTags: ["education"],
+      transformResponse: (response) => {
+        return response.data.educations.map((education) => ({
+          ...education,
+          isExisting: true,
+        }));
+      },
+    }),
+    updateEducation: builder.mutation({
+      query: ({ profile_id, education_id, values }) => ({
+        url: UPDATE_EDUCATION_ENDPOINT.replace(
+          ":profile_id",
+          profile_id
+        ).replace(":education_id", education_id),
+        method: HTTP_METHODS.PUT,
+        data: { education: values },
+      }),
+      invalidatesTags: ["education"],
+      transformResponse: (response) => response.data,
+    }),
+  }),
 });
 
-export const { useCreateEducationMutation, useGetEducationsQuery } =
-  educationApi;
+export const {
+  useCreateEducationMutation,
+  useGetEducationsQuery,
+  useUpdateEducationMutation,
+} = educationApi;

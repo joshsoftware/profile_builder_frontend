@@ -11,27 +11,17 @@ import {
   certificationApi,
   useGetCertificatesQuery,
 } from "../../api/certificationApi";
-import {
-  educationsApi,
-  useGetEducationsQuery,
-} from "../../api/educationApi";
-import {
-  experiencesApi,
-  useGetExperiencesQuery,
-} from "../../api/experienceApi";
-import {
-  profileApi,
-  useGetBasicInfoQuery,
-} from "../../api/profileApi";
-import {
-  projectsApi,
-  useGetProjectQuery,
-} from "../../api/projectApi";
+import { useGetEducationsQuery } from "../../api/educationApi";
+import { useGetExperiencesQuery } from "../../api/experienceApi";
+import { useGetBasicInfoQuery } from "../../api/profileApi";
+import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
   ACHIEVEMENT_LABEL,
+  ACHIEVEMENT_TAG_TYPES,
   BASIC_INFO_KEY,
   BASIC_INFO_LABEL,
+  CERTIFICATE_TAG_TYPES,
   CERTIFICATION_KEY,
   CERTIFICATION_LABEL,
   EDUCATION_KEY,
@@ -43,7 +33,7 @@ import {
   PROJECTS_LABEL,
 } from "../../Constants";
 import Navbar from "../Navbar/navbar";
-import Resume from "../Resume/Resume";
+import Resume from "../Resume";
 import Achievement from "./Achievement";
 import BasicInfo from "./BasicInfo";
 import styles from "./Builder.module.css";
@@ -136,16 +126,14 @@ export const Editor = () => {
 
   useEffect(() => {
     if (showAchievement) {
-      dispatch(achievementApi.util.invalidateTags(["Achievements"]));
+      dispatch(achievementApi.util.invalidateTags(ACHIEVEMENT_TAG_TYPES));
     }
     if (showCertification) {
-      dispatch(certificationApi.util.invalidateTags(["Certificates"]));
+      dispatch(certificationApi.util.invalidateTags(CERTIFICATE_TAG_TYPES));
     }
   }, [dispatch, showAchievement, showCertification]);
 
-  const onChange = (key) => {
-    console.log(key);
-  };
+  const onChange = () => {};
 
   const onProfileChange = (event) => {
     const selectedProfile = Object.values(PROFILES).find(

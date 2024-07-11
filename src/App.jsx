@@ -6,15 +6,15 @@ import { ResumeContext } from "./utils/ResumeContext";
 
 import "./App.css";
 
+const queryClient = new QueryClient();
 const App = () => {
-  const queryClient = new QueryClient();
   const [initialState, setInitialState] = useState({
     basicInfo: {},
     projects: [],
     skills: [],
     education: [],
     workExperience: [],
-    certifications: []
+    certifications: [],
   });
 
   return (

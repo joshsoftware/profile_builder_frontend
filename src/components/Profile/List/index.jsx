@@ -5,7 +5,7 @@ import { Button, Input, Row, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from "@ant-design/icons";
 import { useGetProfileListQuery } from "../../../api/profileApi";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
@@ -36,7 +36,7 @@ const ListProfiles = () => {
       selectedKeys,
       confirm,
       clearFilters,
-      close
+      close,
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -103,7 +103,7 @@ const ListProfiles = () => {
         />
       ) : (
         text
-      )
+      ),
   });
 
   const handleClick = (id) => {
@@ -116,21 +116,21 @@ const ListProfiles = () => {
       dataIndex: "name",
       key: "name",
       width: "20%",
-      ...getColumnSearchProps("name")
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: "20%",
-      ...getColumnSearchProps("email")
+      ...getColumnSearchProps("email"),
     },
     {
       title: "Years Of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
-      sortDirections: ["descend", "ascend"]
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Primary Skills",
@@ -154,7 +154,7 @@ const ListProfiles = () => {
             );
           })}
         </>
-      )
+      ),
     },
     {
       title: "Is Current Employee",
@@ -162,7 +162,7 @@ const ListProfiles = () => {
       key: "is_current_employee",
       render: (is_current_employee) => is_current_employee,
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"]
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Action",
@@ -172,8 +172,8 @@ const ListProfiles = () => {
           <EditOutlined onClick={() => handleClick(record.id)} />
           <DeleteOutlined />
         </Space>
-      )
-    }
+      ),
+    },
   ];
 
   return (

@@ -5,46 +5,56 @@ import {
   PROFILE_GET_ENDPOINT,
   PROFILE_LIST_ENDPOINT,
   PROFILE_REDUCER_PATH,
-  PROFILE_TAG_TYPES
+  UPDATE_PROFILE_ENDPOINT,
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
 export const profileApi = createApi({
   reducerPath: PROFILE_REDUCER_PATH,
   baseQuery: axiosBaseQuery(),
-  tagTypes: PROFILE_TAG_TYPES,
+  tagTypes: ["profile"],
   endpoints: (builder) => ({
     createProfile: builder.mutation({
       query: (values) => ({
         url: CREATE_PROFILE_ENDPOINT,
         method: HTTP_METHODS.POST,
         data: {
-          profile: values
-        }
+          profile: values,
+        },
       }),
-      invalidatesTags: PROFILE_TAG_TYPES,
-      providesTags: PROFILE_TAG_TYPES,
-      transformResponse: (response) => response.data
+      invalidatesTags: ["profile"],
+      providesTags: ["profile"],
+      transformResponse: (response) => response.data,
     }),
     getProfileList: builder.query({
       query: () => ({
-        url: PROFILE_LIST_ENDPOINT
+        url: PROFILE_LIST_ENDPOINT,
       }),
-      providesTags: PROFILE_TAG_TYPES,
-      transformResponse: (response) => response.data
+      providesTags: ["profile"],
+      transformResponse: (response) => response.data,
     }),
     getBasicInfo: builder.query({
       query: (profile_id) => ({
-        url: PROFILE_GET_ENDPOINT.replace(":profile_id", profile_id)
+        url: PROFILE_GET_ENDPOINT.replace(":profile_id", profile_id),
       }),
-      providesTags: PROFILE_TAG_TYPES,
-      transformResponse: (response) => response.data.profile
-    })
-  })
+      providesTags: ["profile"],
+      transformResponse: (response) => response.data.profile,
+    }),
+    updateProfile: builder.mutation({
+      query: ({ profile_id, values }) => ({
+        url: UPDATE_PROFILE_ENDPOINT.replace(":profile_id", profile_id),
+        method: HTTP_METHODS.PUT,
+        data: { profile: values },
+      }),
+      invalidatesTags: ["profile"],
+      transformResponse: (response) => response.data,
+    }),
+  }),
 });
 
 export const {
   useGetProfileListQuery,
   useCreateProfileMutation,
-  useGetBasicInfoQuery
+  useGetBasicInfoQuery,
+  useUpdateProfileMutation,
 } = profileApi;
