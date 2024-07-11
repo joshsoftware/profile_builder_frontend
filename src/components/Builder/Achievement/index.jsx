@@ -6,12 +6,12 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
 import {
   useCreateAchievementMutation,
-  useUpdateAchievementMutation,
+  useUpdateAchievementMutation
 } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
@@ -22,10 +22,6 @@ import {
 } from "../../../helpers";
 
 const Achievement = ({ achievementData }) => {
-  Achievement.propTypes = {
-    achievementData: PropTypes.object.isRequired,
-  };
-
   const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();
   const [updateAchievementService] = useUpdateAchievementMutation();
@@ -36,24 +32,23 @@ const Achievement = ({ achievementData }) => {
       label: "Achievement 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const [action, setAction] = useState("create");
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: { distance: 10 }
   });
 
   useEffect(() => {
     if (profile_id && achievementData) {
-
       if (achievementData?.length > 0) {
         const tabs = achievementData.map((achievement, index) => ({
           label: `Achievement ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: achievement.isExisting,
+          isExisting: achievement.isExisting
         }));
         setItems(tabs);
         newTabIndex.current = achievementData.length;
@@ -61,7 +56,7 @@ const Achievement = ({ achievementData }) => {
           achievementData.reduce((acc, achievement, index) => {
             acc[`achievement_${index}`] = {
               ...achievement,
-              id: achievement.id,
+              id: achievement.id
             };
             return acc;
           }, {})
@@ -83,7 +78,7 @@ const Achievement = ({ achievementData }) => {
     try {
       const response = await createAchievementService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -100,7 +95,7 @@ const Achievement = ({ achievementData }) => {
           const response = await updateAchievementService({
             profile_id: profile_id,
             achievement_id: achievement.id,
-            values: achievement,
+            values: achievement
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -131,7 +126,8 @@ const Achievement = ({ achievementData }) => {
   };
 
   const onReset = () => {
-    form.resetFields();  };
+    form.resetFields();
+  };
 
   const onChange = (key) => {
     setActiveKey(key);
@@ -144,8 +140,8 @@ const Achievement = ({ achievementData }) => {
       {
         label: `Achievement ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -216,8 +212,8 @@ const Achievement = ({ achievementData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name is required",
-                      },
+                        message: "Name is required"
+                      }
                     ]}
                   >
                     <Input placeholder="Achievement name e.g. Star Performer" />
@@ -256,7 +252,7 @@ const Achievement = ({ achievementData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -272,6 +268,10 @@ const Achievement = ({ achievementData }) => {
       </DndContext>
     </div>
   );
+};
+
+Achievement.propTypes = {
+  achievementData: PropTypes.object
 };
 
 export default Achievement;

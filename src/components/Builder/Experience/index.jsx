@@ -39,10 +39,9 @@ const Experience = ({ experienceData }) => {
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
   const [deleteExperienceService] = useDeleteExperienceMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [isModalVisible, setIsModalVisible] = useState(false);
-  const [targetKey, setTargetKey] = useState(null);
   const [items, setItems] = useState([
     {
       label: "Experience 1",
@@ -161,27 +160,25 @@ const Experience = ({ experienceData }) => {
       }
     ]);
     setActiveKey(newActiveKey);
-    form.resetFields([`experience_${newActiveKey}`]); // Reset form fields for the new tab
+    form.resetFields([`experience_${newActiveKey}`]);
   };
 
-  const showModal = (targetKey) => {
-    setIsModalVisible(true);
-    setTargetKey(targetKey);
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
   };
 
   const handleCancel = () => {
-    setIsModalVisible(false);
-    setTargetKey(null);
+    setModalState({ isVisible: false, key: null });
   };
 
   const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
     try {
-      if (experienceData[targetKey]?.id) {
+      if (experienceData[modalState.key]?.id) {
         const response = await deleteExperienceService({
           profile_id: profile_id,
-          experience_id: experienceData[targetKey]?.id
+          experience_id: experienceData[modalState.key]?.id
         });
 
         if (response?.data) {
@@ -189,11 +186,10 @@ const Experience = ({ experienceData }) => {
         }
       }
     } catch (error) {
-      console.log("error in experience delete", error);
       toast.error(error.response?.data?.error_message);
     }
-    form.resetFields([`experience_${targetKey}`]);
-    if (newPanes.length && targetKey === activeKey) {
+    form.resetFields([`experience_${modalState.key}`]);
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -201,9 +197,8 @@ const Experience = ({ experienceData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
-    setIsModalVisible(false);
+    setModalState({ isVisible: false, key: null });
   };
-
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
@@ -376,7 +371,7 @@ const Experience = ({ experienceData }) => {
       <Modal
         title="Confirm Delete"
         centered
-        open={isModalVisible}
+        open={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
         okText="Yes"
@@ -392,7 +387,7 @@ const Experience = ({ experienceData }) => {
 };
 
 Experience.propTypes = {
-  experienceData: PropTypes.object
+  experienceData: PropTypes.array
 };
 
 export default Experience;

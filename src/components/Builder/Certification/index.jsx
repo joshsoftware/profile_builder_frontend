@@ -6,13 +6,13 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateCertificateMutation,
-  useUpdateCertificateMutation,
+  useUpdateCertificateMutation
 } from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
@@ -33,13 +33,13 @@ const Certification = ({ certificationData }) => {
       label: "Certificate 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: { distance: 10 }
   });
 
   useEffect(() => {
@@ -49,7 +49,7 @@ const Certification = ({ certificationData }) => {
           label: `Certification ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: certificate.isExisting,
+          isExisting: certificate.isExisting
         }));
         setItems(tabs);
         newTabIndex.current = certificationData.length;
@@ -64,7 +64,7 @@ const Certification = ({ certificationData }) => {
               from_date: certificate.from_date
                 ? moment(certificate.from_date)
                 : null,
-              to_date: certificate.to_date ? moment(certificate.to_date) : null,
+              to_date: certificate.to_date ? moment(certificate.to_date) : null
             };
             return acc;
           }, {})
@@ -82,7 +82,7 @@ const Certification = ({ certificationData }) => {
     try {
       const response = await createCertificateService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -99,7 +99,7 @@ const Certification = ({ certificationData }) => {
           const response = await updateCertificateService({
             profile_id: profile_id,
             certificate_id: certificate.id,
-            values: certificate,
+            values: certificate
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -144,8 +144,8 @@ const Certification = ({ certificationData }) => {
       {
         label: `Certification ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -218,8 +218,8 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Name is required",
-                          },
+                            message: "Name is required"
+                          }
                         ]}
                       >
                         <Input placeholder="Enter Certificate Name" />
@@ -258,8 +258,8 @@ const Certification = ({ certificationData }) => {
                                       "Issued date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -278,8 +278,8 @@ const Certification = ({ certificationData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -300,8 +300,8 @@ const Certification = ({ certificationData }) => {
                                       "End date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -336,7 +336,7 @@ const Certification = ({ certificationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -355,7 +355,7 @@ const Certification = ({ certificationData }) => {
 };
 
 Certification.propTypes = {
-  certificationData: PropTypes.object.isRequired,
+  certificationData: PropTypes.object
 };
 
 export default Certification;
