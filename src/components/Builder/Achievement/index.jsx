@@ -14,7 +14,7 @@ import {
   useUpdateAchievementMutation,
 } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR } from "../../../Constants";
+import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatAchievementFields,
@@ -36,7 +36,7 @@ const Achievement = ({ achievementData }) => {
       label: "Achievement 1",
       children: null,
       key: "0",
-      isExisting: "",
+      isExisting: false,
     },
   ]);
   const newTabIndex = useRef(1);
@@ -86,7 +86,7 @@ const Achievement = ({ achievementData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -103,7 +103,7 @@ const Achievement = ({ achievementData }) => {
             values: achievement,
           });
           if (response.data?.message) {
-            toast.success(response.data?.message);
+            toast.success(response.data?.message, SUCCESS_TOASTER);
           }
         }
       }

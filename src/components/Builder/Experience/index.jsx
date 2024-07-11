@@ -25,10 +25,9 @@ import {
   useUpdateExperienceMutation,
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
+import { DESIGNATION, INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
-  formatExperienceFields,
   validateId
 } from "../../../helpers";
 
@@ -43,7 +42,7 @@ const Experience = ({ experienceData }) => {
       label: "Experience 1",
       children: null,
       key: "0",
-      isExisting: "",
+      isExisting: false,
     },
   ]);
   const newTabIndex = useRef(1);
@@ -93,7 +92,7 @@ const Experience = ({ experienceData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -110,7 +109,7 @@ const Experience = ({ experienceData }) => {
             values: experience,
           });
           if (response.data?.message) {
-            toast.success(response.data?.message);
+            toast.success(response.data?.message, SUCCESS_TOASTER);
           }
         }
       }

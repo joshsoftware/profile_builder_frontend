@@ -25,7 +25,7 @@ import {
   useUpdateProjectMutation,
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR } from "../../../Constants";
+import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatProjectsFields,
@@ -47,7 +47,7 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: "",
+      isExisting: false,
     },
   ]);
   const newTabIndex = useRef(1);
@@ -100,7 +100,7 @@ const Project = ({ projectData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -117,7 +117,7 @@ const Project = ({ projectData }) => {
             values: project,
           });
           if (response.data?.message) {
-            toast.success(response.data?.message);
+            toast.success(response.data?.message, SUCCESS_TOASTER);
           }
         }
       }

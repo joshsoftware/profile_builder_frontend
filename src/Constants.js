@@ -90,6 +90,19 @@ export const GENDER = [
   { label: "OTHER", value: "Other" },
 ];
 
+export const SUCCESS_TOASTER = {
+  icon: '✅',
+  style: {
+    border: '1px solid #000000',
+    padding: '16px',
+    color: '#000000',
+  },
+  iconTheme: {
+    primary: '#713200',
+    secondary: '#FFFAEE',
+  },
+}
+
 export const DESIGNATION = [
   { lable: "intern", value: "Intern" },
   { lable: "software_engineer", value: "Software Engineer" },

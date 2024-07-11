@@ -170,7 +170,7 @@ export const Editor = () => {
               marginTop: "10px"
             }}
           >
-            Resume Builder
+            Profile Builder
           </Typography.Title>
           <hr />
 
