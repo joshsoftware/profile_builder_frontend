@@ -94,6 +94,7 @@ const Navbar = () => {
       </Header>
       <Modal
         title="Confirm Logout"
+        centered
         open={isModalVisible}
         onOk={handleOk}
         onCancel={handleCancel}
