@@ -3,7 +3,7 @@ export const PROFILE_DETAILS =
 
 export const PROFILES = {
   internal: { title: "INTERNAL", color: "#35549c" },
-  external: { title: "EXTERNAL", color: "#062e38" },
+  external: { title: "EXTERNAL", color: "#062e38" }
 };
 
 // ROUTES
@@ -37,23 +37,11 @@ export const ACHIEVEMENT_LIST_ENDPOINT =
 export const CERTIFICATE_LIST_ENDPOINT =
   "/api/profiles/:profile_id/certificates";
 
-export const UPDATE_PROFILE_ENDPOINT = "/api/profiles/:profile_id";
-export const UPDATE_ACHIEVEMENT_ENDPOINT =
-  "/api/profiles/:profile_id/achievements/:achievement_id";
-export const UPDATE_PROJECT_ENDPOINT =
-  "/api/profiles/:profile_id/projects/:project_id";
-export const UPDATE_EDUCATION_ENDPOINT =
-  "/api/profiles/:profile_id/educations/:education_id";
-export const UPDATE_EXPERIENCE_ENDPOINT =
-  "/api/profiles/:profile_id/experiences/:experience_id";
-export const UPDATE_CERTIFICATE_ENDPOINT =
-  "/api/profiles/:profile_id/certificates/:certificate_id";
-
 // HTTP METHODS
 export const HTTP_METHODS = {
   POST: "POST",
   GET: "GET",
-  PUT: "PUT",
+  PUT: "PUT"
 };
 // Redux Toolkit Query
 export const LOGIN_REDUCER_PATH = "loginApi";
@@ -87,7 +75,7 @@ export const CERTIFICATION_LABEL = "Certification";
 export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },
-  { label: "OTHER", value: "Other" },
+  { label: "OTHER", value: "Other" }
 ];
 
 export const DESIGNATION = [
@@ -98,7 +86,7 @@ export const DESIGNATION = [
   { lable: "project_manager", value: "Project Manager" },
   { lable: "product_manager", value: "Product Manager" },
   { lable: "qa", value: "Quality Assurance (QA) Engineer" },
-  { lable: "devOps", value: "DevOps Engineer" },
+  { lable: "devOps", value: "DevOps Engineer" }
 ];
 
 export const SKILLS = [
@@ -121,7 +109,7 @@ export const SKILLS = [
   { label: "ReactJs", value: "ReactJs" },
   { label: "React-Native", value: "React-Native" },
   { label: "UI/UX", value: "UI/UX" },
-  { label: "VueJs", value: "VueJs" },
+  { label: "VueJs", value: "VueJs" }
 ];
 
 // TODO : Remove once refactor

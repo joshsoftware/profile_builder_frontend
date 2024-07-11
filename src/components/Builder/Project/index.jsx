@@ -10,20 +10,17 @@ import {
   Row,
   Select,
   Space,
-  Tabs,
+  Tabs
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
-import {
-  useCreateProjectMutation,
-  useUpdateProjectMutation,
-} from "../../../api/projectApi";
+import { useCreateProjectMutation } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
 import {
@@ -34,38 +31,28 @@ import {
 
 const Project = ({ projectData }) => {
   Project.propTypes = {
-    projectData: PropTypes.object.isRequired,
+    projectData: PropTypes.object
   };
-
-  const [action, setAction] = useState("create");
   const [createProjectService] = useCreateProjectMutation();
-  const [updateProjectService] = useUpdateProjectMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [items, setItems] = useState([
-    {
-      label: "Project 1",
-      children: null,
-      key: "0",
-      isExisting: "",
-    },
-  ]);
+  const [items, setItems] = useState([]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
+
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
-    if (profile_id && projectData) {
+    if (profile_id) {
       if (projectData?.length > 0) {
         const tabs = projectData.map((project, index) => ({
           label: `Project ${index + 1}`,
           children: null,
-          key: `${index}`,
-          isExisting: project.isExisting,
+          key: `${index}`
         }));
         setItems(tabs);
         newTabIndex.current = projectData.length;
@@ -73,13 +60,13 @@ const Project = ({ projectData }) => {
           projectData.reduce((acc, project, index) => {
             acc[`project_${index}`] = {
               ...project,
-              id: project?.id,
+              id: project.id,
               working_start_date: project.working_start_date
                 ? moment(project.working_start_date)
                 : null,
               working_end_date: project.working_end_date
-                ? moment(project.working_end_date)
-                : null,
+                ? moment(project.working_end_date, "MMM-YYYY")
+                : null
             };
             return acc;
           }, {})
@@ -93,54 +80,24 @@ const Project = ({ projectData }) => {
     }
   }, [profile_id, projectData]);
 
-  const handleCreate = async (values) => {
+  const onFinish = async (values) => {
+    const filteredProjects = filterSection(values);
+    const projects = formatProjectsFields(filteredProjects);
+    if (!validateId(profile_id)) {
+      toast.error(INVALID_ID_ERROR);
+      return;
+    }
+
     try {
       const response = await createProjectService({
         profile_id: profile_id,
-        values: values,
+        values: projects
       });
       if (response.data?.message) {
         toast.success(response.data?.message);
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
-    }
-  };
-
-  const handleUpdate = async (values) => {
-    try {
-      for (const project of values) {
-        if (project.id) {
-          const response = await updateProjectService({
-            profile_id: profile_id,
-            project_id: project.id,
-            values: project,
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message);
-          }
-        }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
-    }
-  };
-
-  const onFinish = (values) => {
-    const filteredProjects = filterSection(values);
-    const projects = formatProjectsFields(filteredProjects);
-
-    if (!validateId(profile_id)) {
-      toast.error(INVALID_ID_ERROR);
-      return;
-    }
-
-    if (action === "create") {
-      handleCreate(projects);
-    } else if (action === "update") {
-      const activeProjectKey = `project_${activeKey}`;
-      const activeProject = values[activeProjectKey];
-      handleUpdate([activeProject]);
     }
   };
 
@@ -159,8 +116,8 @@ const Project = ({ projectData }) => {
       {
         label: `Project ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
   };
@@ -218,7 +175,7 @@ const Project = ({ projectData }) => {
                 <Form
                   layout="vertical"
                   form={form}
-                  name={`project_${item.key}`}
+                  name={`project-form-${item.key}`}
                   onFinish={onFinish}
                   key={item.key}
                 >
@@ -231,8 +188,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required",
-                      },
+                        message: "Name required"
+                      }
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -250,16 +207,6 @@ const Project = ({ projectData }) => {
                       <Form.Item
                         name={[`project_${index}`, "duration"]}
                         label="Project Duration (in years)"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value <= 30 && value >= 0
-                                ? Promise.resolve()
-                                : Promise.reject(
-                                    "duration must be a positive number and either a whole number up to 30 years."
-                                  ),
-                          },
-                        ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />
                       </Form.Item>
@@ -301,8 +248,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required",
-                      },
+                        message: "Worked technology is required"
+                      }
                     ]}
                   >
                     <Select
@@ -316,18 +263,6 @@ const Project = ({ projectData }) => {
                       <Form.Item
                         name={[`project_${index}`, "working_start_date"]}
                         label="Project Start Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > moment()
-                                ? Promise.reject(
-                                    new Error(
-                                      "Start date cannot be in the future"
-                                    )
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
@@ -336,18 +271,6 @@ const Project = ({ projectData }) => {
                       <Form.Item
                         name={[`project_${index}`, "working_end_date"]}
                         label="Project End Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > moment()
-                                ? Promise.reject(
-                                    new Error(
-                                      "End date cannot be in the future"
-                                    )
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
@@ -355,21 +278,8 @@ const Project = ({ projectData }) => {
                   </Row>
                   <Form.Item>
                     <Space>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Projects
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Project {Number(item.key) + 1}
+                      <Button type="primary" htmlType="submit">
+                        Save
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
@@ -377,7 +287,7 @@ const Project = ({ projectData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>

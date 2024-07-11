@@ -30,7 +30,7 @@ const Login = () => {
     },
     onError: (errorResponse) => {
       throw new Error(errorResponse.error);
-    },
+    }
   });
 
   return (
