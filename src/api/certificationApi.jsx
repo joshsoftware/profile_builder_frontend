@@ -3,7 +3,8 @@ import {
   CERTIFICATE_LIST_ENDPOINT,
   CERTIFICATE_REDUCER_PATH,
   CREATE_CERTIFICATE_ENDPOINTS,
-  HTTP_METHODS
+  HTTP_METHODS,
+  UPDATE_CERTIFICATE_ENDPOINT,
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
@@ -16,20 +17,40 @@ export const certificationApi = createApi({
       query: ({ profile_id, values }) => ({
         url: CREATE_CERTIFICATE_ENDPOINTS.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
-        data: { certificates: values }
+        data: { certificates: values },
       }),
       invalidatesTags: ["certificate"],
-      transformResponse: (response) => response.data
+      transformResponse: (response) => response.data,
     }),
     getCertificates: builder.query({
       query: (profile_id) => ({
-        url: CERTIFICATE_LIST_ENDPOINT.replace(":profile_id", profile_id)
+        url: CERTIFICATE_LIST_ENDPOINT.replace(":profile_id", profile_id),
       }),
       providesTags: ["certificate"],
-      transformResponse: (response) => response.data.certificates
-    })
-  })
+      transformResponse: (response) => {
+        return response.data.certificates.map((certificate) => ({
+          ...certificate,
+          isExisting: true,
+        }));
+      },
+    }),
+    updateCertificate: builder.mutation({
+      query: ({ profile_id, certificate_id, values }) => ({
+        url: UPDATE_CERTIFICATE_ENDPOINT.replace(
+          ":profile_id",
+          profile_id
+        ).replace(":certificate_id", certificate_id),
+        method: HTTP_METHODS.PUT,
+        data: { certificate: values },
+      }),
+      invalidatesTags: ["certificate"],
+      transformResponse: (response) => response.data,
+    }),
+  }),
 });
 
-export const { useCreateCertificateMutation, useGetCertificatesQuery } =
-  certificationApi;
+export const {
+  useCreateCertificateMutation,
+  useGetCertificatesQuery,
+  useUpdateCertificateMutation,
+} = certificationApi;

@@ -6,11 +6,14 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
-import { useCreateCertificateMutation } from "../../../api/certificationApi";
+import {
+  useCreateCertificateMutation,
+  useUpdateCertificateMutation,
+} from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
 import {
@@ -20,50 +23,48 @@ import {
 } from "../../../helpers";
 
 const Certification = ({ certificationData }) => {
-  Certification.propTypes = {
-    certificationData: PropTypes.object
-  };
-
+  const [action, setAction] = useState("create");
   const [createCertificateService] = useCreateCertificateMutation();
+  const [updateCertificateService] = useUpdateCertificateMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
-    { label: "Certification 1", children: null, key: "0" }
+    {
+      label: "Certificate 1",
+      children: null,
+      key: "0",
+      isExisting: "",
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: {
-      distance: 10
-    }
+    activationConstraint: { distance: 10 },
   });
 
   useEffect(() => {
     if (profile_id && certificationData) {
       if (certificationData?.length > 0) {
-        const tabs = certificationData?.map((certificate, index) => ({
+        const tabs = certificationData.map((certificate, index) => ({
           label: `Certification ${index + 1}`,
           children: null,
-          key: `${index}`
+          key: `${index}`,
+          isExisting: certificate.isExisting,
         }));
         setItems(tabs);
-        newTabIndex.current = certificationData?.length;
+        newTabIndex.current = certificationData.length;
         form.setFieldsValue(
           certificationData.reduce((acc, certificate, index) => {
             acc[`certificate_${index}`] = {
-              id: certificate.id,
-              name: certificate.name,
-              organization_name: certificate.organization_name,
-              description: certificate.description,
+              ...certificate,
+              id: certificate?.id,
               issued_date: certificate.issued_date
-                ? moment(certificate.issued_date, "MMM-YYYY")
+                ? moment(certificate.issued_date)
                 : null,
               from_date: certificate.from_date
-                ? moment(certificate.from_date, "MMM-YYYY")
+                ? moment(certificate.from_date)
                 : null,
-              to_date: certificate.to_date
-                ? moment(certificate.to_date, "MMM-YYYY")
-                : null
+              to_date: certificate.to_date ? moment(certificate.to_date) : null,
             };
             return acc;
           }, {})
@@ -75,9 +76,42 @@ const Certification = ({ certificationData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, certificationData]);
+  }, [profile_id, certificationData, form]);
 
-  const onFinish = async (values) => {
+  const handleCreate = async (values) => {
+    try {
+      const response = await createCertificateService({
+        profile_id: profile_id,
+        values: values,
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+  };
+
+  const handleUpdate = async (values) => {
+    try {
+      for (const certificate of values) {
+        if (certificate.id) {
+          const response = await updateCertificateService({
+            profile_id: profile_id,
+            certificate_id: certificate.id,
+            values: certificate,
+          });
+          if (response.data?.message) {
+            toast.success(response.data?.message);
+          }
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+  };
+
+  const onFinish = (values) => {
     const filteredCertificates = filterSection(values);
     const certificates = formatCertificationFields(filteredCertificates);
 
@@ -85,16 +119,13 @@ const Certification = ({ certificationData }) => {
       toast.error(INVALID_ID_ERROR);
       return;
     }
-    try {
-      const response = await createCertificateService({
-        profile_id: profile_id,
-        values: certificates
-      });
-      if (response.data?.message) {
-        toast.success(response.data?.message);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+
+    if (action === "create") {
+      handleCreate(certificates);
+    } else if (action === "update") {
+      const activeCertificateKey = `certificate_${activeKey}`;
+      const activeCertificate = values[activeCertificateKey];
+      handleUpdate([activeCertificate]);
     }
   };
 
@@ -113,8 +144,8 @@ const Certification = ({ certificationData }) => {
       {
         label: `Certification ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
   };
@@ -184,9 +215,14 @@ const Certification = ({ certificationData }) => {
                       <Form.Item
                         name={[`certificate_${index}`, "name"]}
                         label="Certificate Name"
-                        rules={[{ required: true, message: "Name required" }]}
+                        rules={[
+                          {
+                            required: true,
+                            message: "Name is required",
+                          },
+                        ]}
                       >
-                        <Input placeholder="Enter certificate name" />
+                        <Input placeholder="Enter Certificate Name" />
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
@@ -194,7 +230,7 @@ const Certification = ({ certificationData }) => {
                         name={[`certificate_${index}`, "organization_name"]}
                         label="Organization Name"
                       >
-                        <Input placeholder="Enter organization name" />
+                        <Input placeholder="Enter Organization Name" />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -203,7 +239,7 @@ const Certification = ({ certificationData }) => {
                     label="Description"
                   >
                     <Input.TextArea
-                      placeholder="Please provide a basic overview of the above certificate"
+                      placeholder="Provide a basic overview of the certificate"
                       showCount
                       maxLength={300}
                     />
@@ -212,7 +248,19 @@ const Certification = ({ certificationData }) => {
                     <Col span={11}>
                       <Form.Item
                         name={[`certificate_${index}`, "issued_date"]}
-                        label="Certificate Issued Date"
+                        label="Issued Date"
+                        rules={[
+                          {
+                            validator: (_, value) =>
+                              value && value > moment()
+                                ? Promise.reject(
+                                    new Error(
+                                      "Issued date cannot be in the future"
+                                    )
+                                  )
+                                : Promise.resolve(),
+                          },
+                        ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
@@ -220,7 +268,19 @@ const Certification = ({ certificationData }) => {
                     <Col span={11} offset={2}>
                       <Form.Item
                         name={[`certificate_${index}`, "from_date"]}
-                        label="Certification Start Date"
+                        label="Start Date"
+                        rules={[
+                          {
+                            validator: (_, value) =>
+                              value && value > moment()
+                                ? Promise.reject(
+                                    new Error(
+                                      "Start date cannot be in the future"
+                                    )
+                                  )
+                                : Promise.resolve(),
+                          },
+                        ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
@@ -230,7 +290,19 @@ const Certification = ({ certificationData }) => {
                     <Col span={11}>
                       <Form.Item
                         name={[`certificate_${index}`, "to_date"]}
-                        label="Certification End Date"
+                        label="End Date"
+                        rules={[
+                          {
+                            validator: (_, value) =>
+                              value && value > moment()
+                                ? Promise.reject(
+                                    new Error(
+                                      "End date cannot be in the future"
+                                    )
+                                  )
+                                : Promise.resolve(),
+                          },
+                        ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
@@ -238,8 +310,25 @@ const Certification = ({ certificationData }) => {
                   </Row>
                   <Form.Item>
                     <Space>
-                      <Button type="primary" htmlType="submit">
-                        Save
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          setAction("create");
+                          form.submit();
+                        }}
+                        disabled={item.isExisting}
+                      >
+                        Create Certificates
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          setAction("update");
+                          form.submit();
+                        }}
+                        disabled={items.length === 0 || !item.isExisting}
+                      >
+                        Update Certificate {Number(item.key) + 1}
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
@@ -247,7 +336,7 @@ const Certification = ({ certificationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -263,6 +352,10 @@ const Certification = ({ certificationData }) => {
       </DndContext>
     </div>
   );
+};
+
+Certification.propTypes = {
+  certificationData: PropTypes.object.isRequired,
 };
 
 export default Certification;

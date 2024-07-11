@@ -6,10 +6,13 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
-import { useCreateEducationMutation } from "../../../api/educationApi";
+import {
+  useCreateEducationMutation,
+  useUpdateEducationMutation,
+} from "../../../api/educationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
 import {
@@ -19,26 +22,25 @@ import {
 } from "../../../helpers";
 
 const Education = ({ educationData }) => {
-  Education.propTypes = {
-    educationData: PropTypes.object
-  };
-
-  const [createEducationervice] = useCreateEducationMutation();
+  const [action, setAction] = useState("create");
+  const [createEducationService] = useCreateEducationMutation();
+  const [updateEducationService] = useUpdateEducationMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     {
       label: "Education 1",
       children: null,
-      key: "0"
-    }
+      key: "0",
+      isExisting: "",
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10
-    }
+      distance: 10,
+    },
   });
 
   useEffect(() => {
@@ -47,7 +49,8 @@ const Education = ({ educationData }) => {
         const tabs = educationData.map((education, index) => ({
           label: `Education ${index + 1}`,
           children: null,
-          key: `${index}`
+          key: `${index}`,
+          isExisting: education.isExisting,
         }));
         setItems(tabs);
         newTabIndex.current = educationData.length;
@@ -55,7 +58,7 @@ const Education = ({ educationData }) => {
           educationData.reduce((acc, education, index) => {
             acc[`education_${index}`] = {
               ...education,
-              id: education?.id
+              id: education?.id,
             };
             return acc;
           }, {})
@@ -69,7 +72,40 @@ const Education = ({ educationData }) => {
     }
   }, [profile_id, educationData]);
 
-  const onFinish = async (values) => {
+  const handleCreate = async (values) => {
+    try {
+      const response = await createEducationService({
+        profile_id: profile_id,
+        values: values,
+      });
+      if (response.data?.message) {
+        toast.success(response.data?.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+  };
+
+  const handleUpdate = async (values) => {
+    try {
+      for (const education of values) {
+        if (education.id) {
+          const response = await updateEducationService({
+            profile_id: profile_id,
+            education_id: education.id,
+            values: education,
+          });
+          if (response.data?.message) {
+            toast.success(response.data?.message);
+          }
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+  };
+
+  const onFinish = (values) => {
     const filteredEducation = filterSection(values);
     const educations = formatEducationFields(filteredEducation);
 
@@ -78,16 +114,12 @@ const Education = ({ educationData }) => {
       return;
     }
 
-    try {
-      const response = await createEducationervice({
-        profile_id: profile_id,
-        values: educations
-      });
-      if (response.data?.message) {
-        toast.success(response.data?.message);
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    if (action === "create") {
+      handleCreate(educations);
+    } else if (action === "update") {
+      const activeEducationKey = `education_${activeKey}`;
+      const activeEducation = values[activeEducationKey];
+      handleUpdate([activeEducation]);
     }
   };
 
@@ -106,8 +138,8 @@ const Education = ({ educationData }) => {
       {
         label: `Education ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
   };
@@ -178,8 +210,8 @@ const Education = ({ educationData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Degree required"
-                      }
+                        message: "Degree required",
+                      },
                     ]}
                   >
                     <Input placeholder="Eg. MCS, BTech in CS" />
@@ -188,7 +220,7 @@ const Education = ({ educationData }) => {
                     <Col span={11}>
                       <Form.Item
                         name={[`education_${index}`, "university_name"]}
-                        label="University Name"
+                        label="University/College Name"
                       >
                         <Input placeholder="Eg. Savitribai Phule Pune University" />
                       </Form.Item>
@@ -222,8 +254,25 @@ const Education = ({ educationData }) => {
                   </Row>
                   <Form.Item>
                     <Space>
-                      <Button type="primary" htmlType="submit">
-                        Save
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          setAction("create");
+                          form.submit();
+                        }}
+                        disabled={item.isExisting}
+                      >
+                        Create Educations
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={() => {
+                          setAction("update");
+                          form.submit();
+                        }}
+                        disabled={items.length === 0 || !item.isExisting}
+                      >
+                        Update Education {Number(item.key) + 1}
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
@@ -231,7 +280,7 @@ const Education = ({ educationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -247,6 +296,10 @@ const Education = ({ educationData }) => {
       </DndContext>
     </div>
   );
+};
+
+Education.propTypes = {
+  educationData: PropTypes.object.isRequired,
 };
 
 export default Education;
