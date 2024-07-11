@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
@@ -15,15 +15,16 @@ import {
 } from "../../../api/educationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { filterSection, formatEducationFields } from "../../../helpers";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatEducationFields,
+  validateId
+} from "../../../helpers";
 
 const Education = ({ educationData }) => {
   const [action, setAction] = useState("create");
   const [createEducationService] = useCreateEducationMutation();
   const [updateEducationService] = useUpdateEducationMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -44,7 +45,6 @@ const Education = ({ educationData }) => {
 
   useEffect(() => {
     if (profile_id && educationData) {
-      setInitialState({ ...initialState, educationData });
       if (educationData?.length > 0) {
         const tabs = educationData.map((education, index) => ({
           label: `Education ${index + 1}`,
@@ -70,7 +70,7 @@ const Education = ({ educationData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, educationData, setInitialState]);
+  }, [profile_id, educationData]);
 
   const handleCreate = async (values) => {
     try {
@@ -109,11 +109,6 @@ const Education = ({ educationData }) => {
     const filteredEducation = filterSection(values);
     const educations = formatEducationFields(filteredEducation);
 
-    setInitialState({
-      ...initialState,
-      educations,
-    });
-
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
@@ -130,10 +125,6 @@ const Education = ({ educationData }) => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      educations: [],
-    });
   };
 
   const onChange = (key) => {
@@ -229,7 +220,7 @@ const Education = ({ educationData }) => {
                     <Col span={11}>
                       <Form.Item
                         name={[`education_${index}`, "university_name"]}
-                        label="University Name"
+                        label="University/College Name"
                       >
                         <Input placeholder="Eg. Savitribai Phule Pune University" />
                       </Form.Item>

@@ -1,16 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import { Col, Row, Space, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
-import {
-  achievementApi,
-  useGetAchievementsQuery,
-} from "../../api/achievementApi";
-import {
-  certificationApi,
-  useGetCertificatesQuery,
-} from "../../api/certificationApi";
+import { useGetAchievementsQuery } from "../../api/achievementApi";
+import { useGetCertificatesQuery } from "../../api/certificationApi";
 import { useGetEducationsQuery } from "../../api/educationApi";
 import { useGetExperiencesQuery } from "../../api/experienceApi";
 import { useGetBasicInfoQuery } from "../../api/profileApi";
@@ -28,9 +21,8 @@ import {
   EDUCATION_LABEL,
   EXPERIENCE_KEY,
   EXPERIENCE_LABEL,
-  PROFILES,
   PROJECTS_KEY,
-  PROJECTS_LABEL,
+  PROJECTS_LABEL
 } from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume";
@@ -52,52 +44,50 @@ const createPanes = (
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
-    children: <BasicInfo profileData={profileData} />,
+    children: <BasicInfo profileData={profileData} />
   },
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
     children: <Project projectData={projectData} />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
     children: <Education educationData={educationData} />,
-    disabled: disableTabs,
+    disabled: disableTabs
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
     children: <Experience experienceData={experienceData} />,
-    disabled: disableTabs,
-  },
+    disabled: disableTabs
+  }
 ];
 
 const achievement = (achievementData, disableTabs) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
   children: <Achievement achievementData={achievementData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 const certification = (certificationData, disableTabs) => ({
   key: CERTIFICATION_KEY,
   label: CERTIFICATION_LABEL,
   children: <Certification certificationData={certificationData} />,
-  disabled: disableTabs,
+  disabled: disableTabs
 });
 
 export const Editor = () => {
   const resumeRef = useRef();
   const { profile_id } = useParams();
-  const dispatch = useDispatch();
   const [items, setItems] = useState(createPanes(null, null, null, null, true));
-  const [profiles, setProfiles] = useState(PROFILES.internal);
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
-  const { data } = useGetBasicInfoQuery(profile_id ?? skipToken);
+  const { data: profileData } = useGetBasicInfoQuery(profile_id ?? skipToken);
   const { data: projectData } = useGetProjectQuery(profile_id ?? skipToken);
   const { data: experienceData } = useGetExperiencesQuery(
     profile_id ?? skipToken
@@ -114,36 +104,19 @@ export const Editor = () => {
 
   useEffect(() => {
     if (profile_id) {
-      if (data) {
-        setItems(
-          createPanes(data, projectData, experienceData, educationData, false)
-        );
-      }
+      setItems(
+        createPanes(
+          profileData,
+          projectData,
+          experienceData,
+          educationData,
+          false
+        )
+      );
     } else {
       setItems(createPanes(null, null, null, null, true));
     }
-  }, [profile_id, data, projectData, experienceData, educationData]);
-
-  useEffect(() => {
-    if (showAchievement) {
-      dispatch(achievementApi.util.invalidateTags(ACHIEVEMENT_TAG_TYPES));
-    }
-    if (showCertification) {
-      dispatch(certificationApi.util.invalidateTags(CERTIFICATE_TAG_TYPES));
-    }
-  }, [dispatch, showAchievement, showCertification]);
-
-  const onChange = () => {};
-
-  const onProfileChange = (event) => {
-    const selectedProfile = Object.values(PROFILES).find(
-      (profile) => profile.title === event.target.value
-    );
-
-    if (selectedProfile) {
-      setProfiles(selectedProfile);
-    }
-  };
+  }, [profile_id, profileData, projectData, experienceData, educationData]);
 
   const handleTabs = (event, tabName) => {
     let updatedItems;
@@ -186,7 +159,7 @@ export const Editor = () => {
             maxHeight: "98vh",
             overflow: "auto",
             padding: "2rem",
-            top: "2rem",
+            top: "2rem"
           }}
         >
           <Typography.Title
@@ -194,7 +167,7 @@ export const Editor = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              marginTop: "10px",
+              marginTop: "10px"
             }}
           >
             Resume Builder
@@ -216,12 +189,7 @@ export const Editor = () => {
             </Space>
           </Space>
           <hr />
-          <Tabs
-            size="small"
-            defaultActiveKey="basic-info"
-            items={items}
-            onChange={onChange}
-          />
+          <Tabs size="small" defaultActiveKey="basic-info" items={items} />
         </Col>
         <Col
           xs={{ span: 24 }}
@@ -234,18 +202,17 @@ export const Editor = () => {
             minHeight: "98vh",
             maxHeight: "98vh",
             padding: "2rem",
-            top: "2rem",
+            top: "2rem"
           }}
         >
           <Resume
             data={{
-              data,
+              profileData,
               projectData,
               experienceData,
               educationData,
               achievementData: showAchievement ? achievementData : null,
-              certificationData: showCertification ? certificationData : null,
-              profiles,
+              certificationData: showCertification ? certificationData : null
             }}
             ref={resumeRef}
           />

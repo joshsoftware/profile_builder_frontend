@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import { Button, Form, Input, Space, Tabs } from "antd";
@@ -15,9 +15,11 @@ import {
 } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { filterSection, formatAchievementFields } from "../../../helpers";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatAchievementFields,
+  validateId
+} from "../../../helpers";
 
 const Achievement = ({ achievementData }) => {
   Achievement.propTypes = {
@@ -27,7 +29,6 @@ const Achievement = ({ achievementData }) => {
   const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();
   const [updateAchievementService] = useUpdateAchievementMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -46,7 +47,6 @@ const Achievement = ({ achievementData }) => {
 
   useEffect(() => {
     if (profile_id && achievementData) {
-      setInitialState({ ...initialState, achievementData });
 
       if (achievementData?.length > 0) {
         const tabs = achievementData.map((achievement, index) => ({
@@ -116,11 +116,6 @@ const Achievement = ({ achievementData }) => {
     const filteredAchievements = filterSection(values);
     const achievements = formatAchievementFields(filteredAchievements);
 
-    setInitialState({
-      ...initialState,
-      achievements,
-    });
-
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
@@ -136,12 +131,7 @@ const Achievement = ({ achievementData }) => {
   };
 
   const onReset = () => {
-    form.resetFields();
-    setInitialState({
-      ...initialState,
-      achievements: [],
-    });
-  };
+    form.resetFields();  };
 
   const onChange = (key) => {
     setActiveKey(key);

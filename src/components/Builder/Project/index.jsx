@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import {
@@ -26,9 +26,11 @@ import {
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR } from "../../../Constants";
-import { filterSection, formatProjectsFields } from "../../../helpers";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatProjectsFields,
+  validateId
+} from "../../../helpers";
 
 const Project = ({ projectData }) => {
   Project.propTypes = {
@@ -38,7 +40,6 @@ const Project = ({ projectData }) => {
   const [action, setAction] = useState("create");
   const [createProjectService] = useCreateProjectMutation();
   const [updateProjectService] = useUpdateProjectMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -59,7 +60,6 @@ const Project = ({ projectData }) => {
 
   useEffect(() => {
     if (profile_id && projectData) {
-      setInitialState({ ...initialState, projectData });
       if (projectData?.length > 0) {
         const tabs = projectData.map((project, index) => ({
           label: `Project ${index + 1}`,
@@ -130,11 +130,6 @@ const Project = ({ projectData }) => {
     const filteredProjects = filterSection(values);
     const projects = formatProjectsFields(filteredProjects);
 
-    setInitialState({
-      ...initialState,
-      projects,
-    });
-
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
@@ -151,10 +146,6 @@ const Project = ({ projectData }) => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      projects: [],
-    });
   };
 
   const onChange = (key) => {

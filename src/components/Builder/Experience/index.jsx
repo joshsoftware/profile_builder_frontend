@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import {
@@ -26,15 +26,16 @@ import {
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { DESIGNATION, INVALID_ID_ERROR } from "../../../Constants";
-import { filterSection, formatExperienceFields } from "../../../helpers";
-import { validateId } from "../../../utils/dto/constants";
-import { ResumeContext } from "../../../utils/ResumeContext";
+import {
+  filterSection,
+  formatExperienceFields,
+  validateId
+} from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
-  const { initialState, setInitialState } = useContext(ResumeContext);
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -53,8 +54,6 @@ const Experience = ({ experienceData }) => {
 
   useEffect(() => {
     if (profile_id && experienceData) {
-      setInitialState({ ...initialState, experienceData });
-
       if (experienceData?.length > 0) {
         const tabs = experienceData.map((experience, index) => ({
           label: `Experience ${index + 1}`,
@@ -124,11 +123,6 @@ const Experience = ({ experienceData }) => {
     const filteredExperiences = filterSection(values);
     const experiences = formatExperienceFields(filteredExperiences);
 
-    setInitialState({
-      ...initialState,
-      experiences,
-    });
-
     if (!validateId(profile_id)) {
       toast.error(INVALID_ID_ERROR);
       return;
@@ -145,10 +139,6 @@ const Experience = ({ experienceData }) => {
 
   const onReset = () => {
     form.resetFields();
-    setInitialState({
-      ...initialState,
-      experiences: [],
-    });
   };
 
   const onChange = (key) => {
