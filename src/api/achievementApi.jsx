@@ -3,7 +3,8 @@ import {
   ACHIEVEMENT_LIST_ENDPOINT,
   ACHIEVEMENT_REDUCER_PATH,
   CREATE_ACHIEVEMENT_ENDPOINTS,
-  HTTP_METHODS
+  HTTP_METHODS,
+  UPDATE_ACHIEVEMENT_ENDPOINT
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
@@ -26,10 +27,29 @@ export const achievementApi = createApi({
         url: ACHIEVEMENT_LIST_ENDPOINT.replace(":profile_id", profile_id)
       }),
       providesTags: ["achievement"],
-      transformResponse: (response) => response.data.achievements
+      transformResponse: (response) => {
+        return response.data.achievements.map(achievement => ({
+          ...achievement,
+          isExisting: true
+        }));
+      }
+    }),
+    updateAchievement: builder.mutation({
+      query: ({ profile_id, achievement_id, values }) => ({
+        url: UPDATE_ACHIEVEMENT_ENDPOINT
+          .replace(":profile_id", profile_id)
+          .replace(":achievement_id", achievement_id),
+        method: HTTP_METHODS.PUT,
+        data: { achievement: values }
+      }),
+      invalidatesTags: ["achievement"],
+      transformResponse: (response) => response.data
     })
   })
 });
 
-export const { useCreateAchievementMutation, useGetAchievementsQuery } =
-  achievementApi;
+export const {
+  useCreateAchievementMutation,
+  useGetAchievementsQuery,
+  useUpdateAchievementMutation
+} = achievementApi;

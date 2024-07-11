@@ -11,13 +11,13 @@ export const loginApi = createApi({
         url: LOGIN_ENDPOINT,
         method: HTTP_METHODS.POST,
         data: {
-          access_token: access_token
-        }
+          access_token: access_token,
+        },
       }),
       invalidatesTags: ["login"],
-      transformResponse: (response) => response.data
-    })
-  })
+      transformResponse: (response) => response.data,
+    }),
+  }),
 });
 
 export const { useLoginMutation } = loginApi;

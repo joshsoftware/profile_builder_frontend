@@ -2,17 +2,21 @@ import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, Form, Input, Row, Select, Space } from "antd";
-import PropTypes from "prop-types"; // Import PropTypes
-import { useCreateProfileMutation } from "../../../api/profileApi";
+import PropTypes from "prop-types";
+import {
+  useCreateProfileMutation,
+  useUpdateProfileMutation,
+} from "../../../api/profileApi";
 import {
   DESIGNATION,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
-  SKILLS
+  SKILLS,
 } from "../../../Constants";
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
+  const [updateProfileService] = useUpdateProfileMutation();
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
@@ -28,7 +32,16 @@ const BasicInfo = ({ profileData }) => {
     }
 
     try {
-      const response = await createProfileService(values);
+      let response;
+      if (profileData) {
+        response = await updateProfileService({
+          profile_id: profileData.id,
+          values,
+        });
+      } else {
+        response = await createProfileService(values);
+      }
+
       if (response.data?.message) {
         toast.success(response.data?.message);
         navigate(
@@ -72,8 +85,8 @@ const BasicInfo = ({ profileData }) => {
               {
                 required: true,
                 type: "email",
-                message: "Valid email required"
-              }
+                message: "Valid email required",
+              },
             ]}
           >
             <Input placeholder="example@joshsoftware.com" />
@@ -85,7 +98,13 @@ const BasicInfo = ({ profileData }) => {
           <Form.Item
             name="mobile"
             label="Mobile"
-            rules={[{ required: true, message: "Mobile number required" }]}
+            rules={[
+              { required: true, message: "Mobile number required" },
+              {
+                pattern: /^[0-9]{10}$/,
+                message: "Mobile number must be exactly 10 digits",
+              },
+            ]}
           >
             <Input type="tel" placeholder="Enter mobile number" />
           </Form.Item>
@@ -105,10 +124,12 @@ const BasicInfo = ({ profileData }) => {
               { required: true, message: "Experience required" },
               {
                 validator: (_, value) =>
-                  value <= 30
+                  value <= 30 && value >= 0
                     ? Promise.resolve()
-                    : Promise.reject("Maximum experience is 30 years.")
-              }
+                    : Promise.reject(
+                        "Experience must be a positive number and either a whole number up to 30 years."
+                      ),
+              },
             ]}
           >
             <Input
@@ -156,6 +177,7 @@ const BasicInfo = ({ profileData }) => {
             name="description"
             label="Description"
             initialValue={PROFILE_DETAILS}
+            rules={[{ required: true, message: "Description required" }]}
           >
             <Input.TextArea
               maxLength={600}
@@ -172,6 +194,12 @@ const BasicInfo = ({ profileData }) => {
               style={{ width: "100%" }}
               placeholder="Select primary skills"
               options={SKILLS}
+              rules={[
+                {
+                  required: true,
+                  message: "At least one primary skill is required",
+                },
+              ]}
             />
           </Form.Item>
         </Col>
@@ -201,9 +229,12 @@ const BasicInfo = ({ profileData }) => {
           <Button type="primary" htmlType="submit" disabled={!!profileData}>
             Create
           </Button>
-          <Button htmlType="button" onClick={onReset}>
-            Reset
+          <Button type="primary" htmlType="submit" disabled={!profileData}>
+            Update
           </Button>
+          {/* <Button htmlType="button" onClick={onReset}>
+            Reset
+          </Button> */}
         </Space>
       </Form.Item>
     </Form>
@@ -212,6 +243,7 @@ const BasicInfo = ({ profileData }) => {
 
 BasicInfo.propTypes = {
   profileData: PropTypes.shape({
+    id: PropTypes.string,
     profile: PropTypes.shape({
       name: PropTypes.string,
       email: PropTypes.string,
@@ -225,9 +257,9 @@ BasicInfo.propTypes = {
       description: PropTypes.string,
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
-      career_objectives: PropTypes.string
-    })
-  })
+      career_objectives: PropTypes.string,
+    }),
+  }),
 };
 
 export default BasicInfo;
