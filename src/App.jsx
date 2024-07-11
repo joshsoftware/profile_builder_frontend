@@ -8,7 +8,7 @@ const App = () => {
   return (
     <div className="App">
       <Router />
-      <Toaster position="top-right" />
+      <Toaster position="bottom-center" />
     </div>
   );
 };

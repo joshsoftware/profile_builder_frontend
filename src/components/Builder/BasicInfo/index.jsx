@@ -13,6 +13,7 @@ import {
   GENDER,
   PROFILE_DETAILS,
   SKILLS,
+  SUCCESS_TOASTER,
 } from "../../../Constants";
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
@@ -43,7 +44,7 @@ const BasicInfo = ({ profileData }) => {
       }
 
       if (response.data?.message) {
-        toast.success(response.data?.message);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
           EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
         );
@@ -232,9 +233,6 @@ const BasicInfo = ({ profileData }) => {
           <Button type="primary" htmlType="submit" disabled={!profileData}>
             Update
           </Button>
-          {/* <Button htmlType="button" onClick={onReset}>
-            Reset
-          </Button> */}
         </Space>
       </Form.Item>
     </Form>

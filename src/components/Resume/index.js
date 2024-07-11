@@ -478,7 +478,7 @@ const Resume = forwardRef(({ data }, ref) => {
           </Button>
         </Dropdown>
         <Radio.Group
-          defaultValue={PROFILES.title}
+          defaultValue={PROFILES.internal.title}
           onChange={onProfileChange}
           buttonStyle="solid"
           style={{ marginLeft: "220px" }}

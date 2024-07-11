@@ -15,7 +15,7 @@ import {
   useUpdateCertificateMutation,
 } from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR } from "../../../Constants";
+import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
@@ -33,7 +33,7 @@ const Certification = ({ certificationData }) => {
       label: "Certificate 1",
       children: null,
       key: "0",
-      isExisting: "",
+      isExisting: false,
     },
   ]);
   const newTabIndex = useRef(1);
@@ -85,7 +85,7 @@ const Certification = ({ certificationData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -102,7 +102,7 @@ const Certification = ({ certificationData }) => {
             values: certificate,
           });
           if (response.data?.message) {
-            toast.success(response.data?.message);
+            toast.success(response.data?.message, SUCCESS_TOASTER);
           }
         }
       }
