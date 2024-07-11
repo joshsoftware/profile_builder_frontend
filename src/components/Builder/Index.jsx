@@ -11,10 +11,8 @@ import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
   ACHIEVEMENT_LABEL,
-  ACHIEVEMENT_TAG_TYPES,
   BASIC_INFO_KEY,
   BASIC_INFO_LABEL,
-  CERTIFICATE_TAG_TYPES,
   CERTIFICATION_KEY,
   CERTIFICATION_LABEL,
   EDUCATION_KEY,
@@ -25,7 +23,7 @@ import {
   PROJECTS_LABEL
 } from "../../Constants";
 import Navbar from "../Navbar/navbar";
-import Resume from "../Resume";
+import Resume from "../Resume/Resume";
 import Achievement from "./Achievement";
 import BasicInfo from "./BasicInfo";
 import styles from "./Builder.module.css";
