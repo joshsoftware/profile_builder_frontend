@@ -7,22 +7,24 @@ import {
   DatePicker,
   Form,
   Input,
+  Modal,
   Row,
   Select,
   Space,
-  Tabs,
+  Tabs
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateProjectMutation,
-  useUpdateProjectMutation,
+  useDeleteProjectMutation,
+  useUpdateProjectMutation
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
@@ -33,13 +35,11 @@ import {
 } from "../../../helpers";
 
 const Project = ({ projectData }) => {
-  Project.propTypes = {
-    projectData: PropTypes.object.isRequired,
-  };
-
   const [action, setAction] = useState("create");
   const [createProjectService] = useCreateProjectMutation();
   const [updateProjectService] = useUpdateProjectMutation();
+  const [deleteProjectService] = useDeleteProjectMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -47,15 +47,15 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
@@ -65,7 +65,7 @@ const Project = ({ projectData }) => {
           label: `Project ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: project.isExisting,
+          isExisting: project.isExisting
         }));
         setItems(tabs);
         newTabIndex.current = projectData.length;
@@ -79,7 +79,7 @@ const Project = ({ projectData }) => {
                 : null,
               working_end_date: project.working_end_date
                 ? moment(project.working_end_date)
-                : null,
+                : null
             };
             return acc;
           }, {})
@@ -97,7 +97,7 @@ const Project = ({ projectData }) => {
     try {
       const response = await createProjectService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -114,7 +114,7 @@ const Project = ({ projectData }) => {
           const response = await updateProjectService({
             profile_id: profile_id,
             project_id: project.id,
-            values: project,
+            values: project
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -159,16 +159,42 @@ const Project = ({ projectData }) => {
       {
         label: `Project ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
+    form.resetFields([`project_${newActiveKey}`]);
   };
 
-  const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, key: null });
+  };
+
+  const remove = async () => {
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+
+    try {
+      if (projectData[modalState.key]?.id) {
+        const response = await deleteProjectService({
+          profile_id: profile_id,
+          project_id: projectData[modalState.key]?.id
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+    form.resetFields([`project_${modalState.key}`]);
+
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -176,13 +202,14 @@ const Project = ({ projectData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setModalState({ isVisible: false, key: null });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -231,8 +258,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required",
-                      },
+                        message: "Name required"
+                      }
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -257,8 +284,8 @@ const Project = ({ projectData }) => {
                                 ? Promise.resolve()
                                 : Promise.reject(
                                     "duration must be a positive number and either a whole number up to 30 years."
-                                  ),
-                          },
+                                  )
+                          }
                         ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />
@@ -301,8 +328,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required",
-                      },
+                        message: "Worked technology is required"
+                      }
                     ]}
                   >
                     <Select
@@ -325,8 +352,8 @@ const Project = ({ projectData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -345,8 +372,8 @@ const Project = ({ projectData }) => {
                                       "End date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -377,7 +404,7 @@ const Project = ({ projectData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -391,8 +418,24 @@ const Project = ({ projectData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modal
+        title="Confirm Delete"
+        centered
+        open={modalState.isVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+        okText="Yes"
+        cancelText="No"
+        okButtonProps={{
+          style: { backgroundColor: "red" }
+        }}
+      >
+        Are you sure you want to delete?
+      </Modal>
     </div>
   );
 };
-
+Project.propTypes = {
+  projectData: PropTypes.array
+};
 export default Project;
