@@ -3,6 +3,7 @@ import {
   ACHIEVEMENT_LIST_ENDPOINT,
   ACHIEVEMENT_REDUCER_PATH,
   CREATE_ACHIEVEMENT_ENDPOINTS,
+  DELETE_ACHIEVEMENT_ENDPOINT,
   HTTP_METHODS,
   UPDATE_ACHIEVEMENT_ENDPOINT
 } from "../Constants";
@@ -44,6 +45,16 @@ export const achievementApi = createApi({
       }),
       invalidatesTags: ["achievement"],
       transformResponse: (response) => response.data
+    }),
+    deleteAchievement: builder.mutation({
+      query: ({ profile_id, achievement_id }) => ({
+        url: DELETE_ACHIEVEMENT_ENDPOINT.replace(
+          ":profile_id",profile_id
+        ).replace(":achievement_id", achievement_id),
+        method: HTTP_METHODS.DELETE
+      }),
+      invalidatesTags: ["achievement"],
+      transformResponse: (response) => response.data.message
     })
   })
 });
@@ -51,5 +62,6 @@ export const achievementApi = createApi({
 export const {
   useCreateAchievementMutation,
   useGetAchievementsQuery,
-  useUpdateAchievementMutation
+  useUpdateAchievementMutation,
+  useDeleteAchievementMutation
 } = achievementApi;

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Form, Input, Space, Tabs } from "antd";
+import { Button, Form, Input, Modal, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -11,6 +11,7 @@ import {
 import PropTypes from "prop-types";
 import {
   useCreateAchievementMutation,
+  useDeleteAchievementMutation,
   useUpdateAchievementMutation
 } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
@@ -25,6 +26,8 @@ const Achievement = ({ achievementData }) => {
   const { profile_id } = useParams();
   const [createAchievementService] = useCreateAchievementMutation();
   const [updateAchievementService] = useUpdateAchievementMutation();
+  const [deleteAchievementService] = useDeleteAchievementMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -133,6 +136,14 @@ const Achievement = ({ achievementData }) => {
     setActiveKey(key);
   };
 
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, key: null });
+  };
+
   const add = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
@@ -144,12 +155,31 @@ const Achievement = ({ achievementData }) => {
       }
     ]);
     setActiveKey(newActiveKey);
+    form.resetFields([`achievement_${newActiveKey}`]);
   };
 
-  const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
+  const remove = async () => {
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+
+    try {
+      if (achievementData[modalState.key]?.id) {
+        const response = await deleteAchievementService({
+          profile_id: profile_id,
+          achievement_id: achievementData[modalState.key]?.id
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+
+    form.resetFields([`achievement_${modalState.key}`]);
+
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -157,13 +187,15 @@ const Achievement = ({ achievementData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -266,6 +298,20 @@ const Achievement = ({ achievementData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modal
+        title="Confirm Delete"
+        centered
+        open={modalState.isVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+        okText="Yes"
+        cancelText="No"
+        okButtonProps={{
+          style: { backgroundColor: "red" }
+        }}
+      >
+        Are you sure you want to delete?
+      </Modal>
     </div>
   );
 };

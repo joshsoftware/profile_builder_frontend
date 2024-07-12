@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_EDUCATION_ENDPOINTS,
+  DELETE_EDUCATION_ENDPOINT,
   EDUCATION_LIST_ENDPOINT,
   EDUCATION_REDUCER_PATH,
   HTTP_METHODS,
@@ -46,6 +47,17 @@ export const educationApi = createApi({
       invalidatesTags: ["education"],
       transformResponse: (response) => response.data,
     }),
+    deleteEducation: builder.mutation({
+      query: ({ profile_id, education_id }) => ({
+        url: DELETE_EDUCATION_ENDPOINT.replace(
+          ":profile_id",
+          profile_id
+        ).replace(":education_id", education_id),
+        method: HTTP_METHODS.DELETE,
+      }),
+      invalidatesTags: ["education"],
+      transformResponse: (response) => response.data.message,
+    }),
   }),
 });
 
@@ -53,4 +65,5 @@ export const {
   useCreateEducationMutation,
   useGetEducationsQuery,
   useUpdateEducationMutation,
+  useDeleteEducationMutation
 } = educationApi;

@@ -199,6 +199,7 @@ const Experience = ({ experienceData }) => {
     setItems(newPanes);
     setModalState({ isVisible: false, key: null });
   };
+
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
@@ -322,7 +323,17 @@ const Experience = ({ experienceData }) => {
                           {
                             type: "object",
                             required: true,
-                            message: "End date cannot be blank"
+                            message: "End date is required"
+                          },
+                          {
+                            validator: (_, value) =>
+                              value && value > moment()
+                                ? Promise.reject(
+                                    new Error(
+                                      "End date cannot be in the future"
+                                    )
+                                  )
+                                : Promise.resolve()
                           }
                         ]}
                       >
