@@ -7,30 +7,30 @@ import {
   DatePicker,
   Form,
   Input,
-  Modal,
   Row,
   Select,
   Space,
-  Tabs
+  Tabs,
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateExperienceMutation,
   useDeleteExperienceMutation,
-  useUpdateExperienceMutation
+  useUpdateExperienceMutation,
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import Modals from "../../../common-components/Modals";
 import {
   DESIGNATION,
   INVALID_ID_ERROR,
-  SUCCESS_TOASTER
+  SUCCESS_TOASTER,
 } from "../../../Constants";
 import { filterSection, validateId } from "../../../helpers";
 
@@ -47,13 +47,13 @@ const Experience = ({ experienceData }) => {
       label: "Experience 1",
       children: null,
       key: "0",
-      isExisting: false
-    }
+      isExisting: false,
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 }
+    activationConstraint: { distance: 10 },
   });
 
   useEffect(() => {
@@ -63,7 +63,7 @@ const Experience = ({ experienceData }) => {
           label: `Experience ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: experience.isExisting
+          isExisting: experience.isExisting,
         }));
 
         setItems(tabs);
@@ -76,7 +76,7 @@ const Experience = ({ experienceData }) => {
               from_date: experience.from_date
                 ? moment(experience.from_date)
                 : null,
-              to_date: experience.to_date ? moment(experience.to_date) : null
+              to_date: experience.to_date ? moment(experience.to_date) : null,
             };
             return acc;
           }, {})
@@ -94,7 +94,7 @@ const Experience = ({ experienceData }) => {
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -111,7 +111,7 @@ const Experience = ({ experienceData }) => {
           const response = await updateExperienceService({
             profile_id: profile_id,
             experience_id: experience.id,
-            values: experience
+            values: experience,
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -156,8 +156,8 @@ const Experience = ({ experienceData }) => {
       {
         label: `Experience ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`experience_${newActiveKey}`]);
@@ -178,7 +178,7 @@ const Experience = ({ experienceData }) => {
       if (experienceData[modalState.key]?.id) {
         const response = await deleteExperienceService({
           profile_id: profile_id,
-          experience_id: experienceData[modalState.key]?.id
+          experience_id: experienceData[modalState.key]?.id,
         });
 
         if (response?.data) {
@@ -228,7 +228,7 @@ const Experience = ({ experienceData }) => {
           : null,
         to_date: experience.to_date
           ? experience.to_date.format("YYYY-MM-DD")
-          : null
+          : null,
       };
     });
   };
@@ -270,8 +270,8 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Designation is required"
-                          }
+                            message: "Designation is required",
+                          },
                         ]}
                       >
                         <Select
@@ -298,7 +298,7 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Start date is required"
+                            message: "Start date is required",
                           },
                           {
                             validator: (_, value) =>
@@ -308,8 +308,8 @@ const Experience = ({ experienceData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -323,7 +323,7 @@ const Experience = ({ experienceData }) => {
                           {
                             type: "object",
                             required: true,
-                            message: "End date is required"
+                            message: "End date is required",
                           },
                           {
                             validator: (_, value) =>
@@ -333,8 +333,8 @@ const Experience = ({ experienceData }) => {
                                       "End date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -365,7 +365,7 @@ const Experience = ({ experienceData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -379,26 +379,17 @@ const Experience = ({ experienceData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modal
-        title="Confirm Delete"
-        centered
-        open={modalState.isVisible}
+      <Modals
+        isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-        okButtonProps={{
-          style: { backgroundColor: "red" }
-        }}
-      >
-        Are you sure you want to delete?
-      </Modal>
+      />
     </div>
   );
 };
 
 Experience.propTypes = {
-  experienceData: PropTypes.array
+  experienceData: PropTypes.array,
 };
 
 export default Experience;

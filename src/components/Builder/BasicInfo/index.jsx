@@ -5,7 +5,7 @@ import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
-  useUpdateProfileMutation
+  useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
   DESIGNATION,
@@ -13,7 +13,7 @@ import {
   GENDER,
   PROFILE_DETAILS,
   SKILLS,
-  SUCCESS_TOASTER
+  SUCCESS_TOASTER,
 } from "../../../Constants";
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
@@ -37,7 +37,7 @@ const BasicInfo = ({ profileData }) => {
       if (profileData) {
         response = await updateProfileService({
           profile_id: profileData.id,
-          values
+          values,
         });
       } else {
         response = await createProfileService(values);
@@ -52,10 +52,6 @@ const BasicInfo = ({ profileData }) => {
     } catch (error) {
       toast.error(error.response?.data?.error_message);
     }
-  };
-
-  const onReset = () => {
-    form.resetFields();
   };
 
   return (
@@ -86,8 +82,8 @@ const BasicInfo = ({ profileData }) => {
               {
                 required: true,
                 type: "email",
-                message: "Valid email required"
-              }
+                message: "Valid email required",
+              },
             ]}
           >
             <Input placeholder="example@joshsoftware.com" />
@@ -103,8 +99,8 @@ const BasicInfo = ({ profileData }) => {
               { required: true, message: "Mobile number required" },
               {
                 pattern: /^[0-9]{10}$/,
-                message: "Mobile number must be exactly 10 digits"
-              }
+                message: "Mobile number must be exactly 10 digits",
+              },
             ]}
           >
             <Input type="tel" placeholder="Enter mobile number" />
@@ -129,8 +125,8 @@ const BasicInfo = ({ profileData }) => {
                     ? Promise.resolve()
                     : Promise.reject(
                         "Experience must be a positive number and either a whole number up to 30 years."
-                      )
-              }
+                      ),
+              },
             ]}
           >
             <Input
@@ -198,8 +194,8 @@ const BasicInfo = ({ profileData }) => {
               rules={[
                 {
                   required: true,
-                  message: "At least one primary skill is required"
-                }
+                  message: "At least one primary skill is required",
+                },
               ]}
             />
           </Form.Item>
@@ -255,9 +251,9 @@ BasicInfo.propTypes = {
       description: PropTypes.string,
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
-      career_objectives: PropTypes.string
-    })
-  })
+      career_objectives: PropTypes.string,
+    }),
+  }),
 };
 
 export default BasicInfo;

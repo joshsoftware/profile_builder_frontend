@@ -51,15 +51,15 @@ export const UPDATE_CERTIFICATE_ENDPOINT =
 
 export const DELETE_PROFILE_ENDPOINT = "/api/profiles/:profile_id";
 export const DELETE_ACHIEVEMENT_ENDPOINT =
-  "/api/profiles/:profile_id/achievement/:achievement_id";
+  "/api/profiles/:profile_id/achievements/:achievement_id";
 export const DELETE_PROJECT_ENDPOINT =
-  "/api/profiles/:profile_id/project/:project_id";
+  "/api/profiles/:profile_id/projects/:project_id";
 export const DELETE_EDUCATION_ENDPOINT =
-  "/api/profiles/:profile_id/education/:education_id";
+  "/api/profiles/:profile_id/educations/:education_id";
 export const DELETE_EXPERIENCE_ENDPOINT =
-  "/api/profiles/:profile_id/experience/:experience_id";
+  "/api/profiles/:profile_id/experiences/:experience_id";
 export const DELETE_CERTIFICATE_ENDPOINT =
-  "/api/profiles/:profile_id/certificate/:certificate_id";
+  "/api/profiles/:profile_id/certificates/:certificate_id";
 
 // HTTP METHODS
 export const HTTP_METHODS = {

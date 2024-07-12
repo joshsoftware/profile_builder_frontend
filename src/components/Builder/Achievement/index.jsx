@@ -6,20 +6,21 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
 import {
   useCreateAchievementMutation,
   useDeleteAchievementMutation,
-  useUpdateAchievementMutation
+  useUpdateAchievementMutation,
 } from "../../../api/achievementApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatAchievementFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Achievement = ({ achievementData }) => {
@@ -35,13 +36,13 @@ const Achievement = ({ achievementData }) => {
       label: "Achievement 1",
       children: null,
       key: "0",
-      isExisting: false
-    }
+      isExisting: false,
+    },
   ]);
   const newTabIndex = useRef(1);
   const [action, setAction] = useState("create");
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 }
+    activationConstraint: { distance: 10 },
   });
 
   useEffect(() => {
@@ -51,7 +52,7 @@ const Achievement = ({ achievementData }) => {
           label: `Achievement ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: achievement.isExisting
+          isExisting: achievement.isExisting,
         }));
         setItems(tabs);
         newTabIndex.current = achievementData.length;
@@ -59,7 +60,7 @@ const Achievement = ({ achievementData }) => {
           achievementData.reduce((acc, achievement, index) => {
             acc[`achievement_${index}`] = {
               ...achievement,
-              id: achievement.id
+              id: achievement.id,
             };
             return acc;
           }, {})
@@ -81,7 +82,7 @@ const Achievement = ({ achievementData }) => {
     try {
       const response = await createAchievementService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -98,7 +99,7 @@ const Achievement = ({ achievementData }) => {
           const response = await updateAchievementService({
             profile_id: profile_id,
             achievement_id: achievement.id,
-            values: achievement
+            values: achievement,
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -151,8 +152,8 @@ const Achievement = ({ achievementData }) => {
       {
         label: `Achievement ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`achievement_${newActiveKey}`]);
@@ -166,7 +167,7 @@ const Achievement = ({ achievementData }) => {
       if (achievementData[modalState.key]?.id) {
         const response = await deleteAchievementService({
           profile_id: profile_id,
-          achievement_id: achievementData[modalState.key]?.id
+          achievement_id: achievementData[modalState.key]?.id,
         });
 
         if (response?.data) {
@@ -244,8 +245,8 @@ const Achievement = ({ achievementData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name is required"
-                      }
+                        message: "Name is required",
+                      },
                     ]}
                   >
                     <Input placeholder="Achievement name e.g. Star Performer" />
@@ -284,7 +285,7 @@ const Achievement = ({ achievementData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -298,26 +299,17 @@ const Achievement = ({ achievementData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modal
-        title="Confirm Delete"
-        centered
-        open={modalState.isVisible}
+      <Modals
+        isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-        okButtonProps={{
-          style: { backgroundColor: "red" }
-        }}
-      >
-        Are you sure you want to delete?
-      </Modal>
+      />
     </div>
   );
 };
 
 Achievement.propTypes = {
-  achievementData: PropTypes.object
+  achievementData: PropTypes.object,
 };
 
 export default Achievement;

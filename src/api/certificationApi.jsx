@@ -65,5 +65,5 @@ export const {
   useCreateCertificateMutation,
   useGetCertificatesQuery,
   useUpdateCertificateMutation,
-  useDeleteCertificateMutation
+  useDeleteCertificateMutation,
 } = certificationApi;

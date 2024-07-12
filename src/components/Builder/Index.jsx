@@ -20,7 +20,7 @@ import {
   EXPERIENCE_KEY,
   EXPERIENCE_LABEL,
   PROJECTS_KEY,
-  PROJECTS_LABEL
+  PROJECTS_LABEL,
 } from "../../Constants";
 import Navbar from "../Navbar/navbar";
 import Resume from "../Resume";
@@ -42,40 +42,40 @@ const createPanes = (
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
-    children: <BasicInfo profileData={profileData} />
+    children: <BasicInfo profileData={profileData} />,
   },
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
     children: <Project projectData={projectData} />,
-    disabled: disableTabs
+    disabled: disableTabs,
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
     children: <Education educationData={educationData} />,
-    disabled: disableTabs
+    disabled: disableTabs,
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
     children: <Experience experienceData={experienceData} />,
-    disabled: disableTabs
-  }
+    disabled: disableTabs,
+  },
 ];
 
 const achievement = (achievementData, disableTabs) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
   children: <Achievement achievementData={achievementData} />,
-  disabled: disableTabs
+  disabled: disableTabs,
 });
 
 const certification = (certificationData, disableTabs) => ({
   key: CERTIFICATION_KEY,
   label: CERTIFICATION_LABEL,
   children: <Certification certificationData={certificationData} />,
-  disabled: disableTabs
+  disabled: disableTabs,
 });
 
 export const Editor = () => {
@@ -157,7 +157,7 @@ export const Editor = () => {
             maxHeight: "98vh",
             overflow: "auto",
             padding: "2rem",
-            top: "2rem"
+            top: "2rem",
           }}
         >
           <Typography.Title
@@ -165,7 +165,7 @@ export const Editor = () => {
             style={{
               display: "flex",
               justifyContent: "center",
-              marginTop: "10px"
+              marginTop: "10px",
             }}
           >
             Profile Builder
@@ -200,7 +200,7 @@ export const Editor = () => {
             minHeight: "98vh",
             maxHeight: "98vh",
             padding: "2rem",
-            top: "2rem"
+            top: "2rem",
           }}
         >
           <Resume
@@ -210,7 +210,7 @@ export const Editor = () => {
               experienceData,
               educationData,
               achievementData: showAchievement ? achievementData : null,
-              certificationData: showCertification ? certificationData : null
+              certificationData: showCertification ? certificationData : null,
             }}
             ref={resumeRef}
           />

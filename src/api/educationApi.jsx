@@ -65,5 +65,5 @@ export const {
   useCreateEducationMutation,
   useGetEducationsQuery,
   useUpdateEducationMutation,
-  useDeleteEducationMutation
+  useDeleteEducationMutation,
 } = educationApi;

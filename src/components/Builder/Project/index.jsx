@@ -11,27 +11,28 @@ import {
   Row,
   Select,
   Space,
-  Tabs
+  Tabs,
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateProjectMutation,
   useDeleteProjectMutation,
-  useUpdateProjectMutation
+  useUpdateProjectMutation,
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatProjectsFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Project = ({ projectData }) => {
@@ -47,15 +48,15 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: false
-    }
+      isExisting: false,
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10
-    }
+      distance: 10,
+    },
   });
 
   useEffect(() => {
@@ -65,7 +66,7 @@ const Project = ({ projectData }) => {
           label: `Project ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: project.isExisting
+          isExisting: project.isExisting,
         }));
         setItems(tabs);
         newTabIndex.current = projectData.length;
@@ -79,7 +80,7 @@ const Project = ({ projectData }) => {
                 : null,
               working_end_date: project.working_end_date
                 ? moment(project.working_end_date)
-                : null
+                : null,
             };
             return acc;
           }, {})
@@ -97,7 +98,7 @@ const Project = ({ projectData }) => {
     try {
       const response = await createProjectService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -114,7 +115,7 @@ const Project = ({ projectData }) => {
           const response = await updateProjectService({
             profile_id: profile_id,
             project_id: project.id,
-            values: project
+            values: project,
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -159,8 +160,8 @@ const Project = ({ projectData }) => {
       {
         label: `Project ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`project_${newActiveKey}`]);
@@ -182,7 +183,7 @@ const Project = ({ projectData }) => {
       if (projectData[modalState.key]?.id) {
         const response = await deleteProjectService({
           profile_id: profile_id,
-          project_id: projectData[modalState.key]?.id
+          project_id: projectData[modalState.key]?.id,
         });
 
         if (response?.data) {
@@ -258,8 +259,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required"
-                      }
+                        message: "Name required",
+                      },
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -284,8 +285,8 @@ const Project = ({ projectData }) => {
                                 ? Promise.resolve()
                                 : Promise.reject(
                                     "duration must be a positive number and either a whole number up to 30 years."
-                                  )
-                          }
+                                  ),
+                          },
                         ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />
@@ -328,8 +329,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required"
-                      }
+                        message: "Worked technology is required",
+                      },
                     ]}
                   >
                     <Select
@@ -352,8 +353,8 @@ const Project = ({ projectData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -372,8 +373,8 @@ const Project = ({ projectData }) => {
                                       "End date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -404,7 +405,7 @@ const Project = ({ projectData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -418,24 +419,15 @@ const Project = ({ projectData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modal
-        title="Confirm Delete"
-        centered
-        open={modalState.isVisible}
+      <Modals
+        isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-        okButtonProps={{
-          style: { backgroundColor: "red" }
-        }}
-      >
-        Are you sure you want to delete?
-      </Modal>
+      />
     </div>
   );
 };
 Project.propTypes = {
-  projectData: PropTypes.array
+  projectData: PropTypes.array,
 };
 export default Project;
