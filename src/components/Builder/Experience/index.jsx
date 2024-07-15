@@ -22,19 +22,24 @@ import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateExperienceMutation,
+  useDeleteExperienceMutation,
   useUpdateExperienceMutation,
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { DESIGNATION, INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
+import Modals from "../../../common-components/Modals";
 import {
-  filterSection,
-  validateId
-} from "../../../helpers";
+  DESIGNATION,
+  INVALID_ID_ERROR,
+  SUCCESS_TOASTER,
+} from "../../../Constants";
+import { filterSection, validateId } from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
+  const [deleteExperienceService] = useDeleteExperienceMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -102,7 +107,7 @@ const Experience = ({ experienceData }) => {
   const handleUpdate = async (values) => {
     try {
       for (const experience of values) {
-        if (experience.id) {
+        if (experience?.id) {
           const response = await updateExperienceService({
             profile_id: profile_id,
             experience_id: experience.id,
@@ -155,12 +160,36 @@ const Experience = ({ experienceData }) => {
       },
     ]);
     setActiveKey(newActiveKey);
+    form.resetFields([`experience_${newActiveKey}`]);
   };
 
-  const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, key: null });
+  };
+
+  const remove = async () => {
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+    try {
+      if (experienceData[modalState.key]?.id) {
+        const response = await deleteExperienceService({
+          profile_id: profile_id,
+          experience_id: experienceData[modalState.key]?.id,
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+    form.resetFields([`experience_${modalState.key}`]);
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -168,13 +197,14 @@ const Experience = ({ experienceData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setModalState({ isVisible: false, key: null });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -293,7 +323,17 @@ const Experience = ({ experienceData }) => {
                           {
                             type: "object",
                             required: true,
-                            message: "End date cannot be blank",
+                            message: "End date is required",
+                          },
+                          {
+                            validator: (_, value) =>
+                              value && value > moment()
+                                ? Promise.reject(
+                                    new Error(
+                                      "End date cannot be in the future"
+                                    )
+                                  )
+                                : Promise.resolve(),
                           },
                         ]}
                       >
@@ -339,12 +379,17 @@ const Experience = ({ experienceData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modals
+        isVisible={modalState.isVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+      />
     </div>
   );
 };
 
 Experience.propTypes = {
-  experienceData: PropTypes.object.isRequired,
+  experienceData: PropTypes.array,
 };
 
 export default Experience;

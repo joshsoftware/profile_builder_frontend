@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
+import { Button, Col, Form, Input, Modal, Row, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -11,20 +11,24 @@ import {
 import PropTypes from "prop-types";
 import {
   useCreateEducationMutation,
+  useDeleteEducationMutation,
   useUpdateEducationMutation,
 } from "../../../api/educationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatEducationFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Education = ({ educationData }) => {
   const [action, setAction] = useState("create");
   const [createEducationService] = useCreateEducationMutation();
   const [updateEducationService] = useUpdateEducationMutation();
+  const [deleteEducationService] = useDeleteEducationMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -141,13 +145,36 @@ const Education = ({ educationData }) => {
         key: newActiveKey,
       },
     ]);
-    setActiveKey(newActiveKey);
+    form.resetFields([`education_${newActiveKey}`]);
   };
 
-  const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, key: null });
+  };
+
+  const remove = async () => {
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+    try {
+      if (educationData[modalState.key]?.id) {
+        const response = await deleteEducationService({
+          profile_id: profile_id,
+          education_id: educationData[modalState.key]?.id,
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+    form.resetFields([`education_${modalState.key}`]);
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -155,13 +182,15 @@ const Education = ({ educationData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -294,12 +323,17 @@ const Education = ({ educationData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modals
+        isVisible={modalState.isVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+      />
     </div>
   );
 };
 
 Education.propTypes = {
-  educationData: PropTypes.object.isRequired,
+  educationData: PropTypes.array,
 };
 
 export default Education;

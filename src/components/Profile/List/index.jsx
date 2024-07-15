@@ -1,13 +1,17 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
+import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Row, Space, Table, Tag, Typography } from "antd";
+import { Button, Input, Modal, Row, Space, Table, Tag, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
-  SearchOutlined,
+  SearchOutlined
 } from "@ant-design/icons";
-import { useGetProfileListQuery } from "../../../api/profileApi";
+import {
+  useDeleteProfileMutation,
+  useGetProfileListQuery
+} from "../../../api/profileApi";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
@@ -18,6 +22,11 @@ const ListProfiles = () => {
   const searchInput = useRef(null);
   const navigate = useNavigate();
   const { data, isFetching } = useGetProfileListQuery();
+  const [deleteProfileService] = useDeleteProfileMutation();
+  const [modalState, setModalState] = useState({
+    isVisible: false,
+    profileID: null
+  });
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -36,7 +45,7 @@ const ListProfiles = () => {
       selectedKeys,
       confirm,
       clearFilters,
-      close,
+      close
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -103,11 +112,34 @@ const ListProfiles = () => {
         />
       ) : (
         text
-      ),
+      )
   });
+
+  const showModal = (profile_id) => {
+    setModalState({ isVisible: true, profileID: profile_id });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, currentRecord: null });
+  };
 
   const handleClick = (id) => {
     navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id));
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await deleteProfileService({
+        profile_id: modalState.profileID
+      });
+      if (response?.data) {
+        toast.success(response?.data);
+      }
+    } catch (error) {
+      console.error("error in profile : ", error);
+      toast.error(error.response?.data?.error_message);
+    }
+    setModalState({ isVisible: false, profileID: null });
   };
 
   const columns = [
@@ -116,21 +148,21 @@ const ListProfiles = () => {
       dataIndex: "name",
       key: "name",
       width: "20%",
-      ...getColumnSearchProps("name"),
+      ...getColumnSearchProps("name")
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: "20%",
-      ...getColumnSearchProps("email"),
+      ...getColumnSearchProps("email")
     },
     {
       title: "Years Of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
-      sortDirections: ["descend", "ascend"],
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Primary Skills",
@@ -154,7 +186,7 @@ const ListProfiles = () => {
             );
           })}
         </>
-      ),
+      )
     },
     {
       title: "Is Current Employee",
@@ -162,18 +194,18 @@ const ListProfiles = () => {
       key: "is_current_employee",
       render: (is_current_employee) => is_current_employee,
       sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"],
+      sortDirections: ["descend", "ascend"]
     },
     {
       title: "Action",
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <EditOutlined onClick={() => handleClick(record.id)} />
-          <DeleteOutlined />
+          <EditOutlined onClick={() => handleClick(record?.id)} />
+          <DeleteOutlined onClick={() => showModal(record?.id)} />
         </Space>
-      ),
-    },
+      )
+    }
   ];
 
   return (
@@ -200,6 +232,20 @@ const ListProfiles = () => {
         bordered={true}
         loading={isFetching}
       />
+      <Modal
+        title="Confirm Delete"
+        centered
+        open={modalState.isVisible}
+        onOk={handleDelete}
+        onCancel={handleCancel}
+        okText="Yes"
+        cancelText="No"
+        okButtonProps={{
+          style: { backgroundColor: "red" }
+        }}
+      >
+        Are you sure you want to delete?
+      </Modal>
     </>
   );
 };

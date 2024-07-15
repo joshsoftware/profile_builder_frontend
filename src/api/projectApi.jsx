@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_PROJECT_ENDPOINTS,
+  DELETE_PROJECT_ENDPOINT,
   HTTP_METHODS,
   PROJECT_LIST_ENDPOINT,
   PROJECT_REDUCER_PATH,
@@ -46,6 +47,17 @@ export const projectApi = createApi({
       invalidatesTags: ["project"],
       transformResponse: (response) => response.data,
     }),
+    deleteProject: builder.mutation({
+      query: ({ profile_id, project_id }) => ({
+        url: DELETE_PROJECT_ENDPOINT.replace(":profile_id", profile_id).replace(
+          ":project_id",
+          project_id
+        ),
+        method: HTTP_METHODS.DELETE,
+      }),
+      invalidatesTags: ["project"],
+      transformResponse: (response) => response.data.message,
+    }),
   }),
 });
 
@@ -53,4 +65,5 @@ export const {
   useCreateProjectMutation,
   useGetProjectQuery,
   useUpdateProjectMutation,
+  useDeleteProjectMutation,
 } = projectApi;

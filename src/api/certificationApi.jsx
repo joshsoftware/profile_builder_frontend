@@ -3,6 +3,7 @@ import {
   CERTIFICATE_LIST_ENDPOINT,
   CERTIFICATE_REDUCER_PATH,
   CREATE_CERTIFICATE_ENDPOINTS,
+  DELETE_CERTIFICATE_ENDPOINT,
   HTTP_METHODS,
   UPDATE_CERTIFICATE_ENDPOINT,
 } from "../Constants";
@@ -46,6 +47,17 @@ export const certificationApi = createApi({
       invalidatesTags: ["certificate"],
       transformResponse: (response) => response.data,
     }),
+    deleteCertificate: builder.mutation({
+      query: ({ profile_id, certificate_id }) => ({
+        url: DELETE_CERTIFICATE_ENDPOINT.replace(
+          ":profile_id",
+          profile_id
+        ).replace(":certificate_id", certificate_id),
+        method: HTTP_METHODS.DELETE,
+      }),
+      invalidatesTags: ["certificate"],
+      transformResponse: (response) => response.data.message,
+    }),
   }),
 });
 
@@ -53,4 +65,5 @@ export const {
   useCreateCertificateMutation,
   useGetCertificatesQuery,
   useUpdateCertificateMutation,
+  useDeleteCertificateMutation,
 } = certificationApi;

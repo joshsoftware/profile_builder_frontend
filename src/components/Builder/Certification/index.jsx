@@ -12,20 +12,24 @@ import moment from "moment";
 import PropTypes from "prop-types";
 import {
   useCreateCertificateMutation,
+  useDeleteCertificateMutation,
   useUpdateCertificateMutation,
 } from "../../../api/certificationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
+import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Certification = ({ certificationData }) => {
   const [action, setAction] = useState("create");
   const [createCertificateService] = useCreateCertificateMutation();
   const [updateCertificateService] = useUpdateCertificateMutation();
+  const [deleteCertificateService] = useDeleteCertificateMutation();
+  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -147,13 +151,36 @@ const Certification = ({ certificationData }) => {
         key: newActiveKey,
       },
     ]);
-    setActiveKey(newActiveKey);
+    form.resetFields([`certificate_${newActiveKey}`]);
   };
 
-  const remove = (targetKey) => {
-    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
-    const newPanes = items.filter((pane) => pane.key !== targetKey);
-    if (newPanes.length && targetKey === activeKey) {
+  const showModal = (key) => {
+    setModalState({ isVisible: true, key });
+  };
+
+  const handleCancel = () => {
+    setModalState({ isVisible: false, key: null });
+  };
+
+  const remove = async () => {
+    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
+    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+    try {
+      if (certificationData[modalState.key]?.id) {
+        const response = await deleteCertificateService({
+          profile_id: profile_id,
+          certificate_id: certificationData[modalState.key]?.id,
+        });
+
+        if (response?.data) {
+          toast.success(response?.data, SUCCESS_TOASTER);
+        }
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+    form.resetFields([`certificate_${modalState.key}`]);
+    if (newPanes.length && modalState.key === activeKey) {
       const { key } =
         newPanes[
           targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
@@ -161,13 +188,15 @@ const Certification = ({ certificationData }) => {
       setActiveKey(key);
     }
     setItems(newPanes);
+    setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      remove(targetKey);
+      showModal(targetKey);
     }
   };
 
@@ -350,12 +379,17 @@ const Certification = ({ certificationData }) => {
           />
         </SortableContext>
       </DndContext>
+      <Modals
+        isVisible={modalState.isVisible}
+        onOk={remove}
+        onCancel={handleCancel}
+      />
     </div>
   );
 };
 
 Certification.propTypes = {
-  certificationData: PropTypes.object.isRequired,
+  certificationData: PropTypes.object,
 };
 
 export default Certification;

@@ -54,10 +54,6 @@ const BasicInfo = ({ profileData }) => {
     }
   };
 
-  const onReset = () => {
-    form.resetFields();
-  };
-
   return (
     <Form
       layout="vertical"
@@ -241,7 +237,7 @@ const BasicInfo = ({ profileData }) => {
 
 BasicInfo.propTypes = {
   profileData: PropTypes.shape({
-    id: PropTypes.string,
+    id: PropTypes.number,
     profile: PropTypes.shape({
       name: PropTypes.string,
       email: PropTypes.string,

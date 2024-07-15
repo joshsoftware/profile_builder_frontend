@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_PROFILE_ENDPOINT,
+  DELETE_PROFILE_ENDPOINT,
   HTTP_METHODS,
   PROFILE_GET_ENDPOINT,
   PROFILE_LIST_ENDPOINT,
@@ -49,6 +50,14 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data,
     }),
+    deleteProfile: builder.mutation({
+      query: ({ profile_id }) => ({
+        url: DELETE_PROFILE_ENDPOINT.replace(":profile_id", profile_id),
+        method: HTTP_METHODS.DELETE,
+      }),
+      invalidatesTags: ["profile"],
+      transformResponse: (response) => response.data.message,
+    }),
   }),
 });
 
@@ -57,4 +66,5 @@ export const {
   useCreateProfileMutation,
   useGetBasicInfoQuery,
   useUpdateProfileMutation,
+  useDeleteProfileMutation,
 } = profileApi;
