@@ -5,7 +5,6 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Input,
-  Modal,
   Row,
   Space,
   Switch,
