@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Modal, Row, Space, Table, Tag, Typography } from "antd";
+import { Button, Input, Modal, Row, Space, Table, Tag, Tooltip, Typography } from "antd";
 import {
   DeleteOutlined,
   EditOutlined,
@@ -201,8 +201,12 @@ const ListProfiles = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <EditOutlined onClick={() => handleClick(record?.id)} />
-          <DeleteOutlined onClick={() => showModal(record?.id)} />
+          <Tooltip title="Edit">
+            <EditOutlined onClick={() => handleClick(record?.id)} />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <DeleteOutlined onClick={() => showModal(record?.id)} />
+          </Tooltip>
         </Space>
       )
     }
