@@ -5,11 +5,13 @@ import { Link, useNavigate } from "react-router-dom";
 import {
   Button,
   Input,
+  Modal,
   Row,
   Space,
   Switch,
   Table,
   Tag,
+  Tooltip,
   Typography
 } from "antd";
 import {
@@ -305,16 +307,12 @@ const ListProfiles = () => {
       key: "action",
       render: (_, record) => (
         <Space size="middle">
-          <EditOutlined onClick={() => handleClick(record?.id)} />
-          <DeleteOutlined
-            onClick={() => showModal(record?.id, "isVisibleDelete")}
-          />
-          <Modals
-            isVisible={modalState.isVisibleDelete}
-            onOk={handleDelete}
-            onCancel={() => handleCancel("isVisibleDelete")}
-            message="Are you sure you want to delete this profile?"
-          />
+          <Tooltip title="Edit">
+            <EditOutlined onClick={() => handleClick(record?.id)} />
+          </Tooltip>
+          <Tooltip title="Delete">
+            <DeleteOutlined onClick={() => showModal(record?.id)} />
+          </Tooltip>
         </Space>
       )
     }

@@ -224,7 +224,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
                   | <CalendarOutlined /> {getMonthYear(item.from_date)} -
-                  {item.to_date ? getMonthYear(item.to_date) : "Present"}
+                  {item.to_date}
                 </div>
               )}
             </div>

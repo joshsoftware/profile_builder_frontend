@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import {
   Button,
+  Checkbox,
   Col,
   DatePicker,
   Form,
@@ -18,7 +19,7 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import moment from "moment";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateExperienceMutation,
@@ -32,7 +33,11 @@ import {
   INVALID_ID_ERROR,
   SUCCESS_TOASTER
 } from "../../../Constants";
-import { filterSection, validateId } from "../../../helpers";
+import {
+  filterSection,
+  formatExperienceFields,
+  validateId
+} from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
@@ -42,6 +47,7 @@ const Experience = ({ experienceData }) => {
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
+  const [isCurrentCompany, setIsCurrentCompany] = useState(true);
   const [items, setItems] = useState([
     {
       label: "Experience 1",
@@ -74,9 +80,12 @@ const Experience = ({ experienceData }) => {
               ...experience,
               id: experience?.id,
               from_date: experience.from_date
-                ? moment(experience.from_date)
+                ? dayjs(experience.from_date)
                 : null,
-              to_date: experience.to_date ? moment(experience.to_date) : null
+              to_date:
+                experience.to_date && experience.to_date !== "Present"
+                  ? dayjs(experience.to_date)
+                  : dayjs()
             };
             return acc;
           }, {})
@@ -91,11 +100,13 @@ const Experience = ({ experienceData }) => {
   }, [profile_id, experienceData]);
 
   const handleCreate = async (values) => {
+    console.log(values);
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
         values: values
       });
+
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
@@ -111,7 +122,13 @@ const Experience = ({ experienceData }) => {
           const response = await updateExperienceService({
             profile_id: profile_id,
             experience_id: experience.id,
-            values: experience
+            values: {
+              ...experience,
+              from_date: experience.from_date.format("MMM-YYYY"),
+              to_date: experience.to_date
+                ? experience.to_date.format("MMM-YYYY")
+                : "present"
+            }
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -198,6 +215,7 @@ const Experience = ({ experienceData }) => {
     }
     setItems(newPanes);
     setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
@@ -208,6 +226,10 @@ const Experience = ({ experienceData }) => {
     }
   };
 
+  const HandleEndDate = (e) => {
+    setIsCurrentCompany(e.target.checked);
+  };
+
   const onDragEnd = ({ active, over }) => {
     if (active.id !== over?.id) {
       setItems((prev) => {
@@ -216,21 +238,6 @@ const Experience = ({ experienceData }) => {
         return arrayMove(prev, activeIndex, overIndex);
       });
     }
-  };
-
-  const formatExperienceFields = (experiences) => {
-    return Object.keys(experiences).map((key) => {
-      const experience = experiences[key];
-      return {
-        ...experience,
-        from_date: experience.from_date
-          ? experience.from_date.format("YYYY-MM-DD")
-          : null,
-        to_date: experience.to_date
-          ? experience.to_date.format("YYYY-MM-DD")
-          : null
-      };
-    });
   };
 
   return (
@@ -285,9 +292,26 @@ const Experience = ({ experienceData }) => {
                       <Form.Item
                         name={[`experience_${index}`, "company_name"]}
                         label="Company Name"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Company Name required"
+                          }
+                        ]}
                       >
                         <Input placeholder="Enter Company Name eg. Amazon" />
                       </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row style={{ margin: "10px 0px 10px 0px" }}>
+                    <Col>
+                      <Checkbox
+                        name={"isCurrentCompany"}
+                        checked={isCurrentCompany}
+                        onChange={HandleEndDate}
+                      >
+                        Is This A Current Company ?
+                      </Checkbox>
                     </Col>
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
@@ -302,7 +326,7 @@ const Experience = ({ experienceData }) => {
                           },
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "Start date cannot be in the future"
@@ -316,29 +340,34 @@ const Experience = ({ experienceData }) => {
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`experience_${index}`, "to_date"]}
-                        label="Employment End Date"
-                        rules={[
-                          {
-                            type: "object",
-                            required: true,
-                            message: "End date is required"
-                          },
-                          {
-                            validator: (_, value) =>
-                              value && value > moment()
-                                ? Promise.reject(
-                                    new Error(
-                                      "End date cannot be in the future"
+                      {!isCurrentCompany && (
+                        <Form.Item
+                          name={[`experience_${index}`, "to_date"]}
+                          label="Employment End Date"
+                          rules={[
+                            {
+                              type: "object",
+                              required: true,
+                              message: "End date is required"
+                            },
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "End date cannot be in the future"
+                                      )
                                     )
-                                  )
-                                : Promise.resolve()
-                          }
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
+                                  : Promise.resolve()
+                            }
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      )}
                     </Col>
                   </Row>
                   <Form.Item>

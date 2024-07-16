@@ -8,7 +8,7 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import moment from "moment";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateCertificateMutation,
@@ -63,12 +63,12 @@ const Certification = ({ certificationData }) => {
               ...certificate,
               id: certificate?.id,
               issued_date: certificate.issued_date
-                ? moment(certificate.issued_date)
+                ? dayjs(certificate.issued_date)
                 : null,
               from_date: certificate.from_date
-                ? moment(certificate.from_date)
+                ? dayjs(certificate.from_date)
                 : null,
-              to_date: certificate.to_date ? moment(certificate.to_date) : null
+              to_date: certificate.to_date ? dayjs(certificate.to_date) : null
             };
             return acc;
           }, {})
@@ -280,8 +280,12 @@ const Certification = ({ certificationData }) => {
                         label="Issued Date"
                         rules={[
                           {
+                            required: true,
+                            message: "Issued date required"
+                          },
+                          {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "Issued date cannot be in the future"
@@ -301,7 +305,7 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "Start date cannot be in the future"
@@ -323,7 +327,7 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "End date cannot be in the future"

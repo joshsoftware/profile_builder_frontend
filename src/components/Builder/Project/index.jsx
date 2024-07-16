@@ -7,7 +7,6 @@ import {
   DatePicker,
   Form,
   Input,
-  Modal,
   Row,
   Select,
   Space,
@@ -19,7 +18,7 @@ import {
   horizontalListSortingStrategy,
   SortableContext
 } from "@dnd-kit/sortable";
-import moment from "moment";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateProjectMutation,
@@ -30,6 +29,7 @@ import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
+  disabledDate,
   filterSection,
   formatProjectsFields,
   validateId
@@ -76,10 +76,10 @@ const Project = ({ projectData }) => {
               ...project,
               id: project?.id,
               working_start_date: project.working_start_date
-                ? moment(project.working_start_date)
+                ? dayjs(project.working_start_date)
                 : null,
               working_end_date: project.working_end_date
-                ? moment(project.working_end_date)
+                ? dayjs(project.working_end_date)
                 : null
             };
             return acc;
@@ -204,6 +204,7 @@ const Project = ({ projectData }) => {
     }
     setItems(newPanes);
     setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
@@ -296,6 +297,12 @@ const Project = ({ projectData }) => {
                   <Form.Item
                     name={[`project_${index}`, "responsibilities"]}
                     label="Responsibilities"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Responsibilities required"
+                      }
+                    ]}
                   >
                     <Input.TextArea
                       placeholder="Please provide responsibilities"
@@ -306,6 +313,12 @@ const Project = ({ projectData }) => {
                   <Form.Item
                     name={[`project_${index}`, "description"]}
                     label="Description of Project"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Description required"
+                      }
+                    ]}
                   >
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the project"
@@ -347,7 +360,7 @@ const Project = ({ projectData }) => {
                         rules={[
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "Start date cannot be in the future"
@@ -367,7 +380,7 @@ const Project = ({ projectData }) => {
                         rules={[
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "End date cannot be in the future"
