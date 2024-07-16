@@ -6,13 +6,13 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
 import {
   useCreateEducationMutation,
   useDeleteEducationMutation,
-  useUpdateEducationMutation,
+  useUpdateEducationMutation
 } from "../../../api/educationApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
@@ -20,7 +20,7 @@ import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatEducationFields,
-  validateId,
+  validateId
 } from "../../../helpers";
 
 const Education = ({ educationData }) => {
@@ -36,15 +36,15 @@ const Education = ({ educationData }) => {
       label: "Education 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10,
-    },
+      distance: 10
+    }
   });
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const Education = ({ educationData }) => {
           label: `Education ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: education.isExisting,
+          isExisting: education.isExisting
         }));
         setItems(tabs);
         newTabIndex.current = educationData.length;
@@ -62,7 +62,7 @@ const Education = ({ educationData }) => {
           educationData.reduce((acc, education, index) => {
             acc[`education_${index}`] = {
               ...education,
-              id: education?.id,
+              id: education?.id
             };
             return acc;
           }, {})
@@ -80,7 +80,7 @@ const Education = ({ educationData }) => {
     try {
       const response = await createEducationService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -97,7 +97,7 @@ const Education = ({ educationData }) => {
           const response = await updateEducationService({
             profile_id: profile_id,
             education_id: education.id,
-            values: education,
+            values: education
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -142,8 +142,8 @@ const Education = ({ educationData }) => {
       {
         label: `Education ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     form.resetFields([`education_${newActiveKey}`]);
   };
@@ -163,7 +163,7 @@ const Education = ({ educationData }) => {
       if (educationData[modalState.key]?.id) {
         const response = await deleteEducationService({
           profile_id: profile_id,
-          education_id: educationData[modalState.key]?.id,
+          education_id: educationData[modalState.key]?.id
         });
 
         if (response?.data) {
@@ -239,8 +239,8 @@ const Education = ({ educationData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Degree required",
-                      },
+                        message: "Degree required"
+                      }
                     ]}
                   >
                     <Input placeholder="Eg. MCS, BTech in CS" />
@@ -309,7 +309,7 @@ const Education = ({ educationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -327,13 +327,14 @@ const Education = ({ educationData }) => {
         isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
+        message="Are you sure you want to delete this education?"
       />
     </div>
   );
 };
 
 Education.propTypes = {
-  educationData: PropTypes.array,
+  educationData: PropTypes.array
 };
 
 export default Education;

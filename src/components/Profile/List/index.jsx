@@ -2,16 +2,29 @@ import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Modal, Row, Space, Table, Tag, Typography } from "antd";
 import {
+  Button,
+  Input,
+  Row,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Typography
+} from "antd";
+import {
+  CheckOutlined,
+  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
   SearchOutlined
 } from "@ant-design/icons";
 import {
   useDeleteProfileMutation,
-  useGetProfileListQuery
+  useGetProfileListQuery,
+  useUpdateProfileStatusMutation
 } from "../../../api/profileApi";
+import Modals from "../../../common-components/Modals";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
@@ -23,11 +36,14 @@ const ListProfiles = () => {
   const navigate = useNavigate();
   const { data, isFetching } = useGetProfileListQuery();
   const [deleteProfileService] = useDeleteProfileMutation();
+  const [updateProfileStatusService] = useUpdateProfileStatusMutation();
   const [modalState, setModalState] = useState({
-    isVisible: false,
+    isVisibleDelete: false,
+    isVisibleIsCurrentEmployee: false,
+    isVisibleIsActive: false,
+    checked: false,
     profileID: null
   });
-
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
     setSearchText(selectedKeys[0]);
@@ -37,6 +53,29 @@ const ListProfiles = () => {
   const handleReset = (clearFilters) => {
     clearFilters();
     setSearchText("");
+  };
+
+  const handleToggleEmployeeStatus = async (key, modalKey) => {
+    const profile_id = modalState.profileID;
+    const profile_status = { [key]: modalState.checked ? "YES" : "NO" };
+    try {
+      const response = await updateProfileStatusService({
+        profile_id,
+        profile_status
+      });
+      console.log("response in profile:", response);
+      toast.success(response?.data?.message);
+    } catch (error) {
+      console.error("error in profile:", error);
+      toast.error(error.response?.data?.error_message);
+    }
+
+    setModalState((prevState) => ({
+      ...prevState,
+      [modalKey]: false,
+      checked: modalState.checked,
+      profileID: null
+    }));
   };
 
   const getColumnSearchProps = (dataIndex) => ({
@@ -115,12 +154,20 @@ const ListProfiles = () => {
       )
   });
 
-  const showModal = (profile_id) => {
-    setModalState({ isVisible: true, profileID: profile_id });
+  const showModal = (profile_id, modalKey, checked) => {
+    setModalState({
+      ...modalState,
+      [modalKey]: true,
+      checked: checked,
+      profileID: profile_id
+    });
   };
-
-  const handleCancel = () => {
-    setModalState({ isVisible: false, currentRecord: null });
+  const handleCancel = (modalKey) => {
+    setModalState((prevState) => ({
+      ...prevState,
+      [modalKey]: false,
+      profileID: null
+    }));
   };
 
   const handleClick = (id) => {
@@ -139,7 +186,7 @@ const ListProfiles = () => {
       console.error("error in profile : ", error);
       toast.error(error.response?.data?.error_message);
     }
-    setModalState({ isVisible: false, profileID: null });
+    setModalState({ ...modalState, isVisibleDelete: false, profileID: null });
   };
 
   const columns = [
@@ -192,9 +239,66 @@ const ListProfiles = () => {
       title: "Is Current Employee",
       dataIndex: "is_current_employee",
       key: "is_current_employee",
-      render: (is_current_employee) => is_current_employee,
-      sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"]
+      render: (_, record) => (
+        <>
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={
+              modalState.profileID === record?.id
+                ? modalState.checked
+                : record?.is_current_employee !== "NO"
+            }
+            onChange={(checked) =>
+              showModal(record?.id, "isVisibleIsCurrentEmployee", checked)
+            }
+          />
+          <Modals
+            isVisible={modalState.isVisibleIsCurrentEmployee}
+            onOk={() =>
+              handleToggleEmployeeStatus(
+                "is_current_employee",
+                "isVisibleIsCurrentEmployee"
+              )
+            }
+            onCancel={() => handleCancel("isVisibleIsCurrentEmployee")}
+            message={`Are you sure you want to ${
+              record?.is_current_employee !== "NO" ? "inactive" : "active"
+            } this employee?`}
+          />
+        </>
+      )
+    },
+    {
+      title: "Is Active",
+      dataIndex: "is_active",
+      key: "is_active",
+      render: (_, record) => (
+        <>
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={
+              modalState.profileID === record?.id
+                ? modalState.checked
+                : record?.is_active !== "NO"
+            }
+            onChange={(checked) =>
+              showModal(record?.id, "isVisibleIsActive", checked)
+            }
+          />
+          <Modals
+            isVisible={modalState.isVisibleIsActive}
+            onOk={() =>
+              handleToggleEmployeeStatus("is_active", "isVisibleIsActive")
+            }
+            onCancel={() => handleCancel("isVisibleIsActive")}
+            message={`Are you sure you want to ${
+              record?.is_active !== "NO" ? "inactive" : "active"
+            } this employee?`}
+          />
+        </>
+      )
     },
     {
       title: "Action",
@@ -202,7 +306,15 @@ const ListProfiles = () => {
       render: (_, record) => (
         <Space size="middle">
           <EditOutlined onClick={() => handleClick(record?.id)} />
-          <DeleteOutlined onClick={() => showModal(record?.id)} />
+          <DeleteOutlined
+            onClick={() => showModal(record?.id, "isVisibleDelete")}
+          />
+          <Modals
+            isVisible={modalState.isVisibleDelete}
+            onOk={handleDelete}
+            onCancel={() => handleCancel("isVisibleDelete")}
+            message="Are you sure you want to delete this profile?"
+          />
         </Space>
       )
     }
@@ -232,20 +344,6 @@ const ListProfiles = () => {
         bordered={true}
         loading={isFetching}
       />
-      <Modal
-        title="Confirm Delete"
-        centered
-        open={modalState.isVisible}
-        onOk={handleDelete}
-        onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-        okButtonProps={{
-          style: { backgroundColor: "red" }
-        }}
-      >
-        Are you sure you want to delete?
-      </Modal>
     </>
   );
 };
