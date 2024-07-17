@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Dropdown, Menu, Radio } from "antd";
 import {
@@ -10,7 +10,7 @@ import {
   GithubOutlined,
   LinkedinOutlined,
   MailOutlined,
-  MobileOutlined,
+  MobileOutlined
 } from "@ant-design/icons";
 import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
@@ -20,9 +20,12 @@ import { getMonthString, PROFILES } from "../../Constants";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const location = useLocation();
+  const { is_josh_employee } = location.state || {};
+
   const [profileType, setProfileType] = useState(PROFILES.internal);
   Resume.propTypes = {
-    data: PropTypes.object.isRequired,
+    data: PropTypes.object.isRequired
   };
   const {
     profileData: profile,
@@ -30,13 +33,13 @@ const Resume = forwardRef(({ data }, ref) => {
     experienceData: experiences,
     educationData: educations,
     achievementData: achievements,
-    certificationData: certifications,
+    certificationData: certifications
   } = data;
 
   const containerRef = useRef();
   const [columns, setColumns] = useState([[], []]);
   const handlePrint = useReactToPrint({
-    content: () => ref.current,
+    content: () => ref.current
   });
 
   const handleDownload = () => {
@@ -68,8 +71,8 @@ const Resume = forwardRef(({ data }, ref) => {
           profile?.github_link && new TextRun(`GitHub: ${profile.github_link}`),
           profile?.linkedin_link && new TextRun().break(),
           profile?.linkedin_link &&
-            new TextRun(`LinkedIn: ${profile.linkedin_link}`),
-        ].filter(Boolean),
+            new TextRun(`LinkedIn: ${profile.linkedin_link}`)
+        ].filter(Boolean)
       });
 
       const sections = [
@@ -87,8 +90,8 @@ const Resume = forwardRef(({ data }, ref) => {
                   `\nPassing Year: ${new Date(item.passing_year).getFullYear()}`
                 ),
                 item.percent_or_cgpa &&
-                  new TextRun(`\nCGPA / Percentage: ${item.percent_or_cgpa}`),
-              ].filter(Boolean),
+                  new TextRun(`\nCGPA / Percentage: ${item.percent_or_cgpa}`)
+              ].filter(Boolean)
             })
         ),
         ...(certifications || []).map(
@@ -99,8 +102,8 @@ const Resume = forwardRef(({ data }, ref) => {
                 new TextRun(
                   `\n${item.name || ""} - ${item.organization_name || ""}`
                 ),
-                new TextRun(`\nIssue Date: ${formatDate(item.issued_date)}`),
-              ].filter(Boolean),
+                new TextRun(`\nIssue Date: ${formatDate(item.issued_date)}`)
+              ].filter(Boolean)
             })
         ),
         ...(achievements || []).map(
@@ -108,8 +111,8 @@ const Resume = forwardRef(({ data }, ref) => {
             new Paragraph({
               children: [
                 new TextRun(`Achievement:`).bold(),
-                new TextRun(`\n${item.name || ""}`),
-              ].filter(Boolean),
+                new TextRun(`\n${item.name || ""}`)
+              ].filter(Boolean)
             })
         ),
         ...(experiences || []).map(
@@ -124,8 +127,8 @@ const Resume = forwardRef(({ data }, ref) => {
                   `\n${formatDate(item.from_date)} - ${formatDate(
                     item.to_date
                   )}`
-                ),
-              ].filter(Boolean),
+                )
+              ].filter(Boolean)
             })
         ),
         ...(projects || []).map(
@@ -152,15 +155,15 @@ const Resume = forwardRef(({ data }, ref) => {
                 item.tech_worked_on &&
                   new TextRun(
                     `\nContribution: ${(item.tech_worked_on || []).join(", ")}`
-                  ),
-              ].filter(Boolean),
+                  )
+              ].filter(Boolean)
             })
-        ),
+        )
       ];
 
       doc.addSection({
         properties: {},
-        children: [profileParagraph, ...sections],
+        children: [profileParagraph, ...sections]
       });
 
       Packer.toBlob(doc)
@@ -429,7 +432,7 @@ const Resume = forwardRef(({ data }, ref) => {
           ))}
         </div>
       </div>
-    ),
+    )
   };
 
   //At component mount which section of resume contains which tab details.
@@ -438,7 +441,7 @@ const Resume = forwardRef(({ data }, ref) => {
       "skills",
       "educations",
       certifications ? "certifications" : null,
-      achievements ? "achievements" : null,
+      achievements ? "achievements" : null
     ].filter(Boolean);
 
     const rightColumn = ["experiences", "projects"].filter(Boolean);
@@ -448,11 +451,12 @@ const Resume = forwardRef(({ data }, ref) => {
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
     const container = containerRef.current;
-    if (!profileType?.color || !container) {
+    if (!container) {
       return;
     }
-    container.style.setProperty("--color", profileType?.color);
-  }, [profileType]);
+    const color = is_josh_employee === "YES" ? "#35549c" : "#062e38";
+    container.style.setProperty("--color", color);
+  }, [profileType, is_josh_employee]);
 
   const getPageMargins = () => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
