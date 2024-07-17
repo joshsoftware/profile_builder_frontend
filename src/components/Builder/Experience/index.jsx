@@ -100,7 +100,6 @@ const Experience = ({ experienceData }) => {
   }, [profile_id, experienceData]);
 
   const handleCreate = async (values) => {
-    console.log(values);
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
