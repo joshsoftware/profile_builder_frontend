@@ -3,7 +3,7 @@ export const PROFILE_DETAILS =
 
 export const PROFILES = {
   internal: { title: "INTERNAL", color: "#35549c" },
-  external: { title: "EXTERNAL", color: "#062e38" }
+  external: { title: "EXTERNAL", color: "#062e38" },
 };
 
 // ROUTES
@@ -67,7 +67,7 @@ export const HTTP_METHODS = {
   GET: "GET",
   PUT: "PUT",
   DELETE: "DELETE",
-  PATCH: "PATCH"
+  PATCH: "PATCH",
 };
 // Redux Toolkit Query
 export const LOGIN_REDUCER_PATH = "loginApi";
@@ -101,7 +101,7 @@ export const CERTIFICATION_LABEL = "Certification";
 export const GENDER = [
   { label: "MALE", value: "Male" },
   { label: "FEMALE", value: "Female" },
-  { label: "OTHER", value: "Other" }
+  { label: "OTHER", value: "Other" },
 ];
 
 export const SUCCESS_TOASTER = {
@@ -109,12 +109,12 @@ export const SUCCESS_TOASTER = {
   style: {
     border: "1px solid #000000",
     padding: "16px",
-    color: "#000000"
+    color: "#000000",
   },
   iconTheme: {
     primary: "#713200",
-    secondary: "#FFFAEE"
-  }
+    secondary: "#FFFAEE",
+  },
 };
 
 export const DESIGNATION = [
@@ -125,7 +125,7 @@ export const DESIGNATION = [
   { lable: "project_manager", value: "Project Manager" },
   { lable: "product_manager", value: "Product Manager" },
   { lable: "qa", value: "Quality Assurance (QA) Engineer" },
-  { lable: "devOps", value: "DevOps Engineer" }
+  { lable: "devOps", value: "DevOps Engineer" },
 ];
 
 export const SKILLS = [
@@ -148,7 +148,7 @@ export const SKILLS = [
   { label: "ReactJs", value: "ReactJs" },
   { label: "React-Native", value: "React-Native" },
   { label: "UI/UX", value: "UI/UX" },
-  { label: "VueJs", value: "VueJs" }
+  { label: "VueJs", value: "VueJs" },
 ];
 
 // TODO : Remove once refactor
