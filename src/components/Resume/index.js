@@ -443,7 +443,7 @@ const Resume = forwardRef(({ data }, ref) => {
     if (!container) {
       return;
     }
-    const color = is_josh_employee === "YES" ? "#35549c" : "#062e38";
+    const color = is_josh_employee === "NO" ? "#062e38" : "#35549c";
     container.style.setProperty("--color", color);
   }, [is_josh_employee]);
 
