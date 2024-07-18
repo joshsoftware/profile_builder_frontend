@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -12,6 +13,7 @@ import {
   Space,
   Tabs,
 } from "antd";
+import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -20,7 +22,9 @@ import {
 } from "@dnd-kit/sortable";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
+import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import {
+  projectApi,
   useCreateProjectMutation,
   useDeleteProjectMutation,
   useUpdateProjectMutation,
@@ -29,7 +33,6 @@ import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
-  disabledDate,
   filterSection,
   formatProjectsFields,
   validateId,
@@ -40,8 +43,10 @@ const Project = ({ projectData }) => {
   const [createProjectService] = useCreateProjectMutation();
   const [updateProjectService] = useUpdateProjectMutation();
   const [deleteProjectService] = useDeleteProjectMutation();
+  const [updateSequence] = useUpdateSequenceMutation(); // Add this line
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     {
@@ -53,6 +58,8 @@ const Project = ({ projectData }) => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
+  const [dragged, setDragged] = useState(false); // Add this line
+  const [newOrder, setNewOrder] = useState({}); // Add this line
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10,
@@ -67,6 +74,7 @@ const Project = ({ projectData }) => {
           children: null,
           key: `${index}`,
           isExisting: project.isExisting,
+          id: project.id,
         }));
         setItems(tabs);
         newTabIndex.current = projectData.length;
@@ -220,8 +228,36 @@ const Project = ({ projectData }) => {
       setItems((prev) => {
         const activeIndex = prev.findIndex((i) => i.key === active.id);
         const overIndex = prev.findIndex((i) => i.key === over?.id);
-        return arrayMove(prev, activeIndex, overIndex);
+        const newItems = arrayMove(prev, activeIndex, overIndex);
+        const newOrder = {};
+        newItems.forEach((item, index) => {
+          newOrder[String(item.id)] = index + 1;
+        });
+        console.log("New Order:", newOrder);
+        setDragged(true);
+        setNewOrder(newOrder);
+        return newItems;
       });
+    }
+  };
+
+  const handleUpdateOrder = async () => {
+    const payload = {
+      id: Number(profile_id),
+      component: {
+        comp_name: "projects",
+        component_priorities: newOrder,
+      },
+    };
+    try {
+      const response = await updateSequence(payload);
+      if (response) {
+        dispatch(projectApi.util.invalidateTags(["project"]));
+        toast.success(response.data, SUCCESS_TOASTER);
+        setDragged(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -243,6 +279,7 @@ const Project = ({ projectData }) => {
             onEdit={onEdit}
             items={items.map((item, index) => ({
               ...item,
+              icon: <DragOutlined />,
               children: (
                 <Form
                   layout="vertical"
@@ -390,7 +427,7 @@ const Project = ({ projectData }) => {
                           },
                         ]}
                       >
-                        <DatePicker style={{ width: "100%" }} picker="month"/>
+                        <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
                     </Col>
                   </Row>
@@ -414,6 +451,13 @@ const Project = ({ projectData }) => {
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleUpdateOrder}
+                        disabled={!dragged}
+                      >
+                        Update Order
                       </Button>
                     </Space>
                   </Form.Item>

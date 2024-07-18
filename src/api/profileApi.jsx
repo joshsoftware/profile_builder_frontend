@@ -7,6 +7,7 @@ import {
   PROFILE_LIST_ENDPOINT,
   PROFILE_REDUCER_PATH,
   UPDATE_PROFILE_ENDPOINT,
+  UPDATE_SEQUENCE_ENDPOINT,
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
 
@@ -58,6 +59,15 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data.message,
     }),
+    updateSequence: builder.mutation({
+      query: (values) => ({
+        url: UPDATE_SEQUENCE_ENDPOINT,
+        method: HTTP_METHODS.PUT,
+        data: values,
+      }),
+      invalidatesTags: ["profile"],
+      transformResponse: (response) => response.data.message,
+    }),
   }),
 });
 
@@ -67,4 +77,5 @@ export const {
   useGetBasicInfoQuery,
   useUpdateProfileMutation,
   useDeleteProfileMutation,
+  useUpdateSequenceMutation,
 } = profileApi;

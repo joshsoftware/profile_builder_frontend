@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -13,6 +14,7 @@ import {
   Space,
   Tabs,
 } from "antd";
+import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -22,10 +24,12 @@ import {
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
+  experienceApi,
   useCreateExperienceMutation,
   useDeleteExperienceMutation,
   useUpdateExperienceMutation,
 } from "../../../api/experienceApi";
+import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import {
@@ -33,13 +37,19 @@ import {
   INVALID_ID_ERROR,
   SUCCESS_TOASTER,
 } from "../../../Constants";
-import { filterSection, formatExperienceFields, validateId } from "../../../helpers";
+import {
+  filterSection,
+  formatExperienceFields,
+  validateId,
+} from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
   const [deleteExperienceService] = useDeleteExperienceMutation();
+  const [updateSequence] = useUpdateSequenceMutation();
+  const dispatch = useDispatch();
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -54,6 +64,8 @@ const Experience = ({ experienceData }) => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
+  const [dragged, setDragged] = useState(false);
+  const [newOrder, setNewOrder] = useState({});
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
@@ -66,6 +78,7 @@ const Experience = ({ experienceData }) => {
           children: null,
           key: `${index}`,
           isExisting: experience.isExisting,
+          id: experience.id,
         }));
 
         setItems(tabs);
@@ -78,9 +91,10 @@ const Experience = ({ experienceData }) => {
               from_date: experience.from_date
                 ? dayjs(experience.from_date)
                 : null,
-                to_date: experience.to_date && experience.to_date !== "Present"
-                ? dayjs(experience.to_date)
-                : dayjs(),
+              to_date:
+                experience.to_date && experience.to_date !== "Present"
+                  ? dayjs(experience.to_date)
+                  : dayjs(),
             };
             return acc;
           }, {})
@@ -95,20 +109,20 @@ const Experience = ({ experienceData }) => {
   }, [profile_id, experienceData]);
 
   const handleCreate = async (values) => {
-    console.log(values)
+    console.log(values);
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
         values: values,
       });
-  
+
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
-  };  
+  };
 
   const handleUpdate = async (values) => {
     try {
@@ -120,7 +134,9 @@ const Experience = ({ experienceData }) => {
             values: {
               ...experience,
               from_date: experience.from_date.format("MMM-YYYY"),
-              to_date: experience.to_date ? experience.to_date.format("MMM-YYYY") : "present",
+              to_date: experience.to_date
+                ? experience.to_date.format("MMM-YYYY")
+                : "present",
             },
           });
           if (response.data?.message) {
@@ -228,8 +244,36 @@ const Experience = ({ experienceData }) => {
       setItems((prev) => {
         const activeIndex = prev.findIndex((i) => i.key === active.id);
         const overIndex = prev.findIndex((i) => i.key === over?.id);
-        return arrayMove(prev, activeIndex, overIndex);
+        const newItems = arrayMove(prev, activeIndex, overIndex);
+        const newOrder = {};
+        newItems.forEach((item, index) => {
+          newOrder[String(item.id)] = index + 1;
+        });
+        console.log("New Order:", newOrder);
+        setDragged(true);
+        setNewOrder(newOrder);
+        return newItems;
       });
+    }
+  };
+
+  const handleUpdateOrder = async () => {
+    const payload = {
+      id: Number(profile_id),
+      component: {
+        comp_name: "experiences",
+        component_priorities: newOrder,
+      },
+    };
+    try {
+      const response = await updateSequence(payload);
+      if (response) {
+        dispatch(experienceApi.util.invalidateTags(["experience"]));
+        toast.success(response.data, SUCCESS_TOASTER);
+        setDragged(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -251,6 +295,7 @@ const Experience = ({ experienceData }) => {
             onEdit={onEdit}
             items={items.map((item, index) => ({
               ...item,
+              icon: <DragOutlined />,
               children: (
                 <Form
                   layout="vertical"
@@ -333,31 +378,34 @@ const Experience = ({ experienceData }) => {
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
-                    {!isCurrentCompany && (
-                      <Form.Item
-                      name={[`experience_${index}`, "to_date"]}
-                      label="Employment End Date"
-                      rules={[
-                        {
-                          type: "object",
-                          required: true,
-                          message: "End date is required",
-                        },
-                        {
-                          validator: (_, value) =>
-                            value && value > dayjs()
-                              ? Promise.reject(
-                                  new Error(
-                                    "End date cannot be in the future"
-                                  )
-                                )
-                              : Promise.resolve(),
-                        },
-                      ]}
-                    >
-                      <DatePicker style={{ width: "100%" }} picker="month" />
-                    </Form.Item>
-                    )}
+                      {!isCurrentCompany && (
+                        <Form.Item
+                          name={[`experience_${index}`, "to_date"]}
+                          label="Employment End Date"
+                          rules={[
+                            {
+                              type: "object",
+                              required: true,
+                              message: "End date is required",
+                            },
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "End date cannot be in the future"
+                                      )
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      )}
                     </Col>
                   </Row>
                   <Form.Item>
@@ -380,6 +428,13 @@ const Experience = ({ experienceData }) => {
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleUpdateOrder}
+                        disabled={!dragged}
+                      >
+                        Update Order
                       </Button>
                     </Space>
                   </Form.Item>
