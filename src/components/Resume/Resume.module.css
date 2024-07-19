@@ -135,7 +135,7 @@
 .skillSection .skillsContent {
   display: flex;
   flex-direction: column;
-  justify-content: end;
+  justify-content: flex-end;
 }
 
 .section .content .item {

@@ -106,7 +106,7 @@ const Experience = ({ experienceData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, experienceData]);
+  }, [profile_id, experienceData, form]);
 
   const handleCreate = async (values) => {
     try {

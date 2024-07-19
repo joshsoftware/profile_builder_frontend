@@ -83,7 +83,7 @@ const Education = ({ educationData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, educationData]);
+  }, [profile_id, educationData, form]);
 
   const handleCreate = async (values) => {
     try {

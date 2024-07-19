@@ -100,7 +100,7 @@ const Project = ({ projectData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, projectData]);
+  }, [profile_id, projectData, form]);
 
   const handleCreate = async (values) => {
     try {

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -79,13 +79,13 @@ const Achievement = ({ achievementData }) => {
         resetItems();
       }
     }
-  }, [profile_id, achievementData]);
+  }, [profile_id, achievementData, form, resetItems]);
 
-  const resetItems = () => {
+  const resetItems = useCallback(() => {
     setItems([{ label: "Achievement 1", children: null, key: "0" }]);
     newTabIndex.current = 1;
     form.resetFields();
-  };
+  }, [form]);
 
   const handleCreate = async (values) => {
     try {
