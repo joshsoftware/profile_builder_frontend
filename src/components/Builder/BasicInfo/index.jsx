@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Select, Space } from "antd";
+import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
@@ -161,6 +162,21 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
+      {/* <Row gutter={16}>
+        <Col span={12}>
+          <Form.Item name="past_experience" label="Past Experience(in months)">
+            <Input placeholder="Ex. 36, 12, etc." />
+          </Form.Item>
+        </Col>
+        <Col span={12}>
+          <Form.Item
+            name="josh_joining_date"
+            label="JOSH Joining Date"
+          >
+            <DatePicker style={{ width: "100%" }} picker="month" />
+          </Form.Item>
+        </Col>
+      </Row> */}
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">

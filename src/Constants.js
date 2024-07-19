@@ -48,6 +48,7 @@ export const UPDATE_EXPERIENCE_ENDPOINT =
   "/api/profiles/:profile_id/experiences/:experience_id";
 export const UPDATE_CERTIFICATE_ENDPOINT =
   "/api/profiles/:profile_id/certificates/:certificate_id";
+export const UPDATE_SEQUENCE_ENDPOINT = "/api/updateSequence";
 
 export const DELETE_PROFILE_ENDPOINT = "/api/profiles/:profile_id";
 export const DELETE_ACHIEVEMENT_ENDPOINT =

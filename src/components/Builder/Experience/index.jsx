@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
 import {
   Button,
@@ -13,6 +14,7 @@ import {
   Space,
   Tabs
 } from "antd";
+import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -22,10 +24,12 @@ import {
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
+  experienceApi,
   useCreateExperienceMutation,
   useDeleteExperienceMutation,
   useUpdateExperienceMutation
 } from "../../../api/experienceApi";
+import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import {
@@ -36,7 +40,7 @@ import {
 import {
   filterSection,
   formatExperienceFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
@@ -44,6 +48,8 @@ const Experience = ({ experienceData }) => {
   const [createExperienceService] = useCreateExperienceMutation();
   const [updateExperienceService] = useUpdateExperienceMutation();
   const [deleteExperienceService] = useDeleteExperienceMutation();
+  const [updateSequence] = useUpdateSequenceMutation();
+  const dispatch = useDispatch();
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -58,6 +64,8 @@ const Experience = ({ experienceData }) => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
+  const [dragged, setDragged] = useState(false);
+  const [newOrder, setNewOrder] = useState({});
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 }
   });
@@ -69,7 +77,8 @@ const Experience = ({ experienceData }) => {
           label: `Experience ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: experience.isExisting
+          isExisting: experience.isExisting,
+          id: experience.id,
         }));
 
         setItems(tabs);
@@ -85,7 +94,7 @@ const Experience = ({ experienceData }) => {
               to_date:
                 experience.to_date && experience.to_date !== "Present"
                   ? dayjs(experience.to_date)
-                  : dayjs()
+                  : dayjs(),
             };
             return acc;
           }, {})
@@ -110,7 +119,7 @@ const Experience = ({ experienceData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -126,8 +135,8 @@ const Experience = ({ experienceData }) => {
               from_date: experience.from_date.format("MMM-YYYY"),
               to_date: experience.to_date
                 ? experience.to_date.format("MMM-YYYY")
-                : "present"
-            }
+                : "present",
+            },
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -234,8 +243,36 @@ const Experience = ({ experienceData }) => {
       setItems((prev) => {
         const activeIndex = prev.findIndex((i) => i.key === active.id);
         const overIndex = prev.findIndex((i) => i.key === over?.id);
-        return arrayMove(prev, activeIndex, overIndex);
+        const newItems = arrayMove(prev, activeIndex, overIndex);
+        const newOrder = {};
+        newItems.forEach((item, index) => {
+          newOrder[String(item.id)] = index + 1;
+        });
+        console.log("New Order:", newOrder);
+        setDragged(true);
+        setNewOrder(newOrder);
+        return newItems;
       });
+    }
+  };
+
+  const handleUpdateOrder = async () => {
+    const payload = {
+      id: Number(profile_id),
+      component: {
+        comp_name: "experiences",
+        component_priorities: newOrder,
+      },
+    };
+    try {
+      const response = await updateSequence(payload);
+      if (response) {
+        dispatch(experienceApi.util.invalidateTags(["experience"]));
+        toast.success(response.data, SUCCESS_TOASTER);
+        setDragged(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -257,6 +294,7 @@ const Experience = ({ experienceData }) => {
             onEdit={onEdit}
             items={items.map((item, index) => ({
               ...item,
+              icon: <DragOutlined />,
               children: (
                 <Form
                   layout="vertical"
@@ -347,7 +385,7 @@ const Experience = ({ experienceData }) => {
                             {
                               type: "object",
                               required: true,
-                              message: "End date is required"
+                              message: "End date is required",
                             },
                             {
                               validator: (_, value) =>
@@ -357,8 +395,8 @@ const Experience = ({ experienceData }) => {
                                         "End date cannot be in the future"
                                       )
                                     )
-                                  : Promise.resolve()
-                            }
+                                  : Promise.resolve(),
+                            },
                           ]}
                         >
                           <DatePicker
@@ -389,6 +427,13 @@ const Experience = ({ experienceData }) => {
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleUpdateOrder}
+                        disabled={!dragged}
+                      >
+                        Update Order
                       </Button>
                     </Space>
                   </Form.Item>

@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Menu } from "antd";
+import { Button, Dropdown, Flex, Menu, Radio, Tag } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -368,9 +368,13 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.subtitleHeading}>Primary Skills</div>
                 <ul className={styles.skillNumbered}>
                   {profile?.primary_skills.map((elem, index) => (
-                    <li className={styles.point} key={"primary" + elem + index}>
+                    <Tag
+                      color="blue"
+                      key={"primary" + elem + index}
+                      style={{ margin: "1px" }}
+                    >
                       {elem}
-                    </li>
+                    </Tag>
                   ))}
                 </ul>
               </div>
@@ -378,16 +382,22 @@ const Resume = forwardRef(({ data }, ref) => {
             {profile?.secondary_skills?.length > 0 && (
               <div>
                 <div className={styles.subtitleHeading}>Secondary Skills</div>
-                <ul className={styles.skillNumbered}>
+                <Flex
+                  justify="flex-end"
+                  align="flex-end"
+                  gap={"small"}
+                  vertical
+                >
                   {profile?.secondary_skills?.map((elem, index) => (
-                    <li
-                      className={styles.point}
-                      key={"secondary" + elem + index}
+                    <Tag
+                      color="blue"
+                      key={"primary" + elem + index}
+                      style={{ margin: "1px" }}
                     >
                       {elem}
-                    </li>
+                    </Tag>
                   ))}
-                </ul>
+                </Flex>
               </div>
             )}
           </div>
@@ -487,8 +497,9 @@ const Resume = forwardRef(({ data }, ref) => {
             <div className={styles.experienceHeading}>
               {profile?.years_of_experience && (
                 <div>
-                  <CheckSquareOutlined /> {profile?.years_of_experience}
-                  <span> Year of Experience</span>
+                  <CheckSquareOutlined />{" "}
+                  {Math.round(profile?.years_of_experience)}
+                  <span>+ Years of Experience</span>
                 </div>
               )}
               {profile?.email && (
@@ -531,10 +542,10 @@ const Resume = forwardRef(({ data }, ref) => {
 
           <div className="container">
             <div className="row pr-2">
-              <div className={`col-4 pb-5 ${styles.middleSeparatorLine}`}>
+              <div className={`col-3 pb-5 ${styles.middleSeparatorLine}`}>
                 {columns[0].map((item) => sectionDiv[item])}
               </div>
-              <div className="col-8 mr-5">
+              <div className="col-9 mr-5">
                 {profile?.description && (
                   <div>
                     <div>

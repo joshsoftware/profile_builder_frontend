@@ -1,6 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
+import { DragOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Space, Tabs } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
@@ -10,10 +12,12 @@ import {
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
 import {
+  achievementApi,
   useCreateAchievementMutation,
   useDeleteAchievementMutation,
   useUpdateAchievementMutation,
 } from "../../../api/achievementApi";
+import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
@@ -28,8 +32,10 @@ const Achievement = ({ achievementData }) => {
   const [createAchievementService] = useCreateAchievementMutation();
   const [updateAchievementService] = useUpdateAchievementMutation();
   const [deleteAchievementService] = useDeleteAchievementMutation();
+  const [updateSequence] = useUpdateSequenceMutation();
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
+  const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     {
@@ -41,6 +47,8 @@ const Achievement = ({ achievementData }) => {
   ]);
   const newTabIndex = useRef(1);
   const [action, setAction] = useState("create");
+  const [dragged, setDragged] = useState(false);
+  const [newOrder, setNewOrder] = useState({});
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
@@ -53,6 +61,7 @@ const Achievement = ({ achievementData }) => {
           children: null,
           key: `${index}`,
           isExisting: achievement.isExisting,
+          id: achievement.id,
         }));
         setItems(tabs);
         newTabIndex.current = achievementData.length;
@@ -88,7 +97,7 @@ const Achievement = ({ achievementData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -205,8 +214,36 @@ const Achievement = ({ achievementData }) => {
       setItems((prev) => {
         const activeIndex = prev.findIndex((i) => i.key === active.id);
         const overIndex = prev.findIndex((i) => i.key === over?.id);
-        return arrayMove(prev, activeIndex, overIndex);
+        const newItems = arrayMove(prev, activeIndex, overIndex);
+        const newOrder = {};
+        newItems.forEach((item, index) => {
+          newOrder[String(item.id)] = index + 1;
+        });
+        console.log("New Order:", newOrder);
+        setDragged(true);
+        setNewOrder(newOrder);
+        return newItems;
       });
+    }
+  };
+
+  const handleUpdateOrder = async () => {
+    const payload = {
+      id: Number(profile_id),
+      component: {
+        comp_name: "achievements",
+        component_priorities: newOrder,
+      },
+    };
+    try {
+      const response = await updateSequence(payload);
+      if (response) {
+        dispatch(achievementApi.util.invalidateTags(["achievement"]));
+        toast.success(response.data, SUCCESS_TOASTER);
+        setDragged(false);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -228,6 +265,7 @@ const Achievement = ({ achievementData }) => {
             onEdit={onEdit}
             items={items.map((item, index) => ({
               ...item,
+              icon: <DragOutlined />,
               children: (
                 <Form
                   layout="vertical"
@@ -281,6 +319,13 @@ const Achievement = ({ achievementData }) => {
                       </Button>
                       <Button htmlType="button" onClick={onReset}>
                         Reset
+                      </Button>
+                      <Button
+                        type="primary"
+                        onClick={handleUpdateOrder}
+                        disabled={!dragged}
+                      >
+                        Update Order
                       </Button>
                     </Space>
                   </Form.Item>
