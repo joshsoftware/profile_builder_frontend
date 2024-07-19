@@ -2,16 +2,31 @@ import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
-import { Button, Input, Modal, Row, Space, Table, Tag, Tooltip, Typography } from "antd";
 import {
+  Button,
+  Input,
+  Radio,
+  Row,
+  Space,
+  Switch,
+  Table,
+  Tag,
+  Tooltip,
+  Typography,
+} from "antd";
+import {
+  CheckOutlined,
+  CloseOutlined,
   DeleteOutlined,
   EditOutlined,
-  SearchOutlined
+  SearchOutlined,
 } from "@ant-design/icons";
 import {
   useDeleteProfileMutation,
-  useGetProfileListQuery
+  useGetProfileListQuery,
+  useUpdateProfileStatusMutation,
 } from "../../../api/profileApi";
+import Modals from "../../../common-components/Modals";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
@@ -19,14 +34,141 @@ import styles from "./ListProfiles.module.css";
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
+  const [activeStatus, setActiveStatus] = useState(true);
   const searchInput = useRef(null);
   const navigate = useNavigate();
   const { data, isFetching } = useGetProfileListQuery();
   const [deleteProfileService] = useDeleteProfileMutation();
-  const [modalState, setModalState] = useState({
-    isVisible: false,
-    profileID: null
+  const [updateProfileStatusService] = useUpdateProfileStatusMutation();
+
+  const [isCurrentEmpModalState, setIsCurrentEmpModalState] = useState({
+    isVisibleIsCurrentEmployee: false,
+    checked: false,
+    profileID: null,
+    record: null,
   });
+
+  const [deleteModal, setDeleteModal] = useState({
+    isVisibleDelete: false,
+    profileID: null,
+  });
+
+  const [toggleActiveModal, setToggleActiveModal] = useState({
+    isVisibleToggleActive: false,
+    isActive: false,
+    profileID: null,
+  });
+
+  const handleDeleteCancel = () => {
+    setDeleteModal({
+      ...deleteModal,
+      isVisibleDelete: false,
+    });
+  };
+  const showActiveInactiveModal = (profile_id, isActive) => {
+    setToggleActiveModal({
+      isVisibleToggleActive: true,
+      isActive,
+      profileID: profile_id,
+    });
+  };
+
+  const handleToggleActiveStatus = async () => {
+    const { profileID, isActive } = toggleActiveModal;
+    const is_active = isActive ? "NO" : "YES";
+    try {
+      const response = await updateProfileStatusService({
+        profile_id: profileID,
+        profile_status: { is_active },
+      });
+      toast.success(response?.data?.message);
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+    setToggleActiveModal({
+      isVisibleToggleActive: false,
+      isActive: false,
+      profileID: null,
+    });
+  };
+
+  const handleToggleActiveCancel = () => {
+    setToggleActiveModal({
+      ...toggleActiveModal,
+      isVisibleToggleActive: false,
+    });
+  };
+
+  const handleToggleCancel = () => {
+    setIsCurrentEmpModalState({
+      ...isCurrentEmpModalState,
+      isVisibleIsCurrentEmployee: false,
+      checked: isCurrentEmpModalState.record?.is_current_employee !== "NO",
+    });
+  };
+
+  const handleToggleEmployeeStatus = async () => {
+    const { profileID, checked } = isCurrentEmpModalState;
+    const profile_status = {
+      is_current_employee: checked ? "YES" : "NO",
+    };
+    try {
+      const response = await updateProfileStatusService({
+        profile_id: profileID,
+        profile_status,
+      });
+      toast.success(response?.data?.message);
+    } catch (error) {
+      toast.error(error.response?.data?.error_message);
+    }
+
+    setIsCurrentEmpModalState({
+      ...isCurrentEmpModalState,
+      isVisibleIsCurrentEmployee: false,
+      checked: false,
+      profileID: null,
+      record: null,
+    });
+  };
+
+  const showIsCurrentEmpModal = (profile_id, checked, record) => {
+    setIsCurrentEmpModalState({
+      isVisibleIsCurrentEmployee: true,
+      checked,
+      profileID: profile_id,
+      record,
+    });
+  };
+  const showDeleteModal = (profile_id) => {
+    setDeleteModal({
+      isVisibleDelete: true,
+      profileID: profile_id,
+    });
+  };
+
+  const handleDelete = async () => {
+    try {
+      const response = await deleteProfileService({
+        profile_id: deleteModal.profileID,
+      });
+      if (response?.data) {
+        toast.success(response?.data);
+      }
+    } catch (error) {
+      console.error("Error deleting profile:", error);
+      toast.error(error.response?.data?.error_message);
+    }
+    setDeleteModal({
+      ...deleteModal,
+      isVisibleDelete: false,
+    });
+  };
+
+  const handleClick = (id, is_josh_employee) => {
+    navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id), {
+      state: { is_josh_employee },
+    });
+  };
 
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
     confirm();
@@ -45,7 +187,7 @@ const ListProfiles = () => {
       selectedKeys,
       confirm,
       clearFilters,
-      close
+      closeDropdown,
     }) => (
       <div style={{ padding: 8 }} onKeyDown={(e) => e.stopPropagation()}>
         <Input
@@ -86,7 +228,7 @@ const ListProfiles = () => {
           >
             Filter
           </Button>
-          <Button type="link" size="small" onClick={() => close()}>
+          <Button type="link" size="small" onClick={closeDropdown}>
             Close
           </Button>
         </Space>
@@ -97,8 +239,8 @@ const ListProfiles = () => {
     ),
     onFilter: (value, record) =>
       record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
-    onFilterDropdownOpenChange: (visible) => {
-      if (visible) {
+    onFilterDropdownOpenChange: (open) => {
+      if (open) {
         setTimeout(() => searchInput.current?.select(), 100);
       }
     },
@@ -112,35 +254,8 @@ const ListProfiles = () => {
         />
       ) : (
         text
-      )
+      ),
   });
-
-  const showModal = (profile_id) => {
-    setModalState({ isVisible: true, profileID: profile_id });
-  };
-
-  const handleCancel = () => {
-    setModalState({ isVisible: false, currentRecord: null });
-  };
-
-  const handleClick = (id) => {
-    navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", id));
-  };
-
-  const handleDelete = async () => {
-    try {
-      const response = await deleteProfileService({
-        profile_id: modalState.profileID
-      });
-      if (response?.data) {
-        toast.success(response?.data);
-      }
-    } catch (error) {
-      console.error("error in profile : ", error);
-      toast.error(error.response?.data?.error_message);
-    }
-    setModalState({ isVisible: false, profileID: null });
-  };
 
   const columns = [
     {
@@ -148,21 +263,21 @@ const ListProfiles = () => {
       dataIndex: "name",
       key: "name",
       width: "20%",
-      ...getColumnSearchProps("name")
+      ...getColumnSearchProps("name"),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
       width: "20%",
-      ...getColumnSearchProps("email")
+      ...getColumnSearchProps("email"),
     },
     {
       title: "Years Of Experience",
       dataIndex: "years_of_experience",
       key: "years_of_experience",
       sorter: (a, b) => a.years_of_experience - b.years_of_experience,
-      sortDirections: ["descend", "ascend"]
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Primary Skills",
@@ -186,15 +301,41 @@ const ListProfiles = () => {
             );
           })}
         </>
-      )
+      ),
     },
     {
-      title: "Is Current Employee",
-      dataIndex: "is_current_employee",
-      key: "is_current_employee",
-      render: (is_current_employee) => is_current_employee,
-      sorter: (a, b) => a.isCurrentEmployee - b.isCurrentEmployee,
-      sortDirections: ["descend", "ascend"]
+      title: "Is Josh Employee",
+      dataIndex: "is_josh_employee",
+      key: "is_josh_employee",
+      render: (_, record) => (
+        <>
+          <Switch
+            checkedChildren={<CheckOutlined />}
+            unCheckedChildren={<CloseOutlined />}
+            checked={
+              isCurrentEmpModalState.profileID === record?.id
+                ? isCurrentEmpModalState.checked
+                : record?.is_current_employee !== "NO"
+            }
+            onChange={(checked) =>
+              showIsCurrentEmpModal(record?.id, checked, record)
+            }
+          />
+          <Modals
+            isVisible={
+              isCurrentEmpModalState.isVisibleIsCurrentEmployee &&
+              isCurrentEmpModalState.profileID === record.id
+            }
+            onOk={handleToggleEmployeeStatus}
+            onCancel={handleToggleCancel}
+            message={`Are you sure you want to ${
+              isCurrentEmpModalState.record?.is_current_employee !== "NO"
+                ? "inactive"
+                : "active"
+            } this employee?`}
+          />
+        </>
+      ),
     },
     {
       title: "Action",
@@ -202,15 +343,45 @@ const ListProfiles = () => {
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Edit">
-            <EditOutlined onClick={() => handleClick(record?.id)} />
+            <EditOutlined
+              onClick={() =>
+                handleClick(record?.id, record?.is_current_employee)
+              }
+            />
           </Tooltip>
           <Tooltip title="Delete">
-            <DeleteOutlined onClick={() => showModal(record?.id)} />
+            <DeleteOutlined onClick={() => showDeleteModal(record?.id)} />
           </Tooltip>
+          <Modals
+            isVisible={deleteModal.isVisibleDelete}
+            onOk={handleDelete}
+            onCancel={handleDeleteCancel}
+            message="Are you sure you want to delete this profile?"
+          />
+          <Button
+            type={"primary"}
+            onClick={() =>
+              showActiveInactiveModal(record?.id, record.is_active === "YES")
+            }
+          >
+            {record.is_active === "YES" ? "Inactive" : "Active"}
+          </Button>
+          <Modals
+            isVisible={toggleActiveModal.isVisibleToggleActive}
+            onOk={handleToggleActiveStatus}
+            onCancel={handleToggleActiveCancel}
+            message={`Are you sure you want to ${
+              toggleActiveModal.isActive ? "inactive" : "active"
+            } this profile?`}
+          />
         </Space>
-      )
-    }
+      ),
+    },
   ];
+
+  const filteredData = data?.profiles?.filter((profile) =>
+    activeStatus ? profile.is_active === "YES" : profile.is_active === "NO",
+  );
 
   return (
     <>
@@ -219,6 +390,14 @@ const ListProfiles = () => {
         <Typography.Title level={1} className={styles.profile_header}>
           Profiles
         </Typography.Title>
+
+        <Radio.Group
+          value={activeStatus ? "active" : "inactive"}
+          onChange={(e) => setActiveStatus(e.target.value === "active")}
+        >
+          <Radio.Button value="active">Active</Radio.Button>
+          <Radio.Button value="inactive">Inactive</Radio.Button>
+        </Radio.Group>
         <Link to={EDITOR_ROUTE}>
           <Button type="primary" className={styles.button}>
             {" "}
@@ -231,25 +410,11 @@ const ListProfiles = () => {
         tableLayout="fixed"
         size="small"
         columns={columns}
-        dataSource={data?.profiles}
+        dataSource={filteredData}
         className={styles.table}
         bordered={true}
         loading={isFetching}
       />
-      <Modal
-        title="Confirm Delete"
-        centered
-        open={modalState.isVisible}
-        onOk={handleDelete}
-        onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-        okButtonProps={{
-          style: { backgroundColor: "red" }
-        }}
-      >
-        Are you sure you want to delete?
-      </Modal>
     </>
   );
 };

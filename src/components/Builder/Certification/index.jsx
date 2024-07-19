@@ -8,7 +8,7 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -16,7 +16,7 @@ import {
   certificationApi,
   useCreateCertificateMutation,
   useDeleteCertificateMutation,
-  useUpdateCertificateMutation,
+  useUpdateCertificateMutation
 } from "../../../api/certificationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
@@ -25,7 +25,7 @@ import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
-  validateId,
+  validateId
 } from "../../../helpers";
 
 const Certification = ({ certificationData }) => {
@@ -42,8 +42,8 @@ const Certification = ({ certificationData }) => {
       label: "Certificate 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -51,7 +51,7 @@ const Certification = ({ certificationData }) => {
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: { distance: 10 }
   });
 
   useEffect(() => {
@@ -95,7 +95,7 @@ const Certification = ({ certificationData }) => {
     try {
       const response = await createCertificateService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -112,7 +112,7 @@ const Certification = ({ certificationData }) => {
           const response = await updateCertificateService({
             profile_id: profile_id,
             certificate_id: certificate.id,
-            values: certificate,
+            values: certificate
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -157,8 +157,8 @@ const Certification = ({ certificationData }) => {
       {
         label: `Certification ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     form.resetFields([`certificate_${newActiveKey}`]);
   };
@@ -178,7 +178,7 @@ const Certification = ({ certificationData }) => {
       if (certificationData[modalState.key]?.id) {
         const response = await deleteCertificateService({
           profile_id: profile_id,
-          certificate_id: certificationData[modalState.key]?.id,
+          certificate_id: certificationData[modalState.key]?.id
         });
 
         if (response?.data) {
@@ -285,8 +285,8 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Name is required",
-                          },
+                            message: "Name is required"
+                          }
                         ]}
                       >
                         <Input placeholder="Enter Certificate Name" />
@@ -319,7 +319,7 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Issued date required",
+                            message: "Issued date required"
                           },
                           {
                             validator: (_, value) =>
@@ -329,8 +329,8 @@ const Certification = ({ certificationData }) => {
                                       "Issued date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -349,8 +349,8 @@ const Certification = ({ certificationData }) => {
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -371,8 +371,8 @@ const Certification = ({ certificationData }) => {
                                       "End date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -414,7 +414,7 @@ const Certification = ({ certificationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -432,13 +432,14 @@ const Certification = ({ certificationData }) => {
         isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
+        message="Are you sure you want to delete this certificate?"
       />
     </div>
   );
 };
 
 Certification.propTypes = {
-  certificationData: PropTypes.object,
+  certificationData: PropTypes.object
 };
 
 export default Certification;

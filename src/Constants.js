@@ -68,6 +68,7 @@ export const HTTP_METHODS = {
   GET: "GET",
   PUT: "PUT",
   DELETE: "DELETE",
+  PATCH: "PATCH",
 };
 // Redux Toolkit Query
 export const LOGIN_REDUCER_PATH = "loginApi";

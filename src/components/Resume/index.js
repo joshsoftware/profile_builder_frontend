@@ -1,5 +1,5 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Dropdown, Flex, Menu, Radio, Tag } from "antd";
 import {
@@ -16,11 +16,13 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import PropTypes from "prop-types";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString, PROFILES } from "../../Constants";
+import { getMonthString } from "../../Constants";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
-  const [profileType, setProfileType] = useState(PROFILES.internal);
+  const location = useLocation();
+  const { is_josh_employee } = location.state || {};
+
   Resume.propTypes = {
     data: PropTypes.object.isRequired,
   };
@@ -58,7 +60,7 @@ const Resume = forwardRef(({ data }, ref) => {
           profile?.gender && new TextRun(` (${profile.gender})`),
           new TextRun().break(),
           new TextRun(
-            `${profile?.years_of_experience || ""} Year of Experience`
+            `${profile?.years_of_experience || ""} Year of Experience`,
           ),
           new TextRun().break(),
           new TextRun(profile?.email || ""),
@@ -81,15 +83,15 @@ const Resume = forwardRef(({ data }, ref) => {
                 new TextRun(
                   `\n${item.degree || ""} - ${item.university_name || ""}, ${
                     item.place || ""
-                  }`
+                  }`,
                 ),
                 new TextRun(
-                  `\nPassing Year: ${new Date(item.passing_year).getFullYear()}`
+                  `\nPassing Year: ${new Date(item.passing_year).getFullYear()}`,
                 ),
                 item.percent_or_cgpa &&
                   new TextRun(`\nCGPA / Percentage: ${item.percent_or_cgpa}`),
               ].filter(Boolean),
-            })
+            }),
         ),
         ...(certifications || []).map(
           (item) =>
@@ -97,11 +99,11 @@ const Resume = forwardRef(({ data }, ref) => {
               children: [
                 new TextRun(`Certification:`).bold(),
                 new TextRun(
-                  `\n${item.name || ""} - ${item.organization_name || ""}`
+                  `\n${item.name || ""} - ${item.organization_name || ""}`,
                 ),
                 new TextRun(`\nIssue Date: ${formatDate(item.issued_date)}`),
               ].filter(Boolean),
-            })
+            }),
         ),
         ...(achievements || []).map(
           (item) =>
@@ -110,7 +112,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 new TextRun(`Achievement:`).bold(),
                 new TextRun(`\n${item.name || ""}`),
               ].filter(Boolean),
-            })
+            }),
         ),
         ...(experiences || []).map(
           (item) =>
@@ -118,15 +120,15 @@ const Resume = forwardRef(({ data }, ref) => {
               children: [
                 new TextRun(`Experience:`).bold(),
                 new TextRun(
-                  `\n${item.designation || ""} - ${item.company_name || ""}`
+                  `\n${item.designation || ""} - ${item.company_name || ""}`,
                 ),
                 new TextRun(
                   `\n${formatDate(item.from_date)} - ${formatDate(
-                    item.to_date
-                  )}`
+                    item.to_date,
+                  )}`,
                 ),
               ].filter(Boolean),
-            })
+            }),
         ),
         ...(projects || []).map(
           (item) =>
@@ -136,8 +138,8 @@ const Resume = forwardRef(({ data }, ref) => {
                 new TextRun(`\n${item.name || ""}`),
                 new TextRun(
                   `\n${formatDate(item.working_start_date)} - ${formatDate(
-                    item.working_end_date
-                  )}`
+                    item.working_end_date,
+                  )}`,
                 ),
                 item.duration && new TextRun(`\nDuration: ${item.duration}`),
                 item.description &&
@@ -147,14 +149,14 @@ const Resume = forwardRef(({ data }, ref) => {
                   new TextRun(`\nResponsibilities: ${item.responsibilities}`),
                 item.technologies &&
                   new TextRun(
-                    `\nTechnologies: ${(item.technologies || []).join(", ")}`
+                    `\nTechnologies: ${(item.technologies || []).join(", ")}`,
                   ),
                 item.tech_worked_on &&
                   new TextRun(
-                    `\nContribution: ${(item.tech_worked_on || []).join(", ")}`
+                    `\nContribution: ${(item.tech_worked_on || []).join(", ")}`,
                   ),
               ].filter(Boolean),
-            })
+            }),
         ),
       ];
 
@@ -172,16 +174,6 @@ const Resume = forwardRef(({ data }, ref) => {
         });
     } catch (error) {
       console.error("Error in handleDownload function:", error);
-    }
-  };
-
-  const onProfileChange = (event) => {
-    const selectedProfile = Object.values(PROFILES).find(
-      (profile) => profile.title === event.target.value
-    );
-
-    if (selectedProfile) {
-      setProfileType(selectedProfile);
     }
   };
 
@@ -458,11 +450,12 @@ const Resume = forwardRef(({ data }, ref) => {
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
     const container = containerRef.current;
-    if (!profileType?.color || !container) {
+    if (!container) {
       return;
     }
-    container.style.setProperty("--color", profileType?.color);
-  }, [profileType]);
+    const color = is_josh_employee === "NO" ? "#062e38" : "#35549c";
+    container.style.setProperty("--color", color);
+  }, [is_josh_employee]);
 
   const getPageMargins = () => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
@@ -487,19 +480,6 @@ const Resume = forwardRef(({ data }, ref) => {
             Download <DownOutlined />
           </Button>
         </Dropdown>
-        <Radio.Group
-          defaultValue={PROFILES.internal.title}
-          onChange={onProfileChange}
-          buttonStyle="solid"
-          style={{ marginLeft: "220px" }}
-        >
-          <Radio.Button value={PROFILES.internal.title}>
-            Internal Profile
-          </Radio.Button>
-          <Radio.Button value={PROFILES.external.title}>
-            External Profile
-          </Radio.Button>
-        </Radio.Group>
       </div>
       <div ref={ref}>
         <style>{getPageMargins()}</style>
