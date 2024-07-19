@@ -68,7 +68,6 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data.message,
     }),
-  }),
     updateProfileStatus: builder.mutation({
       query: ({ profile_id, profile_status }) => ({
         url: UPDATE_PROFILE_ENDPOINT.replace(":profile_id", profile_id),
@@ -78,7 +77,7 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data
     })
-  })
+  }),
 });
 
 export const {

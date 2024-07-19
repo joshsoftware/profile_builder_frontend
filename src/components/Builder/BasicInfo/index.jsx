@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
-import dayjs from "dayjs";
+import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
