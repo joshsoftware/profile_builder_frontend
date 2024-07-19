@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export const filterSection = (values) => {
   return Object.entries(values).reduce((acc, [, section]) => {
     if (!section?.id) {
@@ -31,10 +33,10 @@ export const formatExperienceFields = (experiences) => {
   return experiences.map((experience) => ({
     designation: experience?.designation,
     company_name: experience?.company_name,
-    from_date: experience?.employmentStart?.format("MMM-YYYY"),
-    to_date: experience?.isCurrentCompany
-      ? "Present"
-      : experience?.employmentEnd?.format("MMM-YYYY")
+    from_date: experience?.from_date?.format("MMM-YYYY"),
+    to_date: experience?.to_date
+      ? experience?.to_date?.format("MMM-YYYY")
+      : "Present"
   }));
 };
 
@@ -71,4 +73,9 @@ export const formatAchievementFields = (achievements) => {
 
 export const validateId = (id) => {
   return id && typeof id === "string" && id.trim() !== "";
+};
+
+export const disabledDate = (current) => {
+  // Can not select month before today and today
+  return current && current < dayjs().endOf('month');
 };

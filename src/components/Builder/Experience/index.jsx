@@ -3,6 +3,7 @@ import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 import {
   Button,
+  Checkbox,
   Col,
   DatePicker,
   Form,
@@ -10,29 +11,33 @@ import {
   Row,
   Select,
   Space,
-  Tabs,
+  Tabs
 } from "antd";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext,
+  SortableContext
 } from "@dnd-kit/sortable";
-import moment from "moment";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateExperienceMutation,
   useDeleteExperienceMutation,
-  useUpdateExperienceMutation,
+  useUpdateExperienceMutation
 } from "../../../api/experienceApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
 import {
   DESIGNATION,
   INVALID_ID_ERROR,
-  SUCCESS_TOASTER,
+  SUCCESS_TOASTER
 } from "../../../Constants";
-import { filterSection, validateId } from "../../../helpers";
+import {
+  filterSection,
+  formatExperienceFields,
+  validateId
+} from "../../../helpers";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
@@ -42,18 +47,19 @@ const Experience = ({ experienceData }) => {
   const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
+  const [isCurrentCompany, setIsCurrentCompany] = useState(true);
   const [items, setItems] = useState([
     {
       label: "Experience 1",
       children: null,
       key: "0",
-      isExisting: false,
-    },
+      isExisting: false
+    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 },
+    activationConstraint: { distance: 10 }
   });
 
   useEffect(() => {
@@ -63,7 +69,7 @@ const Experience = ({ experienceData }) => {
           label: `Experience ${index + 1}`,
           children: null,
           key: `${index}`,
-          isExisting: experience.isExisting,
+          isExisting: experience.isExisting
         }));
 
         setItems(tabs);
@@ -74,9 +80,12 @@ const Experience = ({ experienceData }) => {
               ...experience,
               id: experience?.id,
               from_date: experience.from_date
-                ? moment(experience.from_date)
+                ? dayjs(experience.from_date)
                 : null,
-              to_date: experience.to_date ? moment(experience.to_date) : null,
+              to_date:
+                experience.to_date && experience.to_date !== "Present"
+                  ? dayjs(experience.to_date)
+                  : dayjs()
             };
             return acc;
           }, {})
@@ -94,8 +103,9 @@ const Experience = ({ experienceData }) => {
     try {
       const response = await createExperienceService({
         profile_id: profile_id,
-        values: values,
+        values: values
       });
+
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
@@ -111,7 +121,13 @@ const Experience = ({ experienceData }) => {
           const response = await updateExperienceService({
             profile_id: profile_id,
             experience_id: experience.id,
-            values: experience,
+            values: {
+              ...experience,
+              from_date: experience.from_date.format("MMM-YYYY"),
+              to_date: experience.to_date
+                ? experience.to_date.format("MMM-YYYY")
+                : "present"
+            }
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -156,8 +172,8 @@ const Experience = ({ experienceData }) => {
       {
         label: `Experience ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey,
-      },
+        key: newActiveKey
+      }
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`experience_${newActiveKey}`]);
@@ -178,7 +194,7 @@ const Experience = ({ experienceData }) => {
       if (experienceData[modalState.key]?.id) {
         const response = await deleteExperienceService({
           profile_id: profile_id,
-          experience_id: experienceData[modalState.key]?.id,
+          experience_id: experienceData[modalState.key]?.id
         });
 
         if (response?.data) {
@@ -198,6 +214,7 @@ const Experience = ({ experienceData }) => {
     }
     setItems(newPanes);
     setModalState({ isVisible: false, key: null });
+    newTabIndex.current--;
   };
 
   const onEdit = (targetKey, action) => {
@@ -208,6 +225,10 @@ const Experience = ({ experienceData }) => {
     }
   };
 
+  const HandleEndDate = (e) => {
+    setIsCurrentCompany(e.target.checked);
+  };
+
   const onDragEnd = ({ active, over }) => {
     if (active.id !== over?.id) {
       setItems((prev) => {
@@ -216,21 +237,6 @@ const Experience = ({ experienceData }) => {
         return arrayMove(prev, activeIndex, overIndex);
       });
     }
-  };
-
-  const formatExperienceFields = (experiences) => {
-    return Object.keys(experiences).map((key) => {
-      const experience = experiences[key];
-      return {
-        ...experience,
-        from_date: experience.from_date
-          ? experience.from_date.format("YYYY-MM-DD")
-          : null,
-        to_date: experience.to_date
-          ? experience.to_date.format("YYYY-MM-DD")
-          : null,
-      };
-    });
   };
 
   return (
@@ -270,8 +276,8 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Designation is required",
-                          },
+                            message: "Designation is required"
+                          }
                         ]}
                       >
                         <Select
@@ -285,9 +291,26 @@ const Experience = ({ experienceData }) => {
                       <Form.Item
                         name={[`experience_${index}`, "company_name"]}
                         label="Company Name"
+                        rules={[
+                          {
+                            required: true,
+                            message: "Company Name required"
+                          }
+                        ]}
                       >
                         <Input placeholder="Enter Company Name eg. Amazon" />
                       </Form.Item>
+                    </Col>
+                  </Row>
+                  <Row style={{ margin: "10px 0px 10px 0px" }}>
+                    <Col>
+                      <Checkbox
+                        name={"isCurrentCompany"}
+                        checked={isCurrentCompany}
+                        onChange={HandleEndDate}
+                      >
+                        Is This A Current Company ?
+                      </Checkbox>
                     </Col>
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
@@ -298,47 +321,52 @@ const Experience = ({ experienceData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Start date is required",
+                            message: "Start date is required"
                           },
                           {
                             validator: (_, value) =>
-                              value && value > moment()
+                              value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
                                       "Start date cannot be in the future"
                                     )
                                   )
-                                : Promise.resolve(),
-                          },
+                                : Promise.resolve()
+                          }
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
                       </Form.Item>
                     </Col>
                     <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`experience_${index}`, "to_date"]}
-                        label="Employment End Date"
-                        rules={[
-                          {
-                            type: "object",
-                            required: true,
-                            message: "End date is required",
-                          },
-                          {
-                            validator: (_, value) =>
-                              value && value > moment()
-                                ? Promise.reject(
-                                    new Error(
-                                      "End date cannot be in the future"
+                      {!isCurrentCompany && (
+                        <Form.Item
+                          name={[`experience_${index}`, "to_date"]}
+                          label="Employment End Date"
+                          rules={[
+                            {
+                              type: "object",
+                              required: true,
+                              message: "End date is required"
+                            },
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "End date cannot be in the future"
+                                      )
                                     )
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
+                                  : Promise.resolve()
+                            }
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      )}
                     </Col>
                   </Row>
                   <Form.Item>
@@ -365,7 +393,7 @@ const Experience = ({ experienceData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              ),
+              )
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -383,13 +411,14 @@ const Experience = ({ experienceData }) => {
         isVisible={modalState.isVisible}
         onOk={remove}
         onCancel={handleCancel}
+        message="Are you sure you want to delete this experience?"
       />
     </div>
   );
 };
 
 Experience.propTypes = {
-  experienceData: PropTypes.array,
+  experienceData: PropTypes.array
 };
 
 export default Experience;

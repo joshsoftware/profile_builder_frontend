@@ -11,7 +11,7 @@ import {
   EDITOR_ROUTE,
   ERROR_ROUTE,
   PROFILE_LIST_ROUTE,
-  ROOT_ROUTE
+  ROOT_ROUTE,
 } from "../Constants";
 import ProtectedRoutes from "./ProtectedRoutes";
 const Router = () => {

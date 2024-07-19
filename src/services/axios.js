@@ -1,13 +1,14 @@
 import toast from "react-hot-toast";
 import axios from "axios";
+import { logout } from "../api/store/authSlice";
 import store from "../api/store/store";
-import { NETWORK_ERROR } from "../Constants";
+import { NETWORK_ERROR, ROOT_ROUTE } from "../Constants";
 
 const axiosInstance = axios.create({
   baseURL: process.env.REACT_APP_API_URL,
   headers: {
-    "Content-Type": "application/json"
-  }
+    "Content-Type": "application/json",
+  },
 });
 
 axiosInstance.interceptors.request.use(
@@ -21,7 +22,7 @@ axiosInstance.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 axiosInstance.interceptors.response.use(
@@ -29,11 +30,17 @@ axiosInstance.interceptors.response.use(
     return response;
   },
   (error) => {
+    if (error.response && error.response.status === 401) {
+      store.dispatch(logout());
+      toast.error("Session Expired. Please login again.");
+      history.push(ROOT_ROUTE);
+      return Promise.reject(error);
+    }
     error.response?.data?.error_code
       ? toast.error(error.response?.data?.error_message)
       : toast.error(NETWORK_ERROR);
     return Promise.reject(error);
-  }
+  },
 );
 
 export default axiosInstance;
