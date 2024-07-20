@@ -52,6 +52,11 @@ const Achievement = ({ achievementData }) => {
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
+  const resetItems = useCallback(() => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  }, [form]);
 
   useEffect(() => {
     if (profile_id && achievementData) {
@@ -80,12 +85,6 @@ const Achievement = ({ achievementData }) => {
       }
     }
   }, [profile_id, achievementData, form, resetItems]);
-
-  const resetItems = useCallback(() => {
-    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-    newTabIndex.current = 1;
-    form.resetFields();
-  }, [form]);
 
   const handleCreate = async (values) => {
     try {
