@@ -246,12 +246,12 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
-  const handleCreateAchievements = () => {
+  const handleAchievements = (action) => {
     form
       .validateFields()
-      .then(() => {
-        setAction("create");
-        form.submit();
+      .then((values) => {
+        setAction(action);
+        onFinish(values);
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;
@@ -319,16 +319,16 @@ const Achievement = ({ achievementData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={handleCreateAchievements}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("create")}
                         disabled={item.isExisting}
                       >
                         Create Achievements
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Achievement {Number(item.key) + 1}

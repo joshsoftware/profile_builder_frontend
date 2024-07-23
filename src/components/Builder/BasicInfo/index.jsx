@@ -8,7 +8,6 @@ import {
   useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
-  DESIGNATION,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,

@@ -247,12 +247,12 @@ const Certification = ({ certificationData }) => {
     }
   };
 
-  const handleCreateCertificates = () => {
+  const handleCertificates = (action) => {
     form
       .validateFields()
-      .then(() => {
-        setAction("create");
-        form.submit();
+      .then((values) => {
+        setAction(action);
+        onFinish(values);
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;
@@ -400,17 +400,16 @@ const Certification = ({ certificationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={handleCreateCertificates}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("create")}
                         disabled={item.isExisting}
                       >
                         Create Certificates
                       </Button>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("update");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Certificate {Number(item.key) + 1}

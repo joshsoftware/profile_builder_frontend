@@ -241,12 +241,12 @@ const Education = ({ educationData }) => {
     }
   };
 
-  const handleCreateEducations = () => {
+  const handleEducations = (action) => {
     form
       .validateFields()
-      .then(() => {
-        setAction("create");
-        form.submit();
+      .then((values) => {
+        setAction(action);
+        onFinish(values);
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;
@@ -340,17 +340,16 @@ const Education = ({ educationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={handleCreateEducations}
+                        htmlType="button"
+                        onClick={()=> handleEducations("create")}
                         disabled={item.isExisting}
                       >
                         Create Educations
                       </Button>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("update");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleEducations("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Education {Number(item.key) + 1}

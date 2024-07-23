@@ -261,12 +261,12 @@ const Project = ({ projectData }) => {
     }
   };
 
-  const handleCreateProjects = () => {
+  const handleProjects = (action) => {
     form
       .validateFields()
-      .then(() => {
-        setAction("create");
-        form.submit();
+      .then((values) => {
+        setAction(action);
+        onFinish(values);
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;
@@ -452,16 +452,16 @@ const Project = ({ projectData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={handleCreateProjects}
+                        htmlType="button"
+                        onClick={()=> handleProjects("create")}
                         disabled={item.isExisting}
                       >
                         Create Projects
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleProjects("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Project {Number(item.key) + 1}
