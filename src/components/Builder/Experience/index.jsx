@@ -92,7 +92,7 @@ const Experience = ({ experienceData }) => {
                 ? dayjs(experience.from_date)
                 : null,
               to_date:
-                experience.to_date && experience.to_date !== "Present"
+                experience.to_date && experience.to_date !== "present"
                   ? dayjs(experience.to_date)
                   : dayjs(),
             };
@@ -256,6 +256,12 @@ const Experience = ({ experienceData }) => {
     }
   };
 
+  const tabStyle = {
+    errorTab: {
+      borderColor: 'red',
+    }
+  };  
+
   const handleUpdateOrder = async () => {
     const payload = {
       id: Number(profile_id),
@@ -295,6 +301,8 @@ const Experience = ({ experienceData }) => {
             items={items.map((item, index) => ({
               ...item,
               icon: <DragOutlined />,
+              className: item.hasError ? "error-tab" : "",
+              style: item.hasError ? tabStyle.errorTab : {},
               children: (
                 <Form
                   layout="vertical"

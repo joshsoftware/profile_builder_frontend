@@ -360,7 +360,7 @@ const Project = ({ projectData }) => {
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the project"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item

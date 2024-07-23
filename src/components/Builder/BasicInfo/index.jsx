@@ -137,11 +137,7 @@ const BasicInfo = ({ profileData }) => {
         </Col>
         <Col span={12}>
           <Form.Item name="designation" label="Designation">
-            <Select
-              placeholder="Select designation"
-              options={DESIGNATION}
-              allowClear
-            />
+            <Input placeholder="Software Engineer, etc." />
           </Form.Item>
         </Col>
       </Row>
@@ -192,7 +188,7 @@ const BasicInfo = ({ profileData }) => {
             rules={[{ required: true, message: "Description required" }]}
           >
             <Input.TextArea
-              maxLength={600}
+              minLength={50}
               style={{ height: 120, resize: "none" }}
             />
           </Form.Item>

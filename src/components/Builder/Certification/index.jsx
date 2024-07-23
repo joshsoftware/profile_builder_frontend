@@ -308,7 +308,7 @@ const Certification = ({ certificationData }) => {
                     <Input.TextArea
                       placeholder="Provide a basic overview of the certificate"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Row>

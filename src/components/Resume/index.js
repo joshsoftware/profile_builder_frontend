@@ -191,7 +191,7 @@ const Resume = forwardRef(({ data }, ref) => {
       givenYear === currDate.getFullYear() &&
       givenMonth === currDate.getMonth()
     ) {
-      return " Present";
+      return "present";
     }
     return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };

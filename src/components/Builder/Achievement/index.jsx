@@ -295,7 +295,7 @@ const Achievement = ({ achievementData }) => {
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above achievement"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item>
