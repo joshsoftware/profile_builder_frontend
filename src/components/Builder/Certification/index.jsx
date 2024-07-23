@@ -247,6 +247,23 @@ const Certification = ({ certificationData }) => {
     }
   };
 
+  const handleCertificates = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -308,7 +325,7 @@ const Certification = ({ certificationData }) => {
                     <Input.TextArea
                       placeholder="Provide a basic overview of the certificate"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Row>
@@ -383,20 +400,16 @@ const Certification = ({ certificationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("create");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("create")}
                         disabled={item.isExisting}
                       >
                         Create Certificates
                       </Button>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("update");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Certificate {Number(item.key) + 1}

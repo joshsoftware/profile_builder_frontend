@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { PRESENT_VALUE } from "./Constants";
 
 export const filterSection = (values) => {
   return Object.entries(values).reduce((acc, [, section]) => {
@@ -36,7 +37,7 @@ export const formatExperienceFields = (experiences) => {
     from_date: experience?.from_date?.format("MMM-YYYY"),
     to_date: experience?.to_date
       ? experience?.to_date?.format("MMM-YYYY")
-      : "Present"
+      : PRESENT_VALUE
   }));
 };
 
