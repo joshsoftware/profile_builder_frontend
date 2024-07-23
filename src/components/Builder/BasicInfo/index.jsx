@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
@@ -115,18 +115,18 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Past Years Of Experience (in months)"
+            label="Years Of Experience"
             rules={[
               { required: true, message: "Experience required" },
-              {
-                pattern: /^[0-9]+$/,
-                message: "Experience must be a whole number",
-              },
+              // {
+              //   pattern: /^[0-9]+$/,
+              //   message: "Experience must be a whole number",
+              // },
               {
                 validator: (_, value) =>
-                  value <= 360 && value >= 0
+                  value <= 30 && value >= 0
                     ? Promise.resolve()
-                    : Promise.reject("Experience must be between 0 and 360 months"),
+                    : Promise.reject("Experience must be between 0 and 30 years"),
               },
             ]}
           >
@@ -158,7 +158,7 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name="josh_joining_date"
@@ -169,6 +169,13 @@ const BasicInfo = ({ profileData }) => {
         </Col>
         <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">
+            <Input placeholder="Enter GitHub profile link" />
+          </Form.Item>
+        </Col>
+      </Row> */}
+      <Row gutter={16}>
+        <Col span={12}>
+        <Form.Item name="github_link" label="Github Profile Link">
             <Input placeholder="Enter GitHub profile link" />
           </Form.Item>
         </Col>

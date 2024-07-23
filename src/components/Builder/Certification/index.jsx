@@ -124,7 +124,7 @@ const Certification = ({ certificationData }) => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     const filteredCertificates = filterSection(values);
     const certificates = formatCertificationFields(filteredCertificates);
 
@@ -250,9 +250,9 @@ const Certification = ({ certificationData }) => {
   const handleCertificates = (action) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(() => {
         setAction(action);
-        onFinish(values);
+        form.submit();
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;

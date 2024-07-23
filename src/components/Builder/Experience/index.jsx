@@ -149,7 +149,7 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     const filteredExperiences = filterSection(values);
     const experiences = formatExperienceFields(filteredExperiences);
 
@@ -280,9 +280,9 @@ const Experience = ({ experienceData }) => {
   const handleExperiences = (action) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(() => {
         setAction(action);
-        onFinish(values);
+        form.submit();
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;

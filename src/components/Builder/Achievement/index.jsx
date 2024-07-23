@@ -119,7 +119,7 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     const filteredAchievements = filterSection(values);
     const achievements = formatAchievementFields(filteredAchievements);
 
@@ -249,9 +249,9 @@ const Achievement = ({ achievementData }) => {
   const handleAchievements = (action) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(() => {
         setAction(action);
-        onFinish(values);
+        form.submit();
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;

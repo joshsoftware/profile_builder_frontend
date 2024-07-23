@@ -118,7 +118,7 @@ const Education = ({ educationData }) => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     const filteredEducation = filterSection(values);
     const educations = formatEducationFields(filteredEducation);
 
@@ -244,9 +244,9 @@ const Education = ({ educationData }) => {
   const handleEducations = (action) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(() => {
         setAction(action);
-        onFinish(values);
+        form.submit();
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;

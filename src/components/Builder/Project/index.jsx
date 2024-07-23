@@ -135,7 +135,7 @@ const Project = ({ projectData }) => {
     }
   };
 
-  const onFinish = async (values) => {
+  const onFinish = (values) => {
     const filteredProjects = filterSection(values);
     const projects = formatProjectsFields(filteredProjects);
 
@@ -264,9 +264,9 @@ const Project = ({ projectData }) => {
   const handleProjects = (action) => {
     form
       .validateFields()
-      .then((values) => {
+      .then(() => {
         setAction(action);
-        onFinish(values);
+        form.submit();
       })
       .catch((errorInfo) => {
         const errorFields = errorInfo.errorFields;
