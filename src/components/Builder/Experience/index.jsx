@@ -148,7 +148,7 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const filteredExperiences = filterSection(values);
     const experiences = formatExperienceFields(filteredExperiences);
 
@@ -256,12 +256,6 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const tabStyle = {
-    errorTab: {
-      borderColor: 'red',
-    }
-  };  
-
   const handleUpdateOrder = async () => {
     const payload = {
       id: Number(profile_id),
@@ -280,6 +274,23 @@ const Experience = ({ experienceData }) => {
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
+  };
+
+  const handleCreateExperiences = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction("create");
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
   };
 
   return (
@@ -301,8 +312,6 @@ const Experience = ({ experienceData }) => {
             items={items.map((item, index) => ({
               ...item,
               icon: <DragOutlined />,
-              className: item.hasError ? "error-tab" : "",
-              style: item.hasError ? tabStyle.errorTab : {},
               children: (
                 <Form
                   layout="vertical"
@@ -420,7 +429,7 @@ const Experience = ({ experienceData }) => {
                       <Button
                         type="primary"
                         htmlType="submit"
-                        onClick={() => setAction("create")}
+                        onClick={handleCreateExperiences}
                         disabled={item.isExisting}
                       >
                         Create Experiences

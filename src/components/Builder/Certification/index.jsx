@@ -124,7 +124,7 @@ const Certification = ({ certificationData }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const filteredCertificates = filterSection(values);
     const certificates = formatCertificationFields(filteredCertificates);
 
@@ -245,6 +245,23 @@ const Certification = ({ certificationData }) => {
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
+  };
+
+  const handleCreateCertificates = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction("create");
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
   };
 
   return (
@@ -383,10 +400,7 @@ const Certification = ({ certificationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("create");
-                          form.submit();
-                        }}
+                        onClick={handleCreateCertificates}
                         disabled={item.isExisting}
                       >
                         Create Certificates

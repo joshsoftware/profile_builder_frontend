@@ -119,7 +119,7 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const filteredAchievements = filterSection(values);
     const achievements = formatAchievementFields(filteredAchievements);
 
@@ -246,6 +246,23 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
+  const handleCreateAchievements = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction("create");
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -303,7 +320,7 @@ const Achievement = ({ achievementData }) => {
                       <Button
                         type="primary"
                         htmlType="submit"
-                        onClick={() => setAction("create")}
+                        onClick={handleCreateAchievements}
                         disabled={item.isExisting}
                       >
                         Create Achievements

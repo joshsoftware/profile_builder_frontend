@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Select, Space } from "antd";
+import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
@@ -116,22 +116,24 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Years Of Experience"
+            label="Past Years Of Experience (in months)"
             rules={[
               { required: true, message: "Experience required" },
               {
+                pattern: /^[0-9]+$/,
+                message: "Experience must be a whole number",
+              },
+              {
                 validator: (_, value) =>
-                  value <= 30 && value >= 0
+                  value <= 360 && value >= 0
                     ? Promise.resolve()
-                    : Promise.reject(
-                        "Experience must be a positive number and either a whole number up to 30 years."
-                      ),
+                    : Promise.reject("Experience must be between 0 and 360 months"),
               },
             ]}
           >
             <Input
               type="number"
-              placeholder="Enter experience (e.g., 2.5, 1)"
+              placeholder="Enter experience (e.g., 24, 36)"
             />
           </Form.Item>
         </Col>
@@ -157,12 +159,7 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
-      {/* <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item name="past_experience" label="Past Experience(in months)">
-            <Input placeholder="Ex. 36, 12, etc." />
-          </Form.Item>
-        </Col>
+      <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name="josh_joining_date"
@@ -171,8 +168,6 @@ const BasicInfo = ({ profileData }) => {
             <DatePicker style={{ width: "100%" }} picker="month" />
           </Form.Item>
         </Col>
-      </Row> */}
-      <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">
             <Input placeholder="Enter GitHub profile link" />

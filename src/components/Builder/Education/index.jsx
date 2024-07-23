@@ -118,7 +118,7 @@ const Education = ({ educationData }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const filteredEducation = filterSection(values);
     const educations = formatEducationFields(filteredEducation);
 
@@ -241,6 +241,23 @@ const Education = ({ educationData }) => {
     }
   };
 
+  const handleCreateEducations = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction("create");
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -323,10 +340,7 @@ const Education = ({ educationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("create");
-                          form.submit();
-                        }}
+                        onClick={handleCreateEducations}
                         disabled={item.isExisting}
                       >
                         Create Educations

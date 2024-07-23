@@ -135,7 +135,7 @@ const Project = ({ projectData }) => {
     }
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
     const filteredProjects = filterSection(values);
     const projects = formatProjectsFields(filteredProjects);
 
@@ -259,6 +259,23 @@ const Project = ({ projectData }) => {
     } catch (error) {
       toast.error(error.response?.data?.message);
     }
+  };
+
+  const handleCreateProjects = () => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction("create");
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
   };
 
   return (
@@ -436,7 +453,7 @@ const Project = ({ projectData }) => {
                       <Button
                         type="primary"
                         htmlType="submit"
-                        onClick={() => setAction("create")}
+                        onClick={handleCreateProjects}
                         disabled={item.isExisting}
                       >
                         Create Projects
