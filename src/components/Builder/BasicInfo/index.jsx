@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
@@ -19,6 +19,7 @@ import {
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
   const [updateProfileService] = useUpdateProfileMutation();
+  const [formChange, setFormChange] = useState(false);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
@@ -47,22 +48,28 @@ const BasicInfo = ({ profileData }) => {
       }
       let response;
       if (profileData) {
-        response = await updateProfileService({
-          profile_id: profileData.id,
-          values,
-        });
+        if(formChange){
+          response = await updateProfileService({
+            profile_id: profileData.id,
+            values,
+          });
+        } else {
+          toast.success("No new changes detected.");
+        }
       } else {
         response = await createProfileService(values);
       }
 
-      if (response.data?.message) {
+      if (response?.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
           EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
         );
+        setFormChange(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      console.log("In log : ", error);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -72,6 +79,7 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
+      onValuesChange={()=>setFormChange(true)}
       initialValues={
         profileData?.profile || { profileDetails: PROFILE_DETAILS }
       }

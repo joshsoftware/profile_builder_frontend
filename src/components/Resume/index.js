@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Flex, Menu, Tag } from "antd";
+import { Button, Dropdown, Menu, Tag } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -253,25 +253,32 @@ const Resume = forwardRef(({ data }, ref) => {
                   {item.duration}
                 </span>
               )}
-
               {item?.description && (
                 <div>
                   <span className={styles.duration}>
-                    <b className={styles.overview}>Project Description : </b>
-                    {item.description}
+                    <b className={styles.overview}>Project Description: </b>
+                    <span style={{ whiteSpace: 'pre-line' }}>{item.description}</span>
                   </span>
                 </div>
               )}
               {item?.role && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Role : </b>
-                  {item.role}
+                    <ul>
+                      {item.role.split('\n').map((line, index) => (
+                        <li key={index}>{line}</li>
+                      ))}
+                    </ul>
                 </span>
               )}
               {item?.responsibilities && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Responsibility : </b>
-                  {item.responsibilities}
+                    <ul>
+                      {item.responsibilities.split('\n').map((line, index) => (
+                        <li key={index}>{line}</li>
+                      ))}
+                    </ul>
                 </span>
               )}
 
@@ -381,22 +388,17 @@ const Resume = forwardRef(({ data }, ref) => {
             {profile?.secondary_skills?.length > 0 && (
               <div>
                 <div className={styles.subtitleHeading}>Secondary Skills</div>
-                <Flex
-                  justify="flex-end"
-                  align="flex-end"
-                  gap={"small"}
-                  vertical
-                >
+                <ul className={styles.skillNumbered}>
                   {profile?.secondary_skills?.map((elem, index) => (
                     <Tag
                       color="blue"
-                      key={"primary" + elem + index}
+                      key={"secondary" + elem + index}
                       style={{ margin: "1px" }}
                     >
                       {elem}
                     </Tag>
                   ))}
-                </Flex>
+                </ul>
               </div>
             )}
           </div>
@@ -556,7 +558,7 @@ const Resume = forwardRef(({ data }, ref) => {
                       </h4>
                     </div>
                     <div className={`${styles.profiledetails} pb-3`}>
-                      {profile?.description}
+                      <span style={{ whiteSpace: 'pre-line' }}>{profile?.description}</span>
                     </div>
                   </div>
                 )}

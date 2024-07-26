@@ -11,7 +11,7 @@ import {
   Row,
   Select,
   Space,
-  Tabs
+  Tabs,
 } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
@@ -53,7 +53,7 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: false
+      isExisting: false,
     }
   ]);
   const newTabIndex = useRef(1);
@@ -66,6 +66,7 @@ const Project = ({ projectData }) => {
       distance: 10
     }
   });
+  const options = [];
 
   useEffect(() => {
     if (profile_id && projectData) {
@@ -342,12 +343,16 @@ const Project = ({ projectData }) => {
                         label="Project Duration (in years)"
                         rules={[
                           {
-                            validator: (_, value) =>
-                              value <= 30 && value >= 0
+                            validator: (_, value) => {
+                              if (value === undefined || value === '') {
+                                return Promise.resolve();
+                              }
+                              return value <= 50 && value >= 0
                                 ? Promise.resolve()
                                 : Promise.reject(
-                                    "duration must be a positive number and either a whole number up to 30 years."
-                                  )
+                                    "Duration must be a positive number and either a whole number up to 50 years."
+                                  );
+                            }
                           }
                         ]}
                       >
@@ -395,6 +400,8 @@ const Project = ({ projectData }) => {
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
+                      tokenSeparators={[',']}
+                      options={options}
                     />
                   </Form.Item>
                   <Form.Item
@@ -411,6 +418,8 @@ const Project = ({ projectData }) => {
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
+                      tokenSeparators={[',']}
+                      options={options}
                     />
                   </Form.Item>
                   <Row>
