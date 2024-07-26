@@ -331,7 +331,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {(item?.university_name || item?.place) && (
                 <div className={styles.subtitle}>
-                  {item.university_name} , {item.place}
+                  {item.university_name} {item.place && `, ${item.place}`}
                 </div>
               )}
               {item?.passing_year && (
