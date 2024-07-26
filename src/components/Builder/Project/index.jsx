@@ -58,8 +58,9 @@ const Project = ({ projectData }) => {
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const [dragged, setDragged] = useState(false); // Add this line
-  const [newOrder, setNewOrder] = useState({}); // Add this line
+  const [dragged, setDragged] = useState(false);
+  const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -117,21 +118,26 @@ const Project = ({ projectData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const project of values) {
-        if (project.id) {
-          const response = await updateProjectService({
-            profile_id: profile_id,
-            project_id: project.id,
-            values: project
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const project of values) {
+          if (project.id) {
+            const response = await updateProjectService({
+              profile_id: profile_id,
+              project_id: project.id,
+              values: project
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -303,6 +309,7 @@ const Project = ({ projectData }) => {
                   form={form}
                   name={`project_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`project_${index}`, "id"]} hidden>

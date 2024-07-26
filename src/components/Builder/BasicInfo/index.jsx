@@ -39,14 +39,12 @@ const BasicInfo = ({ profileData }) => {
       if (values.years_of_experience || values.josh_joining_date) {
         values.years_of_experience = Number(values.years_of_experience);
         if (values.josh_joining_date) {
-          // Check if josh_joining_date is a dayjs object, if not, parse it
           if (!dayjs.isDayjs(values.josh_joining_date)) {
             values.josh_joining_date = dayjs(values.josh_joining_date);
           }
           values.josh_joining_date = values.josh_joining_date.format("MMM-YYYY");
         }
       }
-      console.log("values : ", values);
       let response;
       if (profileData) {
         response = await updateProfileService({

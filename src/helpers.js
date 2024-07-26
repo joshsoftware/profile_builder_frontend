@@ -91,7 +91,6 @@ export const calculateTotalExperience = (pastExp, joinDate) => {
   const monthsSinceJoining = (diffYears * 12) + diffMonths;
   
   const totalExperienceInMonths = pastExperienceInMonths + monthsSinceJoining;
-  console.log(totalExperienceInMonths)
   const totalExperienceInYears = totalExperienceInMonths / 12;
 
   return Math.round(totalExperienceInYears);
