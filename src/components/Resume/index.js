@@ -17,6 +17,7 @@ import { saveAs } from "file-saver";
 import PropTypes from "prop-types";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 import { getMonthString, PRESENT_VALUE } from "../../Constants";
+import { calculateTotalExperience } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
@@ -445,7 +446,7 @@ const Resume = forwardRef(({ data }, ref) => {
 
     const rightColumn = ["experiences", "projects"].filter(Boolean);
     setColumns([leftColumn, rightColumn]);
-  }, [achievements, certifications]);
+  }, [achievements, certifications]);  
 
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
@@ -466,9 +467,9 @@ const Resume = forwardRef(({ data }, ref) => {
       <Menu.Item key="1" onClick={handlePrint}>
         Download as PDF
       </Menu.Item>
-      <Menu.Item key="2" onClick={handleDownload}>
+      {/* <Menu.Item key="2" onClick={handleDownload}>
         Download as DOCX
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
   );
 
@@ -498,8 +499,7 @@ const Resume = forwardRef(({ data }, ref) => {
               {profile?.years_of_experience && (
                 <div>
                   <CheckSquareOutlined />{" "}
-                  {Math.round(profile?.years_of_experience)}
-                  <span>+ Years of Experience</span>
+                  <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date)}+ Years of Experience</span>
                 </div>
               )}
               {profile?.email && (
