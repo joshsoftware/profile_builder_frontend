@@ -68,7 +68,6 @@ const BasicInfo = ({ profileData }) => {
         setFormChange(false);
       }
     } catch (error) {
-      console.log("In log : ", error);
       toast.error(error.response?.data?.message);
     }
   };
