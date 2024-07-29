@@ -192,7 +192,7 @@ const Resume = forwardRef(({ data }, ref) => {
     ) {
       return PRESENT_VALUE;
     }
-    return ` ${getMonthString(givenMonth)} ${givenYear}   `;
+    return `${getMonthString(givenMonth)} ${givenYear}`;
   };
 
   const sectionDiv = {
@@ -215,7 +215,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
                   | <CalendarOutlined /> {getMonthYear(item.from_date)} -
-                  {item.to_date === PRESENT_VALUE ? " Present" : item.to_date}
+                  {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
                 </div>
               )}
             </div>
@@ -246,11 +246,10 @@ const Resume = forwardRef(({ data }, ref) => {
                   )}
                 </h2>
               )}
-
               {item?.duration && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Duration : </b>
-                  {item.duration}
+                  <b className={styles.overview}>Duration: </b>
+                  {item.duration} years
                 </span>
               )}
               {item?.description && (
@@ -263,7 +262,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.role && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Role : </b>
+                  <b className={styles.overview}>Role: </b>
                     <ul>
                       {item.role.split('\n').map((line, index) => (
                         <li key={index}>{line}</li>
@@ -273,7 +272,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.responsibilities && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Responsibility : </b>
+                  <b className={styles.overview}>Responsibility: </b>
                     <ul>
                       {item.responsibilities.split('\n').map((line, index) => (
                         <li key={index}>{line}</li>
@@ -284,7 +283,7 @@ const Resume = forwardRef(({ data }, ref) => {
 
               {item?.technologies && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Project Techstack : </b>
+                  <b className={styles.overview}>Project Techstack: </b>
                   {Array.isArray(item.technologies)
                     ? item.technologies.join(", ")
                     : item.technologies}
@@ -292,7 +291,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.tech_worked_on && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Technology Worked On : </b>
+                  <b className={styles.overview}>Technology Worked On: </b>
                   {Array.isArray(item.tech_worked_on)
                     ? item.tech_worked_on.join(", ")
                     : item.tech_worked_on}
@@ -338,17 +337,17 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {(item?.university_name || item?.place) && (
                 <div className={styles.subtitle}>
-                  {item.university_name} {item.place && `, ${item.place}`}
+                  {item.university_name}{item.place && `, ${item.place}`}
                 </div>
               )}
               {item?.passing_year && (
                 <div className={styles.passingDate}>
-                  Passing Year : {new Date(item.passing_year).getFullYear()}
+                  Passing Year: {new Date(item.passing_year).getFullYear()}
                 </div>
               )}
               {item?.percent_or_cgpa && (
                 <div className={styles.passingDate}>
-                  CGPA / Percentage : {item.percent_or_cgpa}
+                  CGPA/Percentage: {item.percent_or_cgpa}
                 </div>
               )}
             </div>
@@ -425,7 +424,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  Issue Date : {item.issued_date}
+                  Issue Date: {getMonthYear(item.issued_date)}
                 </div>
               )}
             </div>
