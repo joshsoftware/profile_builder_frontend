@@ -361,7 +361,7 @@ const Project = ({ projectData }) => {
                     <Input.TextArea
                       placeholder="Please provide responsibilities"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item

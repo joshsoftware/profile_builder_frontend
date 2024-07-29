@@ -139,9 +139,17 @@ const BasicInfo = ({ profileData }) => {
             label="Past Years Of Experience(In months)"
             rules={[
               { required: true, message: "Experience required" },
-              { pattern: WHOLE_NO_VALIDATOR, message: "Experience must be a whole number" },
-              { type: 'number', min: 0, max: 720, message: "Experience must be between 0 and 720 months" }
-            ]}            
+              {
+                pattern: WHOLE_NO_VALIDATOR,
+                message: "Experience must be a whole number",
+              },
+              {
+                validator: (_, value) =>
+                  value <= 30 && value >= 0
+                    ? Promise.resolve()
+                    : Promise.reject("Experience must be between 0 and 30 years"),
+              },
+            ]}           
           >
             <Input
               type="number"
