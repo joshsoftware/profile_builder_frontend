@@ -1,4 +1,5 @@
 import React from "react";
+import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Button, Image, Typography } from "antd";
@@ -23,6 +24,8 @@ const Login = () => {
           dispatch(loginAction({ token }));
           window.localStorage.setItem("token", token);
           navigate(PROFILE_LIST_ROUTE);
+        } else if (response?.data) {
+          toast.success(response?.data?.message);
         }
       } catch (error) {
         throw new Error(error);

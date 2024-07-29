@@ -21,13 +21,14 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import { useUserEmailMutation } from "../../../api/emailApi";
 import {
   useDeleteProfileMutation,
   useGetProfileListQuery,
   useUpdateProfileStatusMutation,
 } from "../../../api/profileApi";
-import Modals from "../../../common-components/Modals";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
+import { showConfirm } from "../../../helpers";
 import Navbar from "../../Navbar/navbar";
 import styles from "./ListProfiles.module.css";
 
@@ -37,130 +38,99 @@ const ListProfiles = () => {
   const [activeStatus, setActiveStatus] = useState(true);
   const searchInput = useRef(null);
   const navigate = useNavigate();
-  const { data, isFetching } = useGetProfileListQuery();
+  const [disableInvite, setDisableInvite] = useState({});
+  const { data, isFetching, refetch } = useGetProfileListQuery();
   const [deleteProfileService] = useDeleteProfileMutation();
   const [updateProfileStatusService] = useUpdateProfileStatusMutation();
+  const [sendInvitationService] = useUserEmailMutation();
 
-  const [isCurrentEmpModalState, setIsCurrentEmpModalState] = useState({
-    isVisibleIsCurrentEmployee: false,
-    checked: false,
-    profileID: null,
-    record: null,
-  });
+  console.log("data in profile list : ", data);
 
-  const [deleteModal, setDeleteModal] = useState({
-    isVisibleDelete: false,
-    profileID: null,
-  });
-
-  const [toggleActiveModal, setToggleActiveModal] = useState({
-    isVisibleToggleActive: false,
-    isActive: false,
-    profileID: null,
-  });
-
-  const handleDeleteCancel = () => {
-    setDeleteModal({
-      ...deleteModal,
-      isVisibleDelete: false,
-    });
-  };
   const showActiveInactiveModal = (profile_id, isActive) => {
-    setToggleActiveModal({
-      isVisibleToggleActive: true,
-      isActive,
-      profileID: profile_id,
+    showConfirm({
+      onOk: async () => {
+        const is_active = isActive ? "NO" : "YES";
+        try {
+          const response = await updateProfileStatusService({
+            profile_id,
+            profile_status: { is_active },
+          });
+          toast.success(response?.data?.message);
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
+        }
+      },
+      onCancel: () => {},
+      message: `Are you sure you want to ${
+        isActive ? "inactive" : "active"
+      } this profile?`,
     });
   };
 
-  const handleToggleActiveStatus = async () => {
-    const { profileID, isActive } = toggleActiveModal;
-    const is_active = isActive ? "NO" : "YES";
-    try {
-      const response = await updateProfileStatusService({
-        profile_id: profileID,
-        profile_status: { is_active },
-      });
-      toast.success(response?.data?.message);
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
-    }
-    setToggleActiveModal({
-      isVisibleToggleActive: false,
-      isActive: false,
-      profileID: null,
+  const showIsCurrentEmpModal = (profile_id, checked) => {
+    showConfirm({
+      onOk: async () => {
+        const profile_status = {
+          is_current_employee: checked ? "YES" : "NO",
+        };
+        try {
+          const response = await updateProfileStatusService({
+            profile_id,
+            profile_status,
+          });
+          toast.success(response?.data?.message);
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
+        }
+      },
+      onCancel: () => {},
+      message: `Are you sure you want to ${
+        checked ? "active" : "inactive"
+      } this employee?`,
     });
   };
 
-  const handleToggleActiveCancel = () => {
-    setToggleActiveModal({
-      ...toggleActiveModal,
-      isVisibleToggleActive: false,
-    });
-  };
-
-  const handleToggleCancel = () => {
-    setIsCurrentEmpModalState({
-      ...isCurrentEmpModalState,
-      isVisibleIsCurrentEmployee: false,
-      checked: isCurrentEmpModalState.record?.is_current_employee !== "NO",
-    });
-  };
-
-  const handleToggleEmployeeStatus = async () => {
-    const { profileID, checked } = isCurrentEmpModalState;
-    const profile_status = {
-      is_current_employee: checked ? "YES" : "NO",
-    };
-    try {
-      const response = await updateProfileStatusService({
-        profile_id: profileID,
-        profile_status,
-      });
-      toast.success(response?.data?.message);
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
-    }
-
-    setIsCurrentEmpModalState({
-      ...isCurrentEmpModalState,
-      isVisibleIsCurrentEmployee: false,
-      checked: false,
-      profileID: null,
-      record: null,
-    });
-  };
-
-  const showIsCurrentEmpModal = (profile_id, checked, record) => {
-    setIsCurrentEmpModalState({
-      isVisibleIsCurrentEmployee: true,
-      checked,
-      profileID: profile_id,
-      record,
-    });
-  };
   const showDeleteModal = (profile_id) => {
-    setDeleteModal({
-      isVisibleDelete: true,
-      profileID: profile_id,
+    showConfirm({
+      onOk: async () => {
+        try {
+          const response = await deleteProfileService({
+            profile_id: profile_id,
+          });
+          if (response?.data) {
+            toast.success(response?.data);
+          }
+        } catch (error) {
+          console.error("Error deleting profile:", error);
+          toast.error(error.response?.data?.error_message);
+        }
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this profile?",
     });
   };
 
-  const handleDelete = async () => {
-    try {
-      const response = await deleteProfileService({
-        profile_id: deleteModal.profileID,
-      });
-      if (response?.data) {
-        toast.success(response?.data);
-      }
-    } catch (error) {
-      console.error("Error deleting profile:", error);
-      toast.error(error.response?.data?.error_message);
-    }
-    setDeleteModal({
-      ...deleteModal,
-      isVisibleDelete: false,
+  const handleSendInvite = (profile_id) => {
+    showConfirm({
+      onOk: async () => {
+        try {
+          const response = await sendInvitationService({
+            profile_id,
+          });
+          if (response?.data) {
+            toast.success(response?.data?.message);
+            setDisableInvite((prev) => ({
+              ...prev,
+              [profile_id]: true,
+            }));
+            await refetch();
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
+        }
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to send invitation?",
     });
   };
 
@@ -286,7 +256,7 @@ const ListProfiles = () => {
       ...getColumnSearchProps("primary_skills"),
       render: (_, { primary_skills }) => (
         <>
-          {primary_skills.map((tag, index) => {
+          {primary_skills?.map((tag, index) => {
             let color =
               tag.length > Math.floor(Math.random() * 10) + 1
                 ? "geekblue"
@@ -312,27 +282,8 @@ const ListProfiles = () => {
           <Switch
             checkedChildren={<CheckOutlined />}
             unCheckedChildren={<CloseOutlined />}
-            checked={
-              isCurrentEmpModalState.profileID === record?.id
-                ? isCurrentEmpModalState.checked
-                : record?.is_current_employee !== "NO"
-            }
-            onChange={(checked) =>
-              showIsCurrentEmpModal(record?.id, checked, record)
-            }
-          />
-          <Modals
-            isVisible={
-              isCurrentEmpModalState.isVisibleIsCurrentEmployee &&
-              isCurrentEmpModalState.profileID === record.id
-            }
-            onOk={handleToggleEmployeeStatus}
-            onCancel={handleToggleCancel}
-            message={`Are you sure you want to ${
-              isCurrentEmpModalState.record?.is_current_employee !== "NO"
-                ? "inactive"
-                : "active"
-            } this employee?`}
+            checked={record?.is_current_employee === "YES"}
+            onChange={(checked) => showIsCurrentEmpModal(record?.id, checked)}
           />
         </>
       ),
@@ -340,6 +291,7 @@ const ListProfiles = () => {
     {
       title: "Action",
       key: "action",
+      width: "20%",
       render: (_, record) => (
         <Space size="middle">
           <Tooltip title="Edit">
@@ -352,28 +304,27 @@ const ListProfiles = () => {
           <Tooltip title="Delete">
             <DeleteOutlined onClick={() => showDeleteModal(record?.id)} />
           </Tooltip>
-          <Modals
-            isVisible={deleteModal.isVisibleDelete}
-            onOk={handleDelete}
-            onCancel={handleDeleteCancel}
-            message="Are you sure you want to delete this profile?"
-          />
-          <Button
-            type={"primary"}
-            onClick={() =>
-              showActiveInactiveModal(record?.id, record.is_active === "YES")
-            }
-          >
-            {record.is_active === "YES" ? "Inactive" : "Active"}
-          </Button>
-          <Modals
-            isVisible={toggleActiveModal.isVisibleToggleActive}
-            onOk={handleToggleActiveStatus}
-            onCancel={handleToggleActiveCancel}
-            message={`Are you sure you want to ${
-              toggleActiveModal.isActive ? "inactive" : "active"
-            } this profile?`}
-          />
+          <Tooltip title="This button will change the active status of the profile">
+            <Button
+              type={"primary"}
+              size="small"
+              onClick={() =>
+                showActiveInactiveModal(record?.id, record.is_active === "YES")
+              }
+            >
+              {record.is_active === "YES" ? "Inactive" : "Active"}
+            </Button>
+          </Tooltip>
+          <Tooltip title="This button will send an invite to the profile's email">
+            <Button
+              type={"primary"}
+              size="small"
+              disabled={disableInvite[record?.id] || record?.is_active === "NO"}
+              onClick={() => handleSendInvite(record?.id)}
+            >
+              Send Invite
+            </Button>
+          </Tooltip>
         </Space>
       ),
     },

@@ -275,7 +275,6 @@ const Resume = forwardRef(({ data }, ref) => {
                   {item.responsibilities}
                 </span>
               )}
-
               {item?.technologies && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Project Techstack : </b>
@@ -367,7 +366,7 @@ const Resume = forwardRef(({ data }, ref) => {
               <div>
                 <div className={styles.subtitleHeading}>Primary Skills</div>
                 <ul className={styles.skillNumbered}>
-                  {profile?.primary_skills.map((elem, index) => (
+                  {profile?.primary_skills?.map((elem, index) => (
                     <Tag
                       color="blue"
                       key={"primary" + elem + index}
