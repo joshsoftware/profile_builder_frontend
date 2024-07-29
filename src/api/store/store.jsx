@@ -2,6 +2,7 @@ import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { achievementApi } from "../achievementApi";
 import { certificationApi } from "../certificationApi";
 import { educationApi } from "../educationApi";
+import { userEmailApi } from "../emailApi";
 import { experienceApi } from "../experienceApi";
 import { loginApi } from "../loginApi";
 import { profileApi } from "../profileApi";
@@ -11,8 +12,8 @@ import authReducer from "./authSlice";
 const token = window.localStorage.getItem("token");
 const preloadedState = {
   auth: {
-    token: token ? token : null
-  }
+    token: token ? token : null,
+  },
 };
 const rootReducer = combineReducers({
   [loginApi.reducerPath]: loginApi.reducer,
@@ -22,7 +23,8 @@ const rootReducer = combineReducers({
   [educationApi.reducerPath]: educationApi.reducer,
   [experienceApi.reducerPath]: experienceApi.reducer,
   [projectApi.reducerPath]: projectApi.reducer,
-  auth: authReducer
+  [userEmailApi.reducerPath]: userEmailApi.reducer,
+  auth: authReducer,
 });
 
 const store = configureStore({
@@ -36,8 +38,9 @@ const store = configureStore({
       certificationApi.middleware,
       educationApi.middleware,
       experienceApi.middleware,
-      projectApi.middleware
-    )
+      projectApi.middleware,
+      userEmailApi.middleware,
+    ),
 });
 
 export default store;
