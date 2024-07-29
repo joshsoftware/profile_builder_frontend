@@ -42,13 +42,14 @@ const Education = ({ educationData }) => {
       label: "Education 1",
       children: null,
       key: "0",
-      isExisting: false
+      isExisting: false,
     }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
@@ -100,21 +101,26 @@ const Education = ({ educationData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const education of values) {
-        if (education.id) {
-          const response = await updateEducationService({
-            profile_id: profile_id,
-            education_id: education.id,
-            values: education
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if (formChange) {
+      try {
+        for (const education of values) {
+          if (education.id) {
+            const response = await updateEducationService({
+              profile_id: profile_id,
+              education_id: education.id,
+              values: education
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -213,7 +219,6 @@ const Education = ({ educationData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -283,6 +288,7 @@ const Education = ({ educationData }) => {
                   form={form}
                   name={`education_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`education_${index}`, "id"]} hidden>

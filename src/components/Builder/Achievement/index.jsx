@@ -49,6 +49,7 @@ const Achievement = ({ achievementData }) => {
   const [action, setAction] = useState("create");
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
@@ -101,21 +102,26 @@ const Achievement = ({ achievementData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const achievement of values) {
-        if (achievement.id) {
-          const response = await updateAchievementService({
-            profile_id: profile_id,
-            achievement_id: achievement.id,
-            values: achievement,
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const achievement of values) {
+          if (achievement.id) {
+            const response = await updateAchievementService({
+              profile_id: profile_id,
+              achievement_id: achievement.id,
+              values: achievement,
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -218,7 +224,6 @@ const Achievement = ({ achievementData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -288,6 +293,7 @@ const Achievement = ({ achievementData }) => {
                   form={form}
                   name={`achievement_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`achievement_${index}`, "id"]} hidden>

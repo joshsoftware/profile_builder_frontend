@@ -50,6 +50,7 @@ const Certification = ({ certificationData }) => {
   const dispatch = useDispatch();
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 }
   });
@@ -106,21 +107,26 @@ const Certification = ({ certificationData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const certificate of values) {
-        if (certificate.id) {
-          const response = await updateCertificateService({
-            profile_id: profile_id,
-            certificate_id: certificate.id,
-            values: certificate
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const certificate of values) {
+          if (certificate.id) {
+            const response = await updateCertificateService({
+              profile_id: profile_id,
+              certificate_id: certificate.id,
+              values: certificate
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -219,7 +225,6 @@ const Certification = ({ certificationData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -289,6 +294,7 @@ const Certification = ({ certificationData }) => {
                   form={form}
                   name={`certification_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Row>

@@ -11,7 +11,7 @@ import {
   Row,
   Select,
   Space,
-  Tabs
+  Tabs,
 } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
@@ -53,18 +53,20 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: false
+      isExisting: false,
     }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
-  const [dragged, setDragged] = useState(false); // Add this line
-  const [newOrder, setNewOrder] = useState({}); // Add this line
+  const [dragged, setDragged] = useState(false);
+  const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
       distance: 10
     }
   });
+  const options = [];
 
   useEffect(() => {
     if (profile_id && projectData) {
@@ -117,21 +119,26 @@ const Project = ({ projectData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const project of values) {
-        if (project.id) {
-          const response = await updateProjectService({
-            profile_id: profile_id,
-            project_id: project.id,
-            values: project
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const project of values) {
+          if (project.id) {
+            const response = await updateProjectService({
+              profile_id: profile_id,
+              project_id: project.id,
+              values: project
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -233,7 +240,6 @@ const Project = ({ projectData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -303,6 +309,7 @@ const Project = ({ projectData }) => {
                   form={form}
                   name={`project_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`project_${index}`, "id"]} hidden>
@@ -334,14 +341,7 @@ const Project = ({ projectData }) => {
                         name={[`project_${index}`, "duration"]}
                         label="Project Duration (in years)"
                         rules={[
-                          {
-                            validator: (_, value) =>
-                              value <= 30 && value >= 0
-                                ? Promise.resolve()
-                                : Promise.reject(
-                                    "duration must be a positive number and either a whole number up to 30 years."
-                                  )
-                          }
+                          { type: 'number', min: 0, max: 50, message: "Project duration must be between 0 and 50 years" }
                         ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />
@@ -361,7 +361,7 @@ const Project = ({ projectData }) => {
                     <Input.TextArea
                       placeholder="Please provide responsibilities"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item
@@ -388,6 +388,8 @@ const Project = ({ projectData }) => {
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
+                      tokenSeparators={[',']}
+                      options={options}
                     />
                   </Form.Item>
                   <Form.Item
@@ -404,6 +406,8 @@ const Project = ({ projectData }) => {
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
+                      tokenSeparators={[',']}
+                      options={options}
                     />
                   </Form.Item>
                   <Row>

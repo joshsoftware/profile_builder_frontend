@@ -80,3 +80,18 @@ export const disabledDate = (current) => {
   // Can not select month before today and today
   return current && current < dayjs().endOf('month');
 };
+
+export const calculateTotalExperience = (pastExp, joinDate) => {
+  const pastExperienceInMonths = (pastExp || 0);
+  const joiningDate = new Date(joinDate);
+  const currentDate = new Date();
+
+  const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
+  const diffMonths = currentDate.getMonth() - joiningDate.getMonth();
+  const monthsSinceJoining = (diffYears * 12) + diffMonths;
+  
+  const totalExperienceInMonths = pastExperienceInMonths + monthsSinceJoining;
+  const totalExperienceInYears = totalExperienceInMonths / 12;
+
+  return Math.floor(totalExperienceInYears);
+}; 
