@@ -1,3 +1,8 @@
+import React from "react";
+import { Modal } from "antd";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+const { confirm } = Modal;
+
 import dayjs from "dayjs";
 
 export const filterSection = (values) => {
@@ -24,7 +29,7 @@ export const formatProjectsFields = (projects) => {
     working_end_date: project.working_end_date
       ? project.working_end_date.format("MMM-YYYY")
       : null,
-    duration: project.duration
+    duration: project.duration,
   }));
 };
 
@@ -36,7 +41,7 @@ export const formatExperienceFields = (experiences) => {
     from_date: experience?.from_date?.format("MMM-YYYY"),
     to_date: experience?.to_date
       ? experience?.to_date?.format("MMM-YYYY")
-      : "Present"
+      : "Present",
   }));
 };
 
@@ -47,7 +52,7 @@ export const formatEducationFields = (educations) => {
     university_name: education?.university_name,
     place: education?.place,
     percent_or_cgpa: education?.percent_or_cgpa,
-    passing_year: education?.passing_year
+    passing_year: education?.passing_year,
   }));
 };
 
@@ -59,7 +64,7 @@ export const formatCertificationFields = (certifications) => {
     description: certificate?.description,
     issued_date: certificate?.issued_date?.format("MMM-YYYY"),
     from_date: certificate?.from_date?.format("MMM-YYYY"),
-    to_date: certificate?.to_date?.format("MMM-YYYY")
+    to_date: certificate?.to_date?.format("MMM-YYYY"),
   }));
 };
 
@@ -67,7 +72,7 @@ export const formatCertificationFields = (certifications) => {
 export const formatAchievementFields = (achievements) => {
   return achievements.map((achievement) => ({
     name: achievement?.name,
-    description: achievement?.description
+    description: achievement?.description,
   }));
 };
 
@@ -76,6 +81,23 @@ export const validateId = (id) => {
 };
 
 export const disabledDate = (current) => {
-  // Can not select month before today and today
-  return current && current < dayjs().endOf('month');
+  return current && current < dayjs().endOf("month");
+};
+
+export const showConfirm = ({ onOk, onCancel, message }) => {
+  confirm({
+    title: "Confirm",
+    icon: <ExclamationCircleFilled />,
+    centered: true,
+    content: message,
+    okText: "Yes",
+    okType: "danger",
+    cancelText: "No",
+    onOk() {
+      onOk();
+    },
+    onCancel() {
+      onCancel();
+    },
+  });
 };
