@@ -66,6 +66,7 @@ const Experience = ({ experienceData }) => {
   const { profile_id } = useParams();
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
@@ -124,27 +125,32 @@ const Experience = ({ experienceData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const experience of values) {
-        if (experience?.id) {
-          const response = await updateExperienceService({
-            profile_id: profile_id,
-            experience_id: experience.id,
-            values: {
-              ...experience,
-              from_date: experience.from_date.format("MMM-YYYY"),
-              to_date: experience.to_date
-                ? experience.to_date.format("MMM-YYYY")
-                : PRESENT_VALUE,
-            },
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const experience of values) {
+          if (experience?.id) {
+            const response = await updateExperienceService({
+              profile_id: profile_id,
+              experience_id: experience.id,
+              values: {
+                ...experience,
+                from_date: experience.from_date.format("MMM-YYYY"),
+                to_date: experience.to_date
+                  ? experience.to_date.format("MMM-YYYY")
+                  : PRESENT_VALUE,
+              },
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -245,7 +251,6 @@ const Experience = ({ experienceData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -315,6 +320,7 @@ const Experience = ({ experienceData }) => {
                   form={form}
                   name={`experience_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Row>

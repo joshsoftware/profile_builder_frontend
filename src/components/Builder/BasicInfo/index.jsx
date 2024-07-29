@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Select, Space } from "antd";
+import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import dayjs from "dayjs"; // import dayjs
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
@@ -13,43 +14,62 @@ import {
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
+  WHOLE_NO_VALIDATOR,
 } from "../../../Constants";
+
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
   const [updateProfileService] = useUpdateProfileMutation();
+  const [formChange, setFormChange] = useState(false);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (profileData) {
-      form.setFieldsValue(profileData);
+      const profileDataCopy = { ...profileData };
+      if (profileDataCopy.josh_joining_date) {
+        if (!dayjs.isDayjs(profileDataCopy.josh_joining_date)) {
+          profileDataCopy.josh_joining_date = dayjs(profileDataCopy.josh_joining_date);
+        }
+      }
+      form.setFieldsValue(profileDataCopy);
     }
   }, [profileData, form]);
 
   const onFinish = async (values) => {
-    if (values.years_of_experience) {
-      values.years_of_experience = parseFloat(values.years_of_experience);
-    }
-
     try {
+      if (values.years_of_experience || values.josh_joining_date) {
+        values.years_of_experience = Number(values.years_of_experience);
+        if (values.josh_joining_date) {
+          if (!dayjs.isDayjs(values.josh_joining_date)) {
+            values.josh_joining_date = dayjs(values.josh_joining_date);
+          }
+          values.josh_joining_date = values.josh_joining_date.format("MMM-YYYY");
+        }
+      }
       let response;
       if (profileData) {
-        response = await updateProfileService({
-          profile_id: profileData.id,
-          values,
-        });
+        if(formChange){
+          response = await updateProfileService({
+            profile_id: profileData.id,
+            values,
+          });
+        } else {
+          toast.success("No new changes detected.");
+        }
       } else {
         response = await createProfileService(values);
       }
 
-      if (response.data?.message) {
+      if (response?.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
           EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
         );
+        setFormChange(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -59,6 +79,7 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
+      onValuesChange={()=>setFormChange(true)}
       initialValues={
         profileData?.profile || { profileDetails: PROFILE_DETAILS }
       }
@@ -115,20 +136,20 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Years Of Experience"
+            label="Past Years Of Experience(In months)"
             rules={[
               { required: true, message: "Experience required" },
-              // {
-              //   pattern: /^[0-9]+$/,
-              //   message: "Experience must be a whole number",
-              // },
+              {
+                pattern: WHOLE_NO_VALIDATOR,
+                message: "Experience must be a whole number",
+              },
               {
                 validator: (_, value) =>
                   value <= 30 && value >= 0
                     ? Promise.resolve()
                     : Promise.reject("Experience must be between 0 and 30 years"),
               },
-            ]}
+            ]}           
           >
             <Input
               type="number"
@@ -158,7 +179,7 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
-      {/* <Row gutter={16}>
+      <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name="josh_joining_date"
@@ -169,13 +190,6 @@ const BasicInfo = ({ profileData }) => {
         </Col>
         <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">
-            <Input placeholder="Enter GitHub profile link" />
-          </Form.Item>
-        </Col>
-      </Row> */}
-      <Row gutter={16}>
-        <Col span={12}>
-        <Form.Item name="github_link" label="Github Profile Link">
             <Input placeholder="Enter GitHub profile link" />
           </Form.Item>
         </Col>
@@ -265,6 +279,10 @@ BasicInfo.propTypes = {
       secondary_skills: PropTypes.array,
       career_objectives: PropTypes.string,
     }),
+    josh_joining_date: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object,
+    ]),
   }),
 };
 
