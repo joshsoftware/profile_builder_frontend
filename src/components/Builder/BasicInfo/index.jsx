@@ -27,10 +27,10 @@ const BasicInfo = ({ profileData }) => {
   useEffect(() => {
     if (profileData) {
       const profileDataCopy = { ...profileData };
-      if (profileDataCopy.josh_joining_date) {
-        if (!dayjs.isDayjs(profileDataCopy.josh_joining_date)) {
-          profileDataCopy.josh_joining_date = dayjs(profileDataCopy.josh_joining_date);
-        }
+      if (profileDataCopy.josh_joining_date && profileDataCopy.josh_joining_date.Valid) {
+        profileDataCopy.josh_joining_date = dayjs(profileDataCopy.josh_joining_date.String);
+      } else {
+        profileDataCopy.josh_joining_date = null;
       }
       form.setFieldsValue(profileDataCopy);
     }
