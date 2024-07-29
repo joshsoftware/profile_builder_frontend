@@ -99,7 +99,7 @@ const Project = ({ projectData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, projectData]);
+  }, [profile_id, projectData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -257,6 +257,23 @@ const Project = ({ projectData }) => {
     }
   };
 
+  const handleProjects = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -356,7 +373,7 @@ const Project = ({ projectData }) => {
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the project"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item
@@ -431,16 +448,16 @@ const Project = ({ projectData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
+                        htmlType="button"
+                        onClick={()=> handleProjects("create")}
                         disabled={item.isExisting}
                       >
                         Create Projects
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleProjects("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Project {Number(item.key) + 1}

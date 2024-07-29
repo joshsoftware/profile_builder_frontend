@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -51,6 +51,11 @@ const Achievement = ({ achievementData }) => {
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
+  const resetItems = useCallback(() => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  }, [form]);
 
   useEffect(() => {
     if (profile_id && achievementData) {
@@ -78,13 +83,7 @@ const Achievement = ({ achievementData }) => {
         resetItems();
       }
     }
-  }, [profile_id, achievementData]);
-
-  const resetItems = () => {
-    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-    newTabIndex.current = 1;
-    form.resetFields();
-  };
+  }, [profile_id, achievementData, form, resetItems]);
 
   const handleCreate = async (values) => {
     try {
@@ -243,6 +242,23 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
+  const handleAchievements = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -292,23 +308,23 @@ const Achievement = ({ achievementData }) => {
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above achievement"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item>
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("create")}
                         disabled={item.isExisting}
                       >
                         Create Achievements
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Achievement {Number(item.key) + 1}

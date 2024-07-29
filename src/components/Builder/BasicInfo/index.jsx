@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
-import dayjs from "dayjs";
+import { Button, Col, Form, Input, Row, Select, Space } from "antd";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
   useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
-  DESIGNATION,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
@@ -120,29 +118,27 @@ const BasicInfo = ({ profileData }) => {
             label="Years Of Experience"
             rules={[
               { required: true, message: "Experience required" },
+              // {
+              //   pattern: /^[0-9]+$/,
+              //   message: "Experience must be a whole number",
+              // },
               {
                 validator: (_, value) =>
                   value <= 30 && value >= 0
                     ? Promise.resolve()
-                    : Promise.reject(
-                        "Experience must be a positive number and either a whole number up to 30 years."
-                      ),
+                    : Promise.reject("Experience must be between 0 and 30 years"),
               },
             ]}
           >
             <Input
               type="number"
-              placeholder="Enter experience (e.g., 2.5, 1)"
+              placeholder="Enter experience (e.g., 24, 36)"
             />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item name="designation" label="Designation">
-            <Select
-              placeholder="Select designation"
-              options={DESIGNATION}
-              allowClear
-            />
+            <Input placeholder="Software Engineer, etc." />
           </Form.Item>
         </Col>
       </Row>
@@ -164,11 +160,6 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       {/* <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name="past_experience" label="Past Experience(in months)">
-            <Input placeholder="Ex. 36, 12, etc." />
-          </Form.Item>
-        </Col>
-        <Col span={12}>
           <Form.Item
             name="josh_joining_date"
             label="JOSH Joining Date"
@@ -176,10 +167,15 @@ const BasicInfo = ({ profileData }) => {
             <DatePicker style={{ width: "100%" }} picker="month" />
           </Form.Item>
         </Col>
+        <Col span={12}>
+          <Form.Item name="github_link" label="Github Profile Link">
+            <Input placeholder="Enter GitHub profile link" />
+          </Form.Item>
+        </Col>
       </Row> */}
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item name="github_link" label="Github Profile Link">
+        <Form.Item name="github_link" label="Github Profile Link">
             <Input placeholder="Enter GitHub profile link" />
           </Form.Item>
         </Col>
@@ -193,7 +189,7 @@ const BasicInfo = ({ profileData }) => {
             rules={[{ required: true, message: "Description required" }]}
           >
             <Input.TextArea
-              maxLength={600}
+              minLength={50}
               style={{ height: 120, resize: "none" }}
             />
           </Form.Item>

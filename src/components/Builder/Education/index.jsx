@@ -82,7 +82,7 @@ const Education = ({ educationData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, educationData]);
+  }, [profile_id, educationData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -238,6 +238,23 @@ const Education = ({ educationData }) => {
     }
   };
 
+  const handleEducations = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -320,20 +337,16 @@ const Education = ({ educationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("create");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleEducations("create")}
                         disabled={item.isExisting}
                       >
                         Create Educations
                       </Button>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("update");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleEducations("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Education {Number(item.key) + 1}

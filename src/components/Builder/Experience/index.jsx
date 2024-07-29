@@ -34,6 +34,7 @@ import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import {
   DESIGNATION,
   INVALID_ID_ERROR,
+  PRESENT_VALUE,
   SUCCESS_TOASTER,
 } from "../../../Constants";
 import {
@@ -91,7 +92,7 @@ const Experience = ({ experienceData }) => {
                 ? dayjs(experience.from_date)
                 : null,
               to_date:
-                experience.to_date && experience.to_date !== "Present"
+                experience.to_date && experience.to_date !== PRESENT_VALUE
                   ? dayjs(experience.to_date)
                   : dayjs(),
             };
@@ -105,7 +106,7 @@ const Experience = ({ experienceData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, experienceData]);
+  }, [profile_id, experienceData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -134,7 +135,7 @@ const Experience = ({ experienceData }) => {
               from_date: experience.from_date.format("MMM-YYYY"),
               to_date: experience.to_date
                 ? experience.to_date.format("MMM-YYYY")
-                : "Present",
+                : PRESENT_VALUE,
             },
           });
           if (response.data?.message) {
@@ -272,6 +273,23 @@ const Experience = ({ experienceData }) => {
     }
   };
 
+  const handleExperiences = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -407,16 +425,16 @@ const Experience = ({ experienceData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
+                        htmlType="button"
+                        onClick={() => handleExperiences("create")}
                         disabled={item.isExisting}
                       >
                         Create Experiences
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={() => handleExperiences("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Experience {Number(item.key) + 1}

@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Flex, Menu, Radio, Tag } from "antd";
+import { Button, Dropdown, Flex, Menu, Tag } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -16,7 +16,7 @@ import { Document, Packer, Paragraph, TextRun } from "docx";
 import { saveAs } from "file-saver";
 import PropTypes from "prop-types";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString } from "../../Constants";
+import { getMonthString, PRESENT_VALUE } from "../../Constants";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
@@ -191,7 +191,7 @@ const Resume = forwardRef(({ data }, ref) => {
       givenYear === currDate.getFullYear() &&
       givenMonth === currDate.getMonth()
     ) {
-      return " Present";
+      return PRESENT_VALUE;
     }
     return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };
@@ -216,7 +216,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
                   | <CalendarOutlined /> {getMonthYear(item.from_date)} -
-                  {item.to_date}
+                  {item.to_date === PRESENT_VALUE ? " Present" : item.to_date}
                 </div>
               )}
             </div>
