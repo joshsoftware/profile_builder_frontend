@@ -27,6 +27,7 @@ export const CREATE_EDUCATION_ENDPOINTS =
 export const CREATE_EXPERIENCE_ENDPOINTS =
   "/api/profiles/:profile_id/experiences";
 export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
+export const USER_EMAIL_ENDPOINT = "/api/userinvitation";
 
 export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
 export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
@@ -78,6 +79,7 @@ export const CERTIFICATE_REDUCER_PATH = "certificateApi";
 export const EDUCATION_REDUCER_PATH = "educationApi";
 export const EXPERIENCE_REDUCER_PATH = "experienceApi";
 export const PROJECT_REDUCER_PATH = "projectApi";
+export const USER_EMAIL_REDUCER_PATH = "userEmailApi";
 
 // ERRORS
 export const INVALID_ID_ERROR = "Invalid or missing ID";
