@@ -11,14 +11,14 @@ import {
   Row,
   Select,
   Space,
-  Tabs
+  Tabs,
 } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -27,15 +27,15 @@ import {
   projectApi,
   useCreateProjectMutation,
   useDeleteProjectMutation,
-  useUpdateProjectMutation
+  useUpdateProjectMutation,
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatProjectsFields,
-  validateId
+  showConfirm,
+  validateId,
 } from "../../../helpers";
 
 const Project = ({ projectData }) => {
@@ -44,7 +44,6 @@ const Project = ({ projectData }) => {
   const [updateProjectService] = useUpdateProjectMutation();
   const [deleteProjectService] = useDeleteProjectMutation();
   const [updateSequence] = useUpdateSequenceMutation(); // Add this line
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
@@ -53,8 +52,8 @@ const Project = ({ projectData }) => {
       label: "Project 1",
       children: null,
       key: "0",
-      isExisting: false
-    }
+      isExisting: false,
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -62,8 +61,8 @@ const Project = ({ projectData }) => {
   const [newOrder, setNewOrder] = useState({}); // Add this line
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10
-    }
+      distance: 10,
+    },
   });
 
   useEffect(() => {
@@ -88,10 +87,10 @@ const Project = ({ projectData }) => {
                 : null,
               working_end_date: project.working_end_date
                 ? dayjs(project.working_end_date)
-                : null
+                : null,
             };
             return acc;
-          }, {})
+          }, {}),
         );
         setActiveKey("0");
       } else {
@@ -106,7 +105,7 @@ const Project = ({ projectData }) => {
     try {
       const response = await createProjectService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -123,7 +122,7 @@ const Project = ({ projectData }) => {
           const response = await updateProjectService({
             profile_id: profile_id,
             project_id: project.id,
-            values: project
+            values: project,
           });
           if (response.data?.message) {
             toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -168,58 +167,55 @@ const Project = ({ projectData }) => {
       {
         label: `Project ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`project_${newActiveKey}`]);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
 
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (projectData[targetKey]?.id) {
+            const response = await deleteProjectService({
+              profile_id: profile_id,
+              project_id: projectData[targetKey]?.id,
+            });
 
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
-
-    try {
-      if (projectData[modalState.key]?.id) {
-        const response = await deleteProjectService({
-          profile_id: profile_id,
-          project_id: projectData[modalState.key]?.id
-        });
-
-        if (response?.data) {
-          toast.success(response?.data, SUCCESS_TOASTER);
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
         }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
-    }
-    form.resetFields([`project_${modalState.key}`]);
+        form.resetFields([`project_${targetKey}`]);
 
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this project?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -297,8 +293,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required"
-                      }
+                        message: "Name required",
+                      },
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -322,9 +318,9 @@ const Project = ({ projectData }) => {
                               value <= 30 && value >= 0
                                 ? Promise.resolve()
                                 : Promise.reject(
-                                    "duration must be a positive number and either a whole number up to 30 years."
-                                  )
-                          }
+                                    "duration must be a positive number and either a whole number up to 30 years.",
+                                  ),
+                          },
                         ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />
@@ -337,8 +333,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Responsibilities required"
-                      }
+                        message: "Responsibilities required",
+                      },
                     ]}
                   >
                     <Input.TextArea
@@ -353,8 +349,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Description required"
-                      }
+                        message: "Description required",
+                      },
                     ]}
                   >
                     <Input.TextArea
@@ -379,8 +375,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required"
-                      }
+                        message: "Worked technology is required",
+                      },
                     ]}
                   >
                     <Select
@@ -400,11 +396,11 @@ const Project = ({ projectData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "Start date cannot be in the future"
-                                    )
+                                      "Start date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -420,11 +416,11 @@ const Project = ({ projectData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "End date cannot be in the future"
-                                    )
+                                      "End date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -462,7 +458,7 @@ const Project = ({ projectData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -476,16 +472,10 @@ const Project = ({ projectData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this project?"
-      />
     </div>
   );
 };
 Project.propTypes = {
-  projectData: PropTypes.array
+  projectData: PropTypes.array,
 };
 export default Project;
