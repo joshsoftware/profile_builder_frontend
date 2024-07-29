@@ -341,18 +341,7 @@ const Project = ({ projectData }) => {
                         name={[`project_${index}`, "duration"]}
                         label="Project Duration (in years)"
                         rules={[
-                          {
-                            validator: (_, value) => {
-                              if (value === undefined || value === '') {
-                                return Promise.resolve();
-                              }
-                              return value <= 50 && value >= 0
-                                ? Promise.resolve()
-                                : Promise.reject(
-                                    "Duration must be a positive number and either a whole number up to 50 years."
-                                  );
-                            }
-                          }
+                          { type: 'number', min: 0, max: 50, message: "Project duration must be between 0 and 50 years" }
                         ]}
                       >
                         <Input type="number" placeholder="Eg. 2, 1.5" />

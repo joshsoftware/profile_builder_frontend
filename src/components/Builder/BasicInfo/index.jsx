@@ -14,6 +14,7 @@ import {
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
+  WHOLE_NO_VALIDATOR,
 } from "../../../Constants";
 
 const BasicInfo = ({ profileData }) => {
@@ -138,17 +139,9 @@ const BasicInfo = ({ profileData }) => {
             label="Past Years Of Experience(In months)"
             rules={[
               { required: true, message: "Experience required" },
-              {
-                pattern: /^[0-9]+$/,
-                message: "Experience must be a whole number",
-              },
-              {
-                validator: (_, value) =>
-                  value <= 720 && value >= 0
-                    ? Promise.resolve()
-                    : Promise.reject("Experience must be between 0 and 720 months"),
-              },
-            ]}
+              { pattern: WHOLE_NO_VALIDATOR, message: "Experience must be a whole number" },
+              { type: 'number', min: 0, max: 720, message: "Experience must be between 0 and 720 months" }
+            ]}            
           >
             <Input
               type="number"

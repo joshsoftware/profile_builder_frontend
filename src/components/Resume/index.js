@@ -292,7 +292,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.tech_worked_on && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>My Contribution : </b>
+                  <b className={styles.overview}>Technology Worked On : </b>
                   {Array.isArray(item.tech_worked_on)
                     ? item.tech_worked_on.join(", ")
                     : item.tech_worked_on}
