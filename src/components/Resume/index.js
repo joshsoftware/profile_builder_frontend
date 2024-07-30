@@ -214,7 +214,7 @@ const Resume = forwardRef(({ data }, ref) => {
               {item?.company_name && (
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
-                  | <CalendarOutlined /> {getMonthYear(item.from_date)} -
+                  | <CalendarOutlined /> {getMonthYear(item.from_date)} - {' '}
                   {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
                 </div>
               )}
@@ -494,10 +494,10 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
             </div>
             <div className={styles.experienceHeading}>
-              <div>
+              {profile?.years_of_experience && <div>
                 <CheckSquareOutlined />{" "}
                 <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date?.String)}+ Years of Experience</span>
-              </div>
+              </div>}
               {profile?.email && (
                 <div>
                   <MailOutlined /> {profile?.email}
