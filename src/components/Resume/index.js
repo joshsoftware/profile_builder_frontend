@@ -240,8 +240,8 @@ const Resume = forwardRef(({ data }, ref) => {
                   <b className={styles.underline}>{item.name}</b>
                   {item?.working_start_date && item?.working_end_date && (
                     <span className="px-2">
-                      | {getMonthYear(item.working_start_date)} -
-                      {getMonthYear(item.working_end_date)}
+                      | {getMonthYear(item.working_start_date)} - {' '}
+                      {getMonthYear(item.working_end_date) === PRESENT_VALUE ? "Present" : getMonthYear(item.working_end_date)}
                     </span>
                   )}
                 </h2>

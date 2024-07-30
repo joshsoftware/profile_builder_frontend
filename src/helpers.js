@@ -83,7 +83,7 @@ export const disabledDate = (current) => {
 
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInMonths = (pastExp || 0);
-  const joiningDate = new Date(joinDate || 0);
+  const joiningDate = joinDate ? new Date(joinDate) : new Date();
   const currentDate = new Date();
 
   const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
