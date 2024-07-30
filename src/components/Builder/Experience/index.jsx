@@ -241,7 +241,7 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const HandleEndDate = (e) => {
+  const handleIsCurrentCompany = (e) => {
     setIsCurrentCompany(e.target.checked);
   };
 
@@ -369,7 +369,7 @@ const Experience = ({ experienceData }) => {
                       <Checkbox
                         name={"isCurrentCompany"}
                         checked={isCurrentCompany}
-                        onChange={HandleEndDate}
+                        onChange={handleIsCurrentCompany}
                       >
                         Is This A Current Company ?
                       </Checkbox>

@@ -142,13 +142,7 @@ const BasicInfo = ({ profileData }) => {
               {
                 pattern: WHOLE_NO_VALIDATOR,
                 message: "Experience must be a whole number",
-              },
-              {
-                validator: (_, value) =>
-                  value <= 30 && value >= 0
-                    ? Promise.resolve()
-                    : Promise.reject("Experience must be between 0 and 30 years"),
-              },
+              }
             ]}           
           >
             <Input
@@ -217,6 +211,7 @@ const BasicInfo = ({ profileData }) => {
               style={{ width: "100%" }}
               placeholder="Select primary skills"
               options={SKILLS}
+              tokenSeparators={[',']}
               rules={[
                 {
                   required: true,
@@ -232,6 +227,7 @@ const BasicInfo = ({ profileData }) => {
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Add secondary skills"
+              tokenSeparators={[',']}
             />
           </Form.Item>
         </Col>
