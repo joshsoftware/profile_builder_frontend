@@ -95,6 +95,7 @@ const Achievement = ({ achievementData }) => {
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
+        window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
       toast.error(error.response?.data?.message);
@@ -186,6 +187,7 @@ const Achievement = ({ achievementData }) => {
 
         if (response?.data) {
           toast.success(response?.data, SUCCESS_TOASTER);
+          window.location.reload(); // needs tobe remove after implement download popover
         }
       }
     } catch (error) {

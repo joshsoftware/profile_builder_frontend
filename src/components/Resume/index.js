@@ -1,7 +1,7 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Menu, Tag } from "antd";
+import { Button, Dropdown, Menu } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -314,7 +314,10 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.title} style={{ textAlign: "right" }}>
           <ul className={styles.achievement}>
             {achievements?.map((item) => (
-              <li key={item.id}>{item?.name && <span>• {item.name}</span>}</li>
+              <>
+                <li key={item.id}>{item?.name && <span style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>{item.name}</span>}</li>
+                <div style={{ width: "120px", height: "3px", backgroundColor: "white", marginTop: "4px" }}></div>
+              </>
             ))}
           </ul>
         </div>
@@ -370,32 +373,28 @@ const Resume = forwardRef(({ data }, ref) => {
           <div className={styles.educationItem}>
             {profile?.primary_skills?.length > 0 && (
               <div>
-                <div className={styles.subtitleHeading}>Primary Skills</div>
-                <ul className={styles.skillNumbered}>
+                <div className={styles.subtitleHeading}>Primary</div>
+                <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
                   {profile?.primary_skills.map((elem, index) => (
-                    <Tag
-                      color="blue"
-                      key={"primary" + elem + index}
-                      style={{ margin: "1px" }}
-                    >
+                    <li className={styles.point} key={"primary" + elem + index} style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>
                       {elem}
-                    </Tag>
+                    </li>
                   ))}
                 </ul>
               </div>
             )}
             {profile?.secondary_skills?.length > 0 && (
               <div>
-                <div className={styles.subtitleHeading}>Secondary Skills</div>
-                <ul className={styles.skillNumbered}>
+                <div className={styles.subtitleHeading}>Secondary</div>
+                <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
                   {profile?.secondary_skills?.map((elem, index) => (
-                    <Tag
-                      color="blue"
-                      key={"secondary" + elem + index}
-                      style={{ margin: "1px" }}
-                    >
-                      {elem}
-                    </Tag>
+                    <li
+                    className={styles.point}
+                    key={"secondary" + elem + index}
+                    style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}
+                  >
+                    {elem}
+                  </li>
                   ))}
                 </ul>
               </div>
@@ -495,12 +494,10 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
             </div>
             <div className={styles.experienceHeading}>
-              {profile?.years_of_experience && (
-                <div>
-                  <CheckSquareOutlined />{" "}
-                  <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date)}+ Years of Experience</span>
-                </div>
-              )}
+              <div>
+                <CheckSquareOutlined />{" "}
+                <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date?.String)}+ Years of Experience</span>
+              </div>
               {profile?.email && (
                 <div>
                   <MailOutlined /> {profile?.email}

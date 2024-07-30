@@ -100,6 +100,7 @@ const Certification = ({ certificationData }) => {
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
+        window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -188,11 +189,13 @@ const Certification = ({ certificationData }) => {
         });
 
         if (response?.data) {
+          console.log("data : ", response?.data);
           toast.success(response?.data, SUCCESS_TOASTER);
-        }
+          window.location.reload(); // needs tobe remove after implement download popover
+        } 
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     form.resetFields([`certificate_${modalState.key}`]);
     if (newPanes.length && modalState.key === activeKey) {
