@@ -257,28 +257,30 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div>
                   <span className={styles.duration}>
                     <b className={styles.overview}>Project Description: </b>
-                    <span style={{ whiteSpace: 'pre-line' }}>{item.description}</span>
+                    <span style={{ whiteSpace: "pre-line" }}>
+                      {item.description}
+                    </span>
                   </span>
                 </div>
               )}
               {item?.role && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Role : </b>
-                    <ul>
-                      {item.role.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <ul>
+                    {item.role.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
               {item?.responsibilities && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Responsibility : </b>
-                    <ul>
-                      {item.responsibilities.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <ul>
+                    {item.responsibilities.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
               {item?.technologies && (
@@ -445,7 +447,7 @@ const Resume = forwardRef(({ data }, ref) => {
 
     const rightColumn = ["experiences", "projects"].filter(Boolean);
     setColumns([leftColumn, rightColumn]);
-  }, [achievements, certifications]);  
+  }, [achievements, certifications]);
 
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
@@ -498,7 +500,13 @@ const Resume = forwardRef(({ data }, ref) => {
               {profile?.years_of_experience && (
                 <div>
                   <CheckSquareOutlined />{" "}
-                  <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date)}+ Years of Experience</span>
+                  <span>
+                    {calculateTotalExperience(
+                      profile?.years_of_experience,
+                      profile?.josh_joining_date,
+                    )}
+                    + Years of Experience
+                  </span>
                 </div>
               )}
               {profile?.email && (
@@ -557,7 +565,9 @@ const Resume = forwardRef(({ data }, ref) => {
                       </h4>
                     </div>
                     <div className={`${styles.profiledetails} pb-3`}>
-                      <span style={{ whiteSpace: 'pre-line' }}>{profile?.description}</span>
+                      <span style={{ whiteSpace: "pre-line" }}>
+                        {profile?.description}
+                      </span>
                     </div>
                   </div>
                 )}

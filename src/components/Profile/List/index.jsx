@@ -38,14 +38,10 @@ const ListProfiles = () => {
   const [activeStatus, setActiveStatus] = useState(true);
   const searchInput = useRef(null);
   const navigate = useNavigate();
-  const [disableInvite, setDisableInvite] = useState({});
   const { data, isFetching, refetch } = useGetProfileListQuery();
   const [deleteProfileService] = useDeleteProfileMutation();
   const [updateProfileStatusService] = useUpdateProfileStatusMutation();
   const [sendInvitationService] = useUserEmailMutation();
-
-  console.log("data in profile list : ", data);
-
   const showActiveInactiveModal = (profile_id, isActive) => {
     showConfirm({
       onOk: async () => {
@@ -119,10 +115,6 @@ const ListProfiles = () => {
           });
           if (response?.data) {
             toast.success(response?.data?.message);
-            setDisableInvite((prev) => ({
-              ...prev,
-              [profile_id]: true,
-            }));
             await refetch();
           }
         } catch (error) {
@@ -319,7 +311,7 @@ const ListProfiles = () => {
             <Button
               type={"primary"}
               size="small"
-              disabled={disableInvite[record?.id] || record?.is_active === "NO"}
+              disabled={record?.is_profile_complete === "YES"}
               onClick={() => handleSendInvite(record?.id)}
             >
               Send Invite

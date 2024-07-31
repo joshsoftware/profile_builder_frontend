@@ -43,8 +43,6 @@ const Education = ({ educationData }) => {
       key: "0",
       isExisting: false,
     },
-      isExisting: false,
-    }
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -287,7 +285,7 @@ const Education = ({ educationData }) => {
                   form={form}
                   name={`education_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`education_${index}`, "id"]} hidden>

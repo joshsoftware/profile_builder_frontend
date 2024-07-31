@@ -29,7 +29,9 @@ const BasicInfo = ({ profileData }) => {
       const profileDataCopy = { ...profileData };
       if (profileDataCopy.josh_joining_date) {
         if (!dayjs.isDayjs(profileDataCopy.josh_joining_date)) {
-          profileDataCopy.josh_joining_date = dayjs(profileDataCopy.josh_joining_date);
+          profileDataCopy.josh_joining_date = dayjs(
+            profileDataCopy.josh_joining_date,
+          );
         }
       }
       form.setFieldsValue(profileDataCopy);
@@ -44,12 +46,13 @@ const BasicInfo = ({ profileData }) => {
           if (!dayjs.isDayjs(values.josh_joining_date)) {
             values.josh_joining_date = dayjs(values.josh_joining_date);
           }
-          values.josh_joining_date = values.josh_joining_date.format("MMM-YYYY");
+          values.josh_joining_date =
+            values.josh_joining_date.format("MMM-YYYY");
         }
       }
       let response;
       if (profileData) {
-        if(formChange){
+        if (formChange) {
           response = await updateProfileService({
             profile_id: profileData.id,
             values,
@@ -64,7 +67,10 @@ const BasicInfo = ({ profileData }) => {
       if (response?.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
-          EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
+          EDITOR_PROFILE_ROUTE.replace(
+            ":profile_id",
+            response.data?.profile_id,
+          ),
         );
         setFormChange(false);
       }
@@ -79,7 +85,7 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
-      onValuesChange={()=>setFormChange(true)}
+      onValuesChange={() => setFormChange(true)}
       initialValues={
         profileData?.profile || { profileDetails: PROFILE_DETAILS }
       }
@@ -147,9 +153,11 @@ const BasicInfo = ({ profileData }) => {
                 validator: (_, value) =>
                   value <= 30 && value >= 0
                     ? Promise.resolve()
-                    : Promise.reject("Experience must be between 0 and 30 years"),
+                    : Promise.reject(
+                        "Experience must be between 0 and 30 years",
+                      ),
               },
-            ]}           
+            ]}
           >
             <Input
               type="number"
@@ -181,10 +189,7 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item
-            name="josh_joining_date"
-            label="JOSH Joining Date"
-          >
+          <Form.Item name="josh_joining_date" label="JOSH Joining Date">
             <DatePicker style={{ width: "100%" }} picker="month" />
           </Form.Item>
         </Col>
