@@ -1,9 +1,12 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Dropdown, Menu, Tag } from "antd";
 import {
   CalendarOutlined,
+  CheckOutlined,
   CheckSquareOutlined,
   DownloadOutlined,
   DownOutlined,
@@ -13,12 +16,16 @@ import {
   MobileOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useCompleteProfileMutation } from "../../api/profileApi";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString, PRESENT_VALUE } from "../../Constants";
-import { calculateTotalExperience } from "../../helpers";
+import { getMonthString, PRESENT_VALUE, ROOT_ROUTE, SUCCESS_TOASTER } from "../../Constants";
+import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const role = useSelector((state) => state.auth.role);
+  const [completeProfileService] = useCompleteProfileMutation();
+  const navigate = useNavigate();
   const location = useLocation();
   const { is_josh_employee } = location.state || {};
 
@@ -474,14 +481,39 @@ const Resume = forwardRef(({ data }, ref) => {
     </Menu>
   );
 
+  const handleCompleteProfile = () => {
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (profile?.id) {
+            const response = await completeProfileService({profile_id : profile?.id});
+            if (response?.data) {
+              toast.success(response?.data?.message, SUCCESS_TOASTER);
+              navigate(ROOT_ROUTE);
+            }
+          }         
+        } catch (error) {
+          toast.error(error.response?.data?.message);
+        }
+      },
+      onCancel() {},
+      message: "Are you certain you want to finalize the profile? Once completed, changes cannot be undone.",
+    });
+  } 
+
   return (
     <>
       <div className="header" style={{ marginTop: "10px" }}>
-        <Dropdown overlay={downloadMenu} trigger={["click"]}>
-          <Button type="primary" icon={<DownloadOutlined />}>
-            Download <DownOutlined />
+        {role.toLowerCase()==='admin' ? 
+          <Dropdown overlay={downloadMenu} trigger={["click"]}>
+            <Button type="primary" icon={<DownloadOutlined />}>
+              Download <DownOutlined />
+            </Button>
+          </Dropdown> :         
+          <Button type="primary" icon={<CheckOutlined />} onClick={handleCompleteProfile}>
+            Complete Profile
           </Button>
-        </Dropdown>
+        }
       </div>
       <div ref={ref}>
         <style>{getPageMargins()}</style>

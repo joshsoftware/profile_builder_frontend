@@ -3,6 +3,7 @@ import {
   CREATE_PROFILE_ENDPOINT,
   DELETE_PROFILE_ENDPOINT,
   HTTP_METHODS,
+  PROFILE_COMPLETE_ENDPOINT,
   PROFILE_GET_ENDPOINT,
   PROFILE_LIST_ENDPOINT,
   PROFILE_REDUCER_PATH,
@@ -77,6 +78,15 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data,
     }),
+    completeProfile: builder.mutation({
+      query: ({ profile_id }) => ({
+        url: PROFILE_COMPLETE_ENDPOINT.replace(":profile_id", profile_id),
+        method: HTTP_METHODS.PATCH,
+        data: { profile_id: profile_id },
+      }),
+      invalidatesTags: ["profile"],
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -88,4 +98,5 @@ export const {
   useDeleteProfileMutation,
   useUpdateSequenceMutation,
   useUpdateProfileStatusMutation,
+  useCompleteProfileMutation,
 } = profileApi;

@@ -1,7 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
+  EMPLOYEE_INVITE_ENDPOINT,
   HTTP_METHODS,
-  USER_EMAIL_ENDPOINT,
   USER_EMAIL_REDUCER_PATH,
 } from "../Constants";
 import axiosBaseQuery from "./axiosBaseQuery/service";
@@ -12,13 +12,13 @@ export const userEmailApi = createApi({
   endpoints: (builder) => ({
     userEmail: builder.mutation({
       query: ({ profile_id }) => ({
-        url: USER_EMAIL_ENDPOINT,
+        url: EMPLOYEE_INVITE_ENDPOINT.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
         data: {
           profile_id,
         },
       }),
-      invalidatesTags: ["profile"],
+      invalidatesTags: ["user_email"],
       transformResponse: (response) => response.data,
     }),
   }),

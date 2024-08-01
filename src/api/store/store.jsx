@@ -10,11 +10,17 @@ import { projectApi } from "../projectApi";
 import authReducer from "./authSlice";
 
 const token = window.localStorage.getItem("token");
+const role = window.localStorage.getItem("role");
+const profile_id = window.localStorage.getItem("profile_id");
+
 const preloadedState = {
   auth: {
     token: token ? token : null,
+    role: role ? role : null,
+    profile_id: profile_id ? profile_id : null,
   },
 };
+
 const rootReducer = combineReducers({
   [loginApi.reducerPath]: loginApi.reducer,
   [profileApi.reducerPath]: profileApi.reducer,
