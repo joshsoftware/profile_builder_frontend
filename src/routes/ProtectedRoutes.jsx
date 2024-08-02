@@ -15,9 +15,13 @@ const ProtectedRoutes = ({ Component, allowedRoles }) => {
     if (!token) {
       navigate(ROOT_ROUTE);
     } else if (!allowedRoles.includes(role)) {
-      navigate(EDITOR_PROFILE_ROUTE.replace(':profile_id', profile_id));
-    } else if (role === 'employee' && urlProfileId && urlProfileId !== String(profile_id)) {
-      navigate(EDITOR_PROFILE_ROUTE.replace(':profile_id', profile_id));
+      navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
+    } else if (
+      role === "employee" &&
+      urlProfileId &&
+      urlProfileId !== String(profile_id)
+    ) {
+      navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
     }
   }, [token, role, profile_id, urlProfileId, allowedRoles, navigate]);
 

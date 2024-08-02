@@ -21,6 +21,7 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
+import dayjs from 'dayjs';
 import { useUserEmailMutation } from "../../../api/emailApi";
 import {
   useDeleteProfileMutation,
@@ -28,8 +29,8 @@ import {
   useUpdateProfileStatusMutation,
 } from "../../../api/profileApi";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
-import { showConfirm } from "../../../helpers";
-import Navbar from "../../Navbar/navbar";
+import { calculateTotalExperience, formatDate, showConfirm } from "../../../helpers";
+import Navbar from "../../Navbar";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
@@ -224,22 +225,23 @@ const ListProfiles = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
-      width: "20%",
+      width: "13%",
       ...getColumnSearchProps("name"),
     },
     {
       title: "Email",
       dataIndex: "email",
       key: "email",
-      width: "20%",
+      width: "18%",
       ...getColumnSearchProps("email"),
     },
     {
       title: "Years Of Experience",
-      dataIndex: "years_of_experience",
-      key: "years_of_experience",
-      sorter: (a, b) => a.years_of_experience - b.years_of_experience,
+      dataIndex: "total_experience",
+      key: "total_experience",
+      sorter: (a, b) => a.total_experience - b.total_experience,
       sortDirections: ["descend", "ascend"],
+      render: (text) => (text+"+"),
     },
     {
       title: "Primary Skills",
@@ -264,6 +266,22 @@ const ListProfiles = () => {
           })}
         </>
       ),
+    },
+    {
+      title: "Created At",
+      dataIndex: "created_at",
+      key: "created_at",
+      sorter: (a, b) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
+      sortDirections: ["descend", "ascend"],
+      render: (date) => formatDate(date)
+    },
+    {
+      title: "Updated At",
+      dataIndex: "updated_at",
+      key: "updated_at",
+      sorter: (a, b) => dayjs(a.updated_at).unix() - dayjs(b.updated_at).unix(),
+      sortDirections: ["descend", "ascend"],
+      render: (date) => formatDate(date)
     },
     {
       title: "Is Josh Employee",
@@ -326,6 +344,13 @@ const ListProfiles = () => {
     activeStatus ? profile.is_active === "YES" : profile.is_active === "NO",
   );
 
+  const transformProfilesData = () => {
+    return filteredData?.map(profile => ({
+      ...profile,
+      total_experience: calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date)
+    }));
+  };
+
   return (
     <>
       <Navbar />
@@ -353,7 +378,7 @@ const ListProfiles = () => {
         tableLayout="fixed"
         size="small"
         columns={columns}
-        dataSource={filteredData}
+        dataSource={transformProfilesData()}
         className={styles.table}
         bordered={true}
         loading={isFetching}

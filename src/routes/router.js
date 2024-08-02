@@ -20,15 +20,45 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path={ROOT_ROUTE} element={<Login />} />
-        <Route path={PROFILE_LIST_ROUTE} element={<ProtectedRoutes Component={ListProfiles} allowedRoles={['admin']} />} />
-        <Route path={DASHBOARD_ROUTE} element={<ProtectedRoutes Component={Dashboard} allowedRoles={['admin']} />} />
-        <Route path={EDITOR_ROUTE} element={<ProtectedRoutes Component={Editor} allowedRoles={['admin']} />} />
-        <Route path={`${EDITOR_PROFILE_ROUTE}/:profile_id`} element={<ProtectedRoutes Component={Editor} allowedRoles={['admin', 'employee']} />} />
-        <Route path={EDITOR_PROFILE_ROUTE} element={<ProtectedRoutes Component={Editor} allowedRoles={['admin']} />} />
+        <Route
+          path={PROFILE_LIST_ROUTE}
+          element={
+            <ProtectedRoutes
+              Component={ListProfiles}
+              allowedRoles={["admin"]}
+            />
+          }
+        />
+        <Route
+          path={DASHBOARD_ROUTE}
+          element={
+            <ProtectedRoutes Component={Dashboard} allowedRoles={["admin"]} />
+          }
+        />
+        <Route
+          path={EDITOR_ROUTE}
+          element={
+            <ProtectedRoutes Component={Editor} allowedRoles={["admin"]} />
+          }
+        />
+        <Route
+          path={`${EDITOR_PROFILE_ROUTE}/:profile_id`}
+          element={
+            <ProtectedRoutes
+              Component={Editor}
+              allowedRoles={["admin", "employee"]}
+            />
+          }
+        />
+        <Route
+          path={EDITOR_PROFILE_ROUTE}
+          element={
+            <ProtectedRoutes Component={Editor} allowedRoles={["admin"]} />
+          }
+        />
         <Route path={ERROR_ROUTE} element={<Error />} />
       </Routes>
     </BrowserRouter>
-
   );
 };
 

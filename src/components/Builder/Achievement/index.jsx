@@ -101,7 +101,7 @@ const Achievement = ({ achievementData }) => {
   };
 
   const handleUpdate = async (values) => {
-    if(formChange){
+    if (formChange) {
       try {
         for (const achievement of values) {
           if (achievement.id) {
@@ -289,7 +289,7 @@ const Achievement = ({ achievementData }) => {
                   form={form}
                   name={`achievement_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`achievement_${index}`, "id"]} hidden>
@@ -322,7 +322,7 @@ const Achievement = ({ achievementData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleAchievements("create")}
+                        onClick={() => handleAchievements("create")}
                         disabled={item.isExisting}
                       >
                         Create Achievements
@@ -330,7 +330,7 @@ const Achievement = ({ achievementData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleAchievements("update")}
+                        onClick={() => handleAchievements("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Achievement {Number(item.key) + 1}

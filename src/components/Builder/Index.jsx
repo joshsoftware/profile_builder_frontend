@@ -22,7 +22,7 @@ import {
   PROJECTS_KEY,
   PROJECTS_LABEL,
 } from "../../Constants";
-import Navbar from "../Navbar/navbar";
+import Navbar from "../Navbar";
 import Resume from "../Resume";
 import Achievement from "./Achievement";
 import BasicInfo from "./BasicInfo";
@@ -37,7 +37,7 @@ const createPanes = (
   projectData,
   experienceData,
   educationData,
-  disableTabs
+  disableTabs,
 ) => [
   {
     key: BASIC_INFO_KEY,
@@ -88,16 +88,16 @@ export const Editor = () => {
   const { data: profileData } = useGetBasicInfoQuery(profile_id ?? skipToken);
   const { data: projectData } = useGetProjectQuery(profile_id ?? skipToken);
   const { data: experienceData } = useGetExperiencesQuery(
-    profile_id ?? skipToken
+    profile_id ?? skipToken,
   );
   const { data: educationData } = useGetEducationsQuery(
-    profile_id ?? skipToken
+    profile_id ?? skipToken,
   );
   const { data: achievementData } = useGetAchievementsQuery(
-    profile_id ?? skipToken
+    profile_id ?? skipToken,
   );
   const { data: certificationData } = useGetCertificatesQuery(
-    profile_id ?? skipToken
+    profile_id ?? skipToken,
   );
 
   useEffect(() => {
@@ -108,8 +108,8 @@ export const Editor = () => {
           projectData,
           experienceData,
           educationData,
-          false
-        )
+          false,
+        ),
       );
     } else {
       setItems(createPanes(null, null, null, null, true));

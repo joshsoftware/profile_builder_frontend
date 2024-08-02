@@ -39,7 +39,7 @@ export const certificationApi = createApi({
       query: ({ profile_id, certificate_id, values }) => ({
         url: UPDATE_CERTIFICATE_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":certificate_id", certificate_id),
         method: HTTP_METHODS.PUT,
         data: { certificate: values },
@@ -51,7 +51,7 @@ export const certificationApi = createApi({
       query: ({ profile_id, certificate_id }) => ({
         url: DELETE_CERTIFICATE_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":certificate_id", certificate_id),
         method: HTTP_METHODS.DELETE,
       }),

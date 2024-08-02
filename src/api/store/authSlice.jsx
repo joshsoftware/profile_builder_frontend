@@ -19,10 +19,9 @@ const authSlice = createSlice({
       state.token = null;
       state.role = null;
       state.profile_id = null;
-    }
-  }
+    },
+  },
 });
 
 export const { login, logout } = authSlice.actions;
 export default authSlice.reducer;
-

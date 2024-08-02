@@ -125,7 +125,7 @@ const Experience = ({ experienceData }) => {
   };
 
   const handleUpdate = async (values) => {
-    if(formChange){
+    if (formChange) {
       try {
         for (const experience of values) {
           if (experience?.id) {
@@ -320,7 +320,7 @@ const Experience = ({ experienceData }) => {
                   form={form}
                   name={`experience_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Row>

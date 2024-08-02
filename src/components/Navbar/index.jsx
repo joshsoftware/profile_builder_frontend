@@ -1,6 +1,6 @@
 import React from "react";
 import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { Button, Layout, Menu } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
@@ -13,6 +13,7 @@ const Navbar = () => {
   const dispatch = useDispatch();
   const { Header } = Layout;
   const location = useLocation();
+  const role = useSelector((state) => state.auth.role);
   const showModal = () => {
     showConfirm({
       onOk: () => {
@@ -50,24 +51,28 @@ const Navbar = () => {
           alt="josh-logo"
           style={{ marginRight: "50px", paddingBottom: "10px" }}
         />
-        <Link to={PROFILE_LIST_ROUTE}>
-          <Button
-            type="text"
-            icon={<UserOutlined />}
-            style={getButtonStyle(PROFILE_LIST_ROUTE)}
-          >
-            Profiles
-          </Button>
-        </Link>
-        <Link to={EDITOR_ROUTE}>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            style={getButtonStyle(EDITOR_ROUTE)}
-          >
-            Editor
-          </Button>
-        </Link>
+        {role.toLowerCase() === "admin" && (
+          <>
+            <Link to={PROFILE_LIST_ROUTE}>
+              <Button
+                type="text"
+                icon={<UserOutlined />}
+                style={getButtonStyle(PROFILE_LIST_ROUTE)}
+              >
+                Profiles
+              </Button>
+            </Link>
+            <Link to={EDITOR_ROUTE}>
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                style={getButtonStyle(EDITOR_ROUTE)}
+              >
+                Editor
+              </Button>
+            </Link>
+          </>
+        )}
         <Button
           type="text"
           icon={<LogoutOutlined />}
