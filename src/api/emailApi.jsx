@@ -14,9 +14,6 @@ export const userEmailApi = createApi({
       query: ({ profile_id }) => ({
         url: EMPLOYEE_INVITE_ENDPOINT.replace(":profile_id", profile_id),
         method: HTTP_METHODS.POST,
-        data: {
-          profile_id,
-        },
       }),
       invalidatesTags: ["user_email"],
       transformResponse: (response) => response.data,

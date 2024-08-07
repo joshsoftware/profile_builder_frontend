@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { Button, Layout, Menu } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { useLogoutMutation } from "../../api/loginApi";
 import { logout } from "../../api/store/authSlice";
 import joshLogo from "../../assets/Josh-new-logo.png";
 import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
@@ -14,12 +15,18 @@ const Navbar = () => {
   const { Header } = Layout;
   const location = useLocation();
   const role = useSelector((state) => state.auth.role);
+  const [logoutService] = useLogoutMutation();
   const showModal = () => {
     showConfirm({
-      onOk: () => {
-        dispatch(logout());
-        window.localStorage.removeItem("token");
-        toast.success("Logged out successfully");
+      onOk: async () => {
+        try {
+          await logoutService();
+          dispatch(logout());
+          window.localStorage.removeItem("token");
+          toast.success("Logged out successfully");
+        } catch (error) {
+          toast.error("Failed to logout");
+        }
       },
       onCancel: () => {},
       message: "Are you sure you want to logout?",
