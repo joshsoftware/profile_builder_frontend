@@ -82,7 +82,6 @@ export const profileApi = createApi({
       query: ({ profile_id }) => ({
         url: PROFILE_COMPLETE_ENDPOINT.replace(":profile_id", profile_id),
         method: HTTP_METHODS.PATCH,
-        data: { profile_id: profile_id },
       }),
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data,

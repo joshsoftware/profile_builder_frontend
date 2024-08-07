@@ -2,11 +2,13 @@ import React from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Button, Image, Typography } from "antd";
+import { Button, Image } from "antd";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useLoginMutation } from "../../api/loginApi";
 import { login as loginAction } from "../../api/store/authSlice";
+import resumeSvg from "../../assets/banner.svg";
 import googleIcon from "../../assets/icons8-google-48.png";
+import logo from "../../assets/Josh-new-logo.png";
 import {
   EDITOR_PROFILE_ROUTE,
   PROFILE_LIST_ROUTE,
@@ -28,7 +30,7 @@ const Login = () => {
         const profile_id = response?.data?.profile_id;
         toast.success(response?.data?.message);
 
-        if (token && response?.data?.role && response?.data?.profile_id) {
+        if (token && response?.data?.role) {
           dispatch(loginAction({ token, role, profile_id }));
           window.localStorage.setItem("token", token);
           window.localStorage.setItem("role", role);
@@ -57,13 +59,22 @@ const Login = () => {
   });
 
   return (
-    <div className={styles.divStyle}>
-      <Typography.Title level={1}>Sign In With Google</Typography.Title>
-      <Button className={styles.buttonStyle} onClick={() => login()}>
-        <Image width={40} src={googleIcon} alt="Google Icon" />
-        Login With Google
-      </Button>
-    </div>
+    <>
+      <div className={styles.logoContainer}>
+        <img src={logo} alt="Josh Logo" className={styles.logo} />
+      </div>
+      <div className={styles.container}>
+        <img src={resumeSvg} alt="Resume" />
+        <p className={styles.heading}>
+          A <span>Profile</span> that Stands Out! Make Your Own Profile and{" "}
+          <span>Download as PDF.</span>
+        </p>
+        <Button className={styles.buttonStyle} onClick={() => login()}>
+          <Image width={40} src={googleIcon} alt="Google Icon" />
+          Login With Google
+        </Button>
+      </div>
+    </>
   );
 };
 
