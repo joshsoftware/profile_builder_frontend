@@ -28,7 +28,7 @@ const Login = () => {
         const profile_id = response?.data?.profile_id;
         toast.success(response?.data?.message);
 
-        if (token && response?.data?.role && response?.data?.profile_id) {
+        if (token && role) {
           dispatch(loginAction({ token, role, profile_id }));
           window.localStorage.setItem("token", token);
           window.localStorage.setItem("role", role);
