@@ -105,7 +105,14 @@ export const showConfirm = ({ onOk, onCancel, message }) => {
 
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInMonths = pastExp || 0;
-  const joiningDate = joinDate ? new Date(joinDate) : new Date();
+  let joiningDate;
+  if (typeof joinDate === 'string') {
+    joiningDate = new Date(joinDate);
+  } else if (joinDate && joinDate.String) {
+    joiningDate = new Date(joinDate.String);
+  } else {
+    joiningDate = new Date();
+  }
   const currentDate = new Date();
 
   const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
