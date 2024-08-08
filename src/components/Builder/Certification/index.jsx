@@ -99,6 +99,7 @@ const Certification = ({ certificationData }) => {
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
+        window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);

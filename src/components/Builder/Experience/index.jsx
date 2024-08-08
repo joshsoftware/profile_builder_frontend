@@ -95,7 +95,7 @@ const Experience = ({ experienceData }) => {
               to_date:
                 experience.to_date && experience.to_date !== PRESENT_VALUE
                   ? dayjs(experience.to_date)
-                  : dayjs(),
+                  : "",
             };
             return acc;
           }, {}),
@@ -135,9 +135,9 @@ const Experience = ({ experienceData }) => {
               values: {
                 ...experience,
                 from_date: experience.from_date.format("MMM-YYYY"),
-                to_date: experience.to_date
-                  ? experience.to_date.format("MMM-YYYY")
-                  : PRESENT_VALUE,
+                to_date: isCurrentCompany
+                  ? PRESENT_VALUE
+                  : experience.to_date.format("MMM-YYYY"),
               },
             });
             if (response.data?.message) {
@@ -237,8 +237,8 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const HandleEndDate = (e) => {
-    setIsCurrentCompany(e.target.checked);
+  const handleIsCurrentCompany = () => {
+    setIsCurrentCompany(!isCurrentCompany);
   };
 
   const onDragEnd = ({ active, over }) => {
@@ -362,13 +362,16 @@ const Experience = ({ experienceData }) => {
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
                     <Col>
-                      <Checkbox
-                        name={"isCurrentCompany"}
-                        checked={isCurrentCompany}
-                        onChange={HandleEndDate}
+                      <Form.Item
+                        name={[`experience_${index}`, "isCurrentCompany"]}
                       >
-                        Is This A Current Company ?
-                      </Checkbox>
+                        <Checkbox
+                          onChange={handleIsCurrentCompany}
+                          checked={isCurrentCompany}
+                        >
+                          Is This A Current Company?
+                        </Checkbox>
+                      </Form.Item>
                     </Col>
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>

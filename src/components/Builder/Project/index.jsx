@@ -346,7 +346,7 @@ const Project = ({ projectData }) => {
                           },
                         ]}
                       >
-                        <Input type="number" placeholder="Eg. 2, 1.5" />
+                        <Input type="number" placeholder="Eg. 1, 2.5" />
                       </Form.Item>
                     </Col>
                   </Row>

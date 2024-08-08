@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
-import dayjs from "dayjs"; // import dayjs
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
   useCreateProfileMutation,
@@ -27,12 +27,16 @@ const BasicInfo = ({ profileData }) => {
   useEffect(() => {
     if (profileData) {
       const profileDataCopy = { ...profileData };
-      if (profileDataCopy.josh_joining_date) {
-        if (!dayjs.isDayjs(profileDataCopy.josh_joining_date)) {
-          profileDataCopy.josh_joining_date = dayjs(
-            profileDataCopy.josh_joining_date,
-          );
-        }
+      if (
+        profileDataCopy.josh_joining_date &&
+        profileDataCopy.josh_joining_date.Valid &&
+        profileDataCopy.josh_joining_date.String !== ""
+      ) {
+        profileDataCopy.josh_joining_date = dayjs(
+          profileDataCopy?.josh_joining_date?.String,
+        );
+      } else {
+        profileDataCopy.josh_joining_date = null;
       }
       form.setFieldsValue(profileDataCopy);
     }
@@ -222,6 +226,7 @@ const BasicInfo = ({ profileData }) => {
               style={{ width: "100%" }}
               placeholder="Select primary skills"
               options={SKILLS}
+              tokenSeparators={[","]}
               rules={[
                 {
                   required: true,
@@ -237,6 +242,7 @@ const BasicInfo = ({ profileData }) => {
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Add secondary skills"
+              tokenSeparators={[","]}
             />
           </Form.Item>
         </Col>

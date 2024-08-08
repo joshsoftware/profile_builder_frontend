@@ -105,17 +105,23 @@ export const showConfirm = ({ onOk, onCancel, message }) => {
 
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInMonths = pastExp || 0;
-  const joiningDate = new Date(joinDate);
+  const joiningDate = joinDate ? new Date(joinDate) : new Date();
   const currentDate = new Date();
 
   const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
   const diffMonths = currentDate.getMonth() - joiningDate.getMonth();
   const monthsSinceJoining = diffYears * 12 + diffMonths;
 
-  const totalExperienceInMonths = pastExperienceInMonths + monthsSinceJoining;
+  const totalExperienceInMonths =
+    Number(pastExperienceInMonths) + Number(monthsSinceJoining);
   const totalExperienceInYears = totalExperienceInMonths / 12;
+  const result = Math.floor(totalExperienceInYears);
 
-  return Math.floor(totalExperienceInYears);
+  if (result === 0) {
+    return 1;
+  } else {
+    return result;
+  }
 };
 
 export const formatDate = (date) => {

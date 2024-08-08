@@ -18,7 +18,12 @@ import {
 import PropTypes from "prop-types";
 import { useCompleteProfileMutation } from "../../api/profileApi";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString, PRESENT_VALUE, ROOT_ROUTE, SUCCESS_TOASTER } from "../../Constants";
+import {
+  getMonthString,
+  PRESENT_VALUE,
+  ROOT_ROUTE,
+  SUCCESS_TOASTER,
+} from "../../Constants";
 import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
@@ -486,34 +491,42 @@ const Resume = forwardRef(({ data }, ref) => {
       onOk: async () => {
         try {
           if (profile?.id) {
-            const response = await completeProfileService({profile_id : profile?.id});
+            const response = await completeProfileService({
+              profile_id: profile?.id,
+            });
             if (response?.data) {
               toast.success(response?.data?.message, SUCCESS_TOASTER);
               navigate(ROOT_ROUTE);
             }
-          }         
+          }
         } catch (error) {
           toast.error(error.response?.data?.message);
         }
       },
       onCancel() {},
-      message: "Are you certain you want to finalize the profile? Once completed, changes cannot be undone.",
+      message:
+        "Are you certain you want to finalize the profile? Once completed, changes cannot be undone.",
     });
-  } 
+  };
 
   return (
     <>
       <div className="header" style={{ marginTop: "10px" }}>
-        {role.toLowerCase()==='admin' ? 
+        {role.toLowerCase() === "admin" ? (
           <Dropdown overlay={downloadMenu} trigger={["click"]}>
             <Button type="primary" icon={<DownloadOutlined />}>
               Download <DownOutlined />
             </Button>
-          </Dropdown> :         
-          <Button type="primary" icon={<CheckOutlined />} onClick={handleCompleteProfile}>
+          </Dropdown>
+        ) : (
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            onClick={handleCompleteProfile}
+          >
             Complete Profile
           </Button>
-        }
+        )}
       </div>
       <div ref={ref}>
         <style>{getPageMargins()}</style>

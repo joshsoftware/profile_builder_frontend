@@ -8,6 +8,7 @@ import {
   Radio,
   Row,
   Space,
+  Spin,
   Switch,
   Table,
   Tag,
@@ -21,7 +22,7 @@ import {
   EditOutlined,
   SearchOutlined,
 } from "@ant-design/icons";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 import { useUserEmailMutation } from "../../../api/emailApi";
 import {
   useDeleteProfileMutation,
@@ -29,7 +30,11 @@ import {
   useUpdateProfileStatusMutation,
 } from "../../../api/profileApi";
 import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
-import { calculateTotalExperience, formatDate, showConfirm } from "../../../helpers";
+import {
+  calculateTotalExperience,
+  formatDate,
+  showConfirm,
+} from "../../../helpers";
 import Navbar from "../../Navbar";
 import styles from "./ListProfiles.module.css";
 
@@ -42,7 +47,8 @@ const ListProfiles = () => {
   const { data, isFetching, refetch } = useGetProfileListQuery();
   const [deleteProfileService] = useDeleteProfileMutation();
   const [updateProfileStatusService] = useUpdateProfileStatusMutation();
-  const [sendInvitationService] = useUserEmailMutation();
+  const [sendInvitationService, { isLoading }] = useUserEmailMutation();
+
   const showActiveInactiveModal = (profile_id, isActive) => {
     showConfirm({
       onOk: async () => {
@@ -241,7 +247,7 @@ const ListProfiles = () => {
       key: "total_experience",
       sorter: (a, b) => a.total_experience - b.total_experience,
       sortDirections: ["descend", "ascend"],
-      render: (text) => (text+"+"),
+      render: (text) => text + "+",
     },
     {
       title: "Primary Skills",
@@ -273,7 +279,7 @@ const ListProfiles = () => {
       key: "created_at",
       sorter: (a, b) => dayjs(a.created_at).unix() - dayjs(b.created_at).unix(),
       sortDirections: ["descend", "ascend"],
-      render: (date) => formatDate(date)
+      render: (date) => formatDate(date),
     },
     {
       title: "Updated At",
@@ -281,7 +287,7 @@ const ListProfiles = () => {
       key: "updated_at",
       sorter: (a, b) => dayjs(a.updated_at).unix() - dayjs(b.updated_at).unix(),
       sortDirections: ["descend", "ascend"],
-      render: (date) => formatDate(date)
+      render: (date) => formatDate(date),
     },
     {
       title: "Is Josh Employee",
@@ -345,44 +351,49 @@ const ListProfiles = () => {
   );
 
   const transformProfilesData = () => {
-    return filteredData?.map(profile => ({
+    return filteredData?.map((profile) => ({
       ...profile,
-      total_experience: calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date)
+      total_experience: calculateTotalExperience(
+        profile?.years_of_experience,
+        profile?.josh_joining_date,
+      ),
     }));
   };
 
   return (
     <>
-      <Navbar />
-      <Row className={styles.rowStyle}>
-        <Typography.Title level={1} className={styles.profile_header}>
-          Profiles
-        </Typography.Title>
+      <Spin spinning={isLoading} size="large" tip={"Just a moment.."}>
+        <Navbar />
+        <Row className={styles.rowStyle}>
+          <Typography.Title level={1} className={styles.profile_header}>
+            Profiles
+          </Typography.Title>
 
-        <Radio.Group
-          value={activeStatus ? "active" : "inactive"}
-          onChange={(e) => setActiveStatus(e.target.value === "active")}
-        >
-          <Radio.Button value="active">Active</Radio.Button>
-          <Radio.Button value="inactive">Inactive</Radio.Button>
-        </Radio.Group>
-        <Link to={EDITOR_ROUTE}>
-          <Button type="primary" className={styles.button}>
-            {" "}
-            + New{" "}
-          </Button>
-        </Link>
-      </Row>
+          <Radio.Group
+            value={activeStatus ? "active" : "inactive"}
+            onChange={(e) => setActiveStatus(e.target.value === "active")}
+          >
+            <Radio.Button value="active">Active</Radio.Button>
+            <Radio.Button value="inactive">Inactive</Radio.Button>
+          </Radio.Group>
+          <Link to={EDITOR_ROUTE}>
+            <Button type="primary" className={styles.button}>
+              {" "}
+              + New{" "}
+            </Button>
+          </Link>
+        </Row>
 
-      <Table
-        tableLayout="fixed"
-        size="small"
-        columns={columns}
-        dataSource={transformProfilesData()}
-        className={styles.table}
-        bordered={true}
-        loading={isFetching}
-      />
+        <Table
+          tableLayout="fixed"
+          size="small"
+          columns={columns}
+          dataSource={transformProfilesData()}
+          className={styles.table}
+          bordered={true}
+          loading={isFetching}
+        />
+      </Spin>
     </>
   );
 };

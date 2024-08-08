@@ -16,6 +16,7 @@ export const ERROR_ROUTE = "*";
 
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
+export const LOGOUT_ENDPOINT = "/api/logout";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
 export const CREATE_ACHIEVEMENT_ENDPOINTS =
@@ -27,7 +28,6 @@ export const CREATE_EDUCATION_ENDPOINTS =
 export const CREATE_EXPERIENCE_ENDPOINTS =
   "/api/profiles/:profile_id/experiences";
 export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
-export const USER_EMAIL_ENDPOINT = "/api/userinvitation";
 export const EMPLOYEE_INVITE_ENDPOINT =
   "/api/profiles/:profile_id/employee_invite";
 export const PROFILE_COMPLETE_ENDPOINT =
