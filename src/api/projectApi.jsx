@@ -39,7 +39,7 @@ export const projectApi = createApi({
       query: ({ profile_id, project_id, values }) => ({
         url: UPDATE_PROJECT_ENDPOINT.replace(":profile_id", profile_id).replace(
           ":project_id",
-          project_id
+          project_id,
         ),
         method: HTTP_METHODS.PUT,
         data: { project: values },
@@ -51,7 +51,7 @@ export const projectApi = createApi({
       query: ({ profile_id, project_id }) => ({
         url: DELETE_PROJECT_ENDPOINT.replace(":profile_id", profile_id).replace(
           ":project_id",
-          project_id
+          project_id,
         ),
         method: HTTP_METHODS.DELETE,
       }),

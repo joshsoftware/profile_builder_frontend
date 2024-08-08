@@ -39,7 +39,7 @@ export const educationApi = createApi({
       query: ({ profile_id, education_id, values }) => ({
         url: UPDATE_EDUCATION_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":education_id", education_id),
         method: HTTP_METHODS.PUT,
         data: { education: values },
@@ -51,7 +51,7 @@ export const educationApi = createApi({
       query: ({ profile_id, education_id }) => ({
         url: DELETE_EDUCATION_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":education_id", education_id),
         method: HTTP_METHODS.DELETE,
       }),
