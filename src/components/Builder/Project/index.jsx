@@ -8,6 +8,7 @@ import {
   DatePicker,
   Form,
   Input,
+  InputNumber,
   Row,
   Select,
   Space,
@@ -337,16 +338,10 @@ const Project = ({ projectData }) => {
                         name={[`project_${index}`, "duration"]}
                         label="Project Duration (in years)"
                         rules={[
-                          {
-                            type: "number",
-                            min: 0,
-                            max: 50,
-                            message:
-                              "Project duration must be between 0 and 50 years",
-                          },
+                          { type: 'number', min: 0, max: 50, message: "Project duration must be between 0 and 50 years" }
                         ]}
                       >
-                        <Input type="number" placeholder="Eg. 1, 2.5" />
+                        <InputNumber type="number" placeholder="Eg. 1, 2.5"/>
                       </Form.Item>
                     </Col>
                   </Row>
