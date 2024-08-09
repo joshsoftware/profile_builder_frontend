@@ -13,7 +13,7 @@ import {
   MobileOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
-import joshImage from "../../assets/Josh-Logo-White-bg.svg";
+import joshImage from "../../assets/josh-black-logo.png";
 import { getMonthString, PRESENT_VALUE } from "../../Constants";
 import { calculateTotalExperience } from "../../helpers";
 import styles from "./Resume.module.css";
@@ -35,146 +35,10 @@ const Resume = forwardRef(({ data }, ref) => {
   } = data;
 
   const containerRef = useRef();
-  const [columns, setColumns] = useState([[], []]);
+  // const [columns, setColumns] = useState([[], []]);
   const handlePrint = useReactToPrint({
     content: () => ref.current,
   });
-
-  // const handleDownload = () => {
-  //   try {
-  //     const doc = new Document();
-
-  //     const formatDate = (date) => {
-  //       if (!date) {
-  //         return "";
-  //       }
-  //       const d = new Date(date);
-  //       return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-  //     };
-
-  //     const profileParagraph = new Paragraph({
-  //       children: [
-  //         new TextRun(profile?.name || "").bold().break(),
-  //         new TextRun(profile?.designation || ""),
-  //         profile?.gender && new TextRun(` (${profile.gender})`),
-  //         new TextRun().break(),
-  //         new TextRun(
-  //           `${profile?.years_of_experience || ""} Year of Experience`,
-  //         ),
-  //         new TextRun().break(),
-  //         new TextRun(profile?.email || ""),
-  //         profile?.mobile && new TextRun().break(),
-  //         profile?.mobile && new TextRun(profile.mobile),
-  //         profile?.github_link && new TextRun().break(),
-  //         profile?.github_link && new TextRun(`GitHub: ${profile.github_link}`),
-  //         profile?.linkedin_link && new TextRun().break(),
-  //         profile?.linkedin_link &&
-  //           new TextRun(`LinkedIn: ${profile.linkedin_link}`),
-  //       ].filter(Boolean),
-  //     });
-
-  //     const sections = [
-  //       ...(educations || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Education:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.degree || ""} - ${item.university_name || ""}, ${
-  //                   item.place || ""
-  //                 }`,
-  //               ),
-  //               new TextRun(
-  //                 `\nPassing Year: ${new Date(item.passing_year).getFullYear()}`,
-  //               ),
-  //               item.percent_or_cgpa &&
-  //                 new TextRun(`\nCGPA / Percentage: ${item.percent_or_cgpa}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(certifications || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Certification:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.name || ""} - ${item.organization_name || ""}`,
-  //               ),
-  //               new TextRun(`\nIssue Date: ${formatDate(item.issued_date)}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(achievements || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Achievement:`).bold(),
-  //               new TextRun(`\n${item.name || ""}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(experiences || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Experience:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.designation || ""} - ${item.company_name || ""}`,
-  //               ),
-  //               new TextRun(
-  //                 `\n${formatDate(item.from_date)} - ${formatDate(
-  //                   item.to_date,
-  //                 )}`,
-  //               ),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(projects || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Project:`).bold(),
-  //               new TextRun(`\n${item.name || ""}`),
-  //               new TextRun(
-  //                 `\n${formatDate(item.working_start_date)} - ${formatDate(
-  //                   item.working_end_date,
-  //                 )}`,
-  //               ),
-  //               item.duration && new TextRun(`\nDuration: ${item.duration}`),
-  //               item.description &&
-  //                 new TextRun(`\nDescription: ${item.description}`),
-  //               item.role && new TextRun(`\nRole: ${item.role}`),
-  //               item.responsibilities &&
-  //                 new TextRun(`\nResponsibilities: ${item.responsibilities}`),
-  //               item.technologies &&
-  //                 new TextRun(
-  //                   `\nTechnologies: ${(item.technologies || []).join(", ")}`,
-  //                 ),
-  //               item.tech_worked_on &&
-  //                 new TextRun(
-  //                   `\nContribution: ${(item.tech_worked_on || []).join(", ")}`,
-  //                 ),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //     ];
-
-  //     doc.addSection({
-  //       properties: {},
-  //       children: [profileParagraph, ...sections],
-  //     });
-
-  //     Packer.toBlob(doc)
-  //       .then((blob) => {
-  //         saveAs(blob, "Resume.docx");
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error creating DOCX file:", error);
-  //       });
-  //   } catch (error) {
-  //     console.error("Error in handleDownload function:", error);
-  //   }
-  // };
 
   const getMonthYear = (value) => {
     if (!value) {
@@ -214,8 +78,10 @@ const Resume = forwardRef(({ data }, ref) => {
               {item?.company_name && (
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
-                  | <CalendarOutlined /> {getMonthYear(item.from_date)} - {' '}
-                  {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
+                  | <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
+                  {item.to_date === PRESENT_VALUE
+                    ? " Present"
+                    : getMonthYear(item.to_date)}
                 </div>
               )}
             </div>
@@ -240,8 +106,10 @@ const Resume = forwardRef(({ data }, ref) => {
                   <b className={styles.underline}>{item.name}</b>
                   {item?.working_start_date && item?.working_end_date && (
                     <span className="px-2">
-                      | {getMonthYear(item.working_start_date)} - {' '}
-                      {getMonthYear(item.working_end_date) === PRESENT_VALUE ? "Present" : getMonthYear(item.working_end_date)}
+                      | {getMonthYear(item.working_start_date)} -{" "}
+                      {getMonthYear(item.working_end_date) === PRESENT_VALUE
+                        ? "Present"
+                        : getMonthYear(item.working_end_date)}
                     </span>
                   )}
                 </h2>
@@ -256,28 +124,30 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div>
                   <span className={styles.duration}>
                     <b className={styles.overview}>Project Description: </b>
-                    <span style={{ whiteSpace: 'pre-line' }}>{item.description}</span>
+                    <span style={{ whiteSpace: "pre-line" }}>
+                      {item.description}
+                    </span>
                   </span>
                 </div>
               )}
               {item?.role && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Role: </b>
-                    <ul>
-                      {item.role.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <ul>
+                    {item.role.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
               {item?.responsibilities && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Responsibility: </b>
-                    <ul>
-                      {item.responsibilities.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <ul>
+                    {item.responsibilities.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
 
@@ -315,8 +185,27 @@ const Resume = forwardRef(({ data }, ref) => {
           <ul className={styles.achievement}>
             {achievements?.map((item) => (
               <>
-                <li key={item.id}>{item?.name && <span style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>{item.name}</span>}</li>
-                <div style={{ width: "120px", height: "3px", backgroundColor: "white", marginTop: "4px" }}></div>
+                <li key={item.id}>
+                  {item?.name && (
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: "120px",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {item.name}
+                    </span>
+                  )}
+                </li>
+                <div
+                  style={{
+                    width: "120px",
+                    height: "3px",
+                    backgroundColor: "white",
+                    marginTop: "4px",
+                  }}
+                ></div>
               </>
             ))}
           </ul>
@@ -340,7 +229,8 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {(item?.university_name || item?.place) && (
                 <div className={styles.subtitle}>
-                  {item.university_name}{item.place && `, ${item.place}`}
+                  {item.university_name}
+                  {item.place && `, ${item.place}`}
                 </div>
               )}
               {item?.passing_year && (
@@ -376,7 +266,15 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.subtitleHeading}>Primary</div>
                 <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
                   {profile?.primary_skills.map((elem, index) => (
-                    <li className={styles.point} key={"primary" + elem + index} style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>
+                    <li
+                      className={styles.point}
+                      key={"primary" + elem + index}
+                      style={{
+                        display: "inline-block",
+                        width: "120px",
+                        wordWrap: "break-word",
+                      }}
+                    >
                       {elem}
                     </li>
                   ))}
@@ -389,12 +287,16 @@ const Resume = forwardRef(({ data }, ref) => {
                 <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
                   {profile?.secondary_skills?.map((elem, index) => (
                     <li
-                    className={styles.point}
-                    key={"secondary" + elem + index}
-                    style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}
-                  >
-                    {elem}
-                  </li>
+                      className={styles.point}
+                      key={"secondary" + elem + index}
+                      style={{
+                        display: "inline-block",
+                        width: "120px",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {elem}
+                    </li>
                   ))}
                 </ul>
               </div>
@@ -434,17 +336,17 @@ const Resume = forwardRef(({ data }, ref) => {
   };
 
   //At component mount which section of resume contains which tab details.
-  useEffect(() => {
-    const leftColumn = [
-      "skills",
-      "educations",
-      certifications ? "certifications" : null,
-      achievements ? "achievements" : null,
-    ].filter(Boolean);
+  // useEffect(() => {
+  //   const leftColumn = [
+  //     "skills",
+  //     "educations",
+  //     certifications ? "certifications" : null,
+  //     achievements ? "achievements" : null,
+  //   ].filter(Boolean);
 
-    const rightColumn = ["experiences", "projects"].filter(Boolean);
-    setColumns([leftColumn, rightColumn]);
-  }, [achievements, certifications]);  
+  //   const rightColumn = ["experiences", "projects"].filter(Boolean);
+  //   setColumns([leftColumn, rightColumn]);
+  // }, [achievements, certifications]);
 
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
@@ -465,9 +367,6 @@ const Resume = forwardRef(({ data }, ref) => {
       <Menu.Item key="1" onClick={handlePrint}>
         Download as PDF
       </Menu.Item>
-      {/* <Menu.Item key="2" onClick={handleDownload}>
-        Download as DOCX
-      </Menu.Item> */}
     </Menu>
   );
 
@@ -480,86 +379,99 @@ const Resume = forwardRef(({ data }, ref) => {
           </Button>
         </Dropdown>
       </div>
-      <div ref={ref}>
+      <div ref={ref} className={styles.main}>
         <style>{getPageMargins()}</style>
-        <div ref={containerRef} className={styles.container}>
-          <div className={styles.header}>
-            <p className={styles.heading}>{profile?.name}</p>
-            <div className={styles.subHeading}>
-              {profile?.designation && (
-                <span className="px-1">{profile?.designation}</span>
-              )}
-              {profile?.gender && (
-                <span className="px-1">({profile?.gender})</span>
-              )}
-            </div>
-            <div className={styles.experienceHeading}>
-              {profile?.years_of_experience && <div>
-                <CheckSquareOutlined />{" "}
-                <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date?.String)}+ Years of Experience</span>
-              </div>}
-              {profile?.email && (
-                <div>
-                  <MailOutlined /> {profile?.email}
+        <div ref={containerRef}>
+          <div>
+            <div className={styles.container}>
+              <div className={styles.employeeInfo}>
+                <p className={styles.nameStyle}>{profile?.name}</p>
+                <div className={styles.designation}>
+                  {profile?.designation && <span>{profile?.designation}</span>}
+                  {profile?.gender && (
+                    <span className="px-1">({profile?.gender})</span>
+                  )}
                 </div>
-              )}
-              {profile?.mobile && (
                 <div>
-                  <MobileOutlined /> {profile?.mobile}
+                  {profile?.years_of_experience && (
+                    <div className={styles.iconTextWrapper}>
+                      <CheckSquareOutlined />{" "}
+                      <span>
+                        {calculateTotalExperience(
+                          profile?.years_of_experience,
+                          profile?.josh_joining_date?.String,
+                        )}
+                        + Years of Experience
+                      </span>
+                    </div>
+                  )}
+                  {profile?.email && (
+                    <div className={styles.iconTextWrapper}>
+                      <MailOutlined /> <span>{profile?.email}</span>
+                    </div>
+                  )}
+                  {profile?.mobile && (
+                    <div className={styles.iconTextWrapper}>
+                      <MobileOutlined /> <span>{profile?.mobile}</span>
+                    </div>
+                  )}
+                  <div className={styles.socialLink}>
+                    {profile?.github_link && (
+                      <div className={styles.iconTextWrapper}>
+                        <GithubOutlined />{" "}
+                        <Link
+                          className={styles.customLink}
+                          target="_blank"
+                          to={profile?.github_link}
+                        >
+                          GitHub
+                        </Link>
+                      </div>
+                    )}
+                    {profile?.linkedin_link && (
+                      <div className={styles.iconTextWrapper}>
+                        <LinkedinOutlined />
+                        {"  "}
+                        <Link
+                          className={styles.customLink}
+                          target="_blank"
+                          to={profile?.linkedin_link}
+                        >
+                          LinkedIn
+                        </Link>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              )}
-              <div className={styles.socialLink}>
-                {profile?.github_link && (
-                  <>
-                    <GithubOutlined />{" "}
-                    <Link target="_blank" to={profile?.github_link}>
-                      GitHub
-                    </Link>{" "}
-                  </>
-                )}
-                {profile?.linkedin_link && (
-                  <>
-                    <LinkedinOutlined />{" "}
-                    <Link target="_blank" to={profile?.linkedin_link}>
-                      LinkedIn
-                    </Link>
-                  </>
-                )}
+              </div>
+              <div className={styles.flexCenter}>
+                <img src={joshImage} alt="Not Found" className={styles.logo} />
               </div>
             </div>
-            <img
-              src={joshImage}
-              alt="Not Found"
-              width={250}
-              height={180}
-              className={styles.logo}
-            />
           </div>
 
-          <div className="container">
-            <div className="row pr-2">
-              <div className={`col-3 pb-5 ${styles.middleSeparatorLine}`}>
-                {columns[0].map((item) => sectionDiv[item])}
-              </div>
-              <div className="col-9 mr-5">
-                {profile?.description && (
+          <div>
+            <div>
+              {profile?.description && (
+                <div>
                   <div>
-                    <div>
-                      <h4>
-                        <b
-                          className={`${styles.paddingLeft} ${styles.sectionTitle}`}
-                        >
-                          Profile
-                        </b>
-                      </h4>
-                    </div>
-                    <div className={`${styles.profiledetails} pb-3`}>
-                      <span style={{ whiteSpace: 'pre-line' }}>{profile?.description}</span>
-                    </div>
+                    <h4>
+                      <b className={`${styles.sectionTitle}`}>Profile</b>
+                    </h4>
                   </div>
-                )}
-                {columns[1].map((item) => sectionDiv[item])}
-              </div>
+                  <div className={`${styles.profiledetails} `}>
+                    <span style={{ whiteSpace: "pre-line" }}>
+                      {profile?.description}
+                    </span>
+                  </div>
+                </div>
+              )}
+              {sectionDiv.skills}
+              {sectionDiv.educations}
+              {sectionDiv.experiences}
+              {sectionDiv.projects}
+              {sectionDiv.certifications}
+              {sectionDiv.achievements}
             </div>
           </div>
         </div>
