@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
@@ -9,49 +9,70 @@ import {
   useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
-  DESIGNATION,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
+  WHOLE_NO_VALIDATOR,
 } from "../../../Constants";
+
 const BasicInfo = ({ profileData }) => {
   const [createProfileService] = useCreateProfileMutation();
   const [updateProfileService] = useUpdateProfileMutation();
+  const [formChange, setFormChange] = useState(false);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
   useEffect(() => {
     if (profileData) {
-      form.setFieldsValue(profileData);
+      const profileDataCopy = { ...profileData };
+      if (profileDataCopy.josh_joining_date &&
+          profileDataCopy.josh_joining_date.Valid &&
+          profileDataCopy.josh_joining_date.String !== ""
+      ) {
+        profileDataCopy.josh_joining_date = dayjs(profileDataCopy?.josh_joining_date?.String);
+      } else {
+        profileDataCopy.josh_joining_date = null;
+      }
+      form.setFieldsValue(profileDataCopy);
     }
   }, [profileData, form]);
 
   const onFinish = async (values) => {
-    if (values.years_of_experience) {
-      values.years_of_experience = parseFloat(values.years_of_experience);
-    }
-
     try {
+      if (values.years_of_experience || values.josh_joining_date) {
+        values.years_of_experience = Number(values.years_of_experience);
+        if (values.josh_joining_date) {
+          if (!dayjs.isDayjs(values.josh_joining_date)) {
+            values.josh_joining_date = dayjs(values.josh_joining_date);
+          }
+          values.josh_joining_date = values.josh_joining_date.format("MMM-YYYY");
+        }
+      }
       let response;
       if (profileData) {
-        response = await updateProfileService({
-          profile_id: profileData.id,
-          values,
-        });
+        if(formChange){
+          response = await updateProfileService({
+            profile_id: profileData.id,
+            values,
+          });
+        } else {
+          toast.success("No new changes detected.");
+        }
       } else {
         response = await createProfileService(values);
       }
 
-      if (response.data?.message) {
+      if (response?.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
           EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
         );
+        setFormChange(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -61,6 +82,7 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
+      onValuesChange={()=>setFormChange(true)}
       initialValues={
         profileData?.profile || { profileDetails: PROFILE_DETAILS }
       }
@@ -117,32 +139,24 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Years Of Experience"
+            label="Past Years Of Experience(In months)"
             rules={[
               { required: true, message: "Experience required" },
               {
-                validator: (_, value) =>
-                  value <= 30 && value >= 0
-                    ? Promise.resolve()
-                    : Promise.reject(
-                        "Experience must be a positive number and either a whole number up to 30 years."
-                      ),
-              },
-            ]}
+                pattern: WHOLE_NO_VALIDATOR,
+                message: "Experience must be a whole number",
+              }
+            ]}           
           >
             <Input
               type="number"
-              placeholder="Enter experience (e.g., 2.5, 1)"
+              placeholder="Enter experience (e.g., 24, 36)"
             />
           </Form.Item>
         </Col>
         <Col span={12}>
           <Form.Item name="designation" label="Designation">
-            <Select
-              placeholder="Select designation"
-              options={DESIGNATION}
-              allowClear
-            />
+            <Input placeholder="Software Engineer, etc." />
           </Form.Item>
         </Col>
       </Row>
@@ -162,12 +176,7 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
       </Row>
-      {/* <Row gutter={16}>
-        <Col span={12}>
-          <Form.Item name="past_experience" label="Past Experience(in months)">
-            <Input placeholder="Ex. 36, 12, etc." />
-          </Form.Item>
-        </Col>
+      <Row gutter={16}>
         <Col span={12}>
           <Form.Item
             name="josh_joining_date"
@@ -176,8 +185,6 @@ const BasicInfo = ({ profileData }) => {
             <DatePicker style={{ width: "100%" }} picker="month" />
           </Form.Item>
         </Col>
-      </Row> */}
-      <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="github_link" label="Github Profile Link">
             <Input placeholder="Enter GitHub profile link" />
@@ -193,7 +200,7 @@ const BasicInfo = ({ profileData }) => {
             rules={[{ required: true, message: "Description required" }]}
           >
             <Input.TextArea
-              maxLength={600}
+              minLength={50}
               style={{ height: 120, resize: "none" }}
             />
           </Form.Item>
@@ -207,6 +214,7 @@ const BasicInfo = ({ profileData }) => {
               style={{ width: "100%" }}
               placeholder="Select primary skills"
               options={SKILLS}
+              tokenSeparators={[',']}
               rules={[
                 {
                   required: true,
@@ -222,6 +230,7 @@ const BasicInfo = ({ profileData }) => {
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Add secondary skills"
+              tokenSeparators={[',']}
             />
           </Form.Item>
         </Col>
@@ -269,6 +278,10 @@ BasicInfo.propTypes = {
       secondary_skills: PropTypes.array,
       career_objectives: PropTypes.string,
     }),
+    josh_joining_date: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.object,
+    ]),
   }),
 };
 

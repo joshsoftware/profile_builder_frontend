@@ -90,6 +90,8 @@ export const EDUCATION_KEY = "education";
 export const EXPERIENCE_KEY = "experience";
 export const ACHIEVEMENT_KEY = "achievement";
 export const CERTIFICATION_KEY = "certification";
+export const PRESENT_VALUE = "present";
+export const WHOLE_NO_VALIDATOR = /^[0-9]+$/
 
 // Keywords
 export const BASIC_INFO_LABEL = "Basic Info";

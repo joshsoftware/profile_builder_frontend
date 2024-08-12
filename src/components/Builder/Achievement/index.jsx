@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { DragOutlined } from "@ant-design/icons";
 import { Button, Form, Input, Space, Tabs } from "antd";
+import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -49,9 +49,15 @@ const Achievement = ({ achievementData }) => {
   const [action, setAction] = useState("create");
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 },
   });
+  const resetItems = useCallback(() => {
+    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
+    newTabIndex.current = 1;
+    form.resetFields();
+  }, [form]);
 
   useEffect(() => {
     if (profile_id && achievementData) {
@@ -79,13 +85,7 @@ const Achievement = ({ achievementData }) => {
         resetItems();
       }
     }
-  }, [profile_id, achievementData]);
-
-  const resetItems = () => {
-    setItems([{ label: "Achievement 1", children: null, key: "0" }]);
-    newTabIndex.current = 1;
-    form.resetFields();
-  };
+  }, [profile_id, achievementData, form, resetItems]);
 
   const handleCreate = async (values) => {
     try {
@@ -95,6 +95,7 @@ const Achievement = ({ achievementData }) => {
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
+        window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
       toast.error(error.response?.data?.message);
@@ -102,21 +103,26 @@ const Achievement = ({ achievementData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const achievement of values) {
-        if (achievement.id) {
-          const response = await updateAchievementService({
-            profile_id: profile_id,
-            achievement_id: achievement.id,
-            values: achievement,
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const achievement of values) {
+          if (achievement.id) {
+            const response = await updateAchievementService({
+              profile_id: profile_id,
+              achievement_id: achievement.id,
+              values: achievement,
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -181,6 +187,7 @@ const Achievement = ({ achievementData }) => {
 
         if (response?.data) {
           toast.success(response?.data, SUCCESS_TOASTER);
+          window.location.reload(); // needs tobe remove after implement download popover
         }
       }
     } catch (error) {
@@ -219,7 +226,6 @@ const Achievement = ({ achievementData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -247,6 +253,23 @@ const Achievement = ({ achievementData }) => {
     }
   };
 
+  const handleAchievements = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -272,6 +295,7 @@ const Achievement = ({ achievementData }) => {
                   form={form}
                   name={`achievement_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`achievement_${index}`, "id"]} hidden>
@@ -296,23 +320,23 @@ const Achievement = ({ achievementData }) => {
                     <Input.TextArea
                       placeholder="Please provide a basic overview of the above achievement"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Form.Item>
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("create")}
                         disabled={item.isExisting}
                       >
                         Create Achievements
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleAchievements("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Achievement {Number(item.key) + 1}

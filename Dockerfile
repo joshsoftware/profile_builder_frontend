@@ -1,32 +1,19 @@
-# fetch the latest node image from alpine
-FROM node:alpine AS builder
+# Fetching the latest node image on alpine linux
+FROM node:20-alpine AS production
 
-# work directory
+# Declaring env
+ENV NODE_ENV production
+
+# Setting up the work directory
 WORKDIR /react-app
 
-# copy package.json and package-lock.json
-COPY package*.json ./
+# Installing dependencies
+COPY ./package*.json /react-app
 
-# install dependencies
-RUN npm install
 RUN npm install
 
-# copy all the files in our project
+# Copying all the files in our project
 COPY . .
 
-# build the project
-RUN npm run build
-
-# # fetch the latest nginx image
-# FROM nginx:alpine
-
-# # copy the build folder from react to the nginx folder
-# COPY --from=builder /react-app/build /usr/share/nginx/html
-
-# # copy the nginx configuration file
-# COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expose port 80
-EXPOSE 3000
-
-CMD [ "npm", "start" ]
+# Starting our application
+CMD ["npm", "run", "start"]

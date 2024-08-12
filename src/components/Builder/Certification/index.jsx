@@ -50,6 +50,7 @@ const Certification = ({ certificationData }) => {
   const dispatch = useDispatch();
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 }
   });
@@ -99,6 +100,7 @@ const Certification = ({ certificationData }) => {
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
+        window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
       toast.error(error.response?.data?.error_message);
@@ -106,21 +108,26 @@ const Certification = ({ certificationData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const certificate of values) {
-        if (certificate.id) {
-          const response = await updateCertificateService({
-            profile_id: profile_id,
-            certificate_id: certificate.id,
-            values: certificate
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const certificate of values) {
+          if (certificate.id) {
+            const response = await updateCertificateService({
+              profile_id: profile_id,
+              certificate_id: certificate.id,
+              values: certificate
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -182,11 +189,13 @@ const Certification = ({ certificationData }) => {
         });
 
         if (response?.data) {
+          console.log("data : ", response?.data);
           toast.success(response?.data, SUCCESS_TOASTER);
-        }
+          window.location.reload(); // needs tobe remove after implement download popover
+        } 
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     form.resetFields([`certificate_${modalState.key}`]);
     if (newPanes.length && modalState.key === activeKey) {
@@ -219,7 +228,6 @@ const Certification = ({ certificationData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -247,6 +255,23 @@ const Certification = ({ certificationData }) => {
     }
   };
 
+  const handleCertificates = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -272,6 +297,7 @@ const Certification = ({ certificationData }) => {
                   form={form}
                   name={`certification_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Row>
@@ -308,7 +334,7 @@ const Certification = ({ certificationData }) => {
                     <Input.TextArea
                       placeholder="Provide a basic overview of the certificate"
                       showCount
-                      maxLength={300}
+                      minLength={50}
                     />
                   </Form.Item>
                   <Row>
@@ -383,20 +409,16 @@ const Certification = ({ certificationData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("create");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("create")}
                         disabled={item.isExisting}
                       >
                         Create Certificates
                       </Button>
                       <Button
                         type="primary"
-                        onClick={() => {
-                          setAction("update");
-                          form.submit();
-                        }}
+                        htmlType="button"
+                        onClick={()=> handleCertificates("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Certificate {Number(item.key) + 1}

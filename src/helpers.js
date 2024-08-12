@@ -1,4 +1,5 @@
 import dayjs from "dayjs";
+import { PRESENT_VALUE } from "./Constants";
 
 export const filterSection = (values) => {
   return Object.entries(values).reduce((acc, [, section]) => {
@@ -36,7 +37,7 @@ export const formatExperienceFields = (experiences) => {
     from_date: experience?.from_date?.format("MMM-YYYY"),
     to_date: experience?.to_date
       ? experience?.to_date?.format("MMM-YYYY")
-      : "Present"
+      : PRESENT_VALUE
   }));
 };
 
@@ -79,3 +80,23 @@ export const disabledDate = (current) => {
   // Can not select month before today and today
   return current && current < dayjs().endOf('month');
 };
+
+export const calculateTotalExperience = (pastExp, joinDate) => {
+  const pastExperienceInMonths = (pastExp || 0);
+  const joiningDate = joinDate ? new Date(joinDate) : new Date();
+  const currentDate = new Date();
+
+  const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
+  const diffMonths = currentDate.getMonth() - joiningDate.getMonth();
+  const monthsSinceJoining = (diffYears * 12) + diffMonths;
+  
+  const totalExperienceInMonths = Number(pastExperienceInMonths) + Number(monthsSinceJoining);
+  const totalExperienceInYears = totalExperienceInMonths / 12;
+  const result = Math.floor(totalExperienceInYears);
+
+  if(result === 0){
+    return 1
+  } else {
+    return result
+  }
+}; 

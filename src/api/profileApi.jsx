@@ -75,8 +75,8 @@ export const profileApi = createApi({
         data: { profile_status },
       }),
       invalidatesTags: ["profile"],
-      transformResponse: (response) => response.data,
-    }),
+      transformResponse: (response) => response.data
+    })
   }),
 });
 

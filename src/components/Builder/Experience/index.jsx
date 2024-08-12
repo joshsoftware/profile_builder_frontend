@@ -35,6 +35,7 @@ import Modals from "../../../common-components/Modals";
 import {
   DESIGNATION,
   INVALID_ID_ERROR,
+  PRESENT_VALUE,
   SUCCESS_TOASTER
 } from "../../../Constants";
 import {
@@ -66,6 +67,7 @@ const Experience = ({ experienceData }) => {
   const { profile_id } = useParams();
   const [dragged, setDragged] = useState(false);
   const [newOrder, setNewOrder] = useState({});
+  const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: { distance: 10 }
   });
@@ -92,9 +94,9 @@ const Experience = ({ experienceData }) => {
                 ? dayjs(experience.from_date)
                 : null,
               to_date:
-                experience.to_date && experience.to_date !== "Present"
+                experience.to_date && experience.to_date !== PRESENT_VALUE
                   ? dayjs(experience.to_date)
-                  : dayjs(),
+                  : "",
             };
             return acc;
           }, {})
@@ -106,7 +108,7 @@ const Experience = ({ experienceData }) => {
         form.setFieldsValue({});
       }
     }
-  }, [profile_id, experienceData]);
+  }, [profile_id, experienceData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -124,27 +126,30 @@ const Experience = ({ experienceData }) => {
   };
 
   const handleUpdate = async (values) => {
-    try {
-      for (const experience of values) {
-        if (experience?.id) {
-          const response = await updateExperienceService({
-            profile_id: profile_id,
-            experience_id: experience.id,
-            values: {
-              ...experience,
-              from_date: experience.from_date.format("MMM-YYYY"),
-              to_date: experience.to_date
-                ? experience.to_date.format("MMM-YYYY")
-                : "present",
-            },
-          });
-          if (response.data?.message) {
-            toast.success(response.data?.message, SUCCESS_TOASTER);
+    if(formChange){
+      try {
+        for (const experience of values) {
+          if (experience?.id) {
+            const response = await updateExperienceService({
+              profile_id: profile_id,
+              experience_id: experience.id,
+              values: {
+                ...experience,
+                from_date: experience.from_date.format("MMM-YYYY"),
+                to_date: isCurrentCompany ? PRESENT_VALUE : experience.to_date.format("MMM-YYYY")
+              },
+            });
+            if (response.data?.message) {
+              toast.success(response.data?.message, SUCCESS_TOASTER);
+              setFormChange(false);
+            }
           }
         }
+      } catch (error) {
+        toast.error(error.response?.data?.error_message);
       }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
+    } else {
+      toast.success("No new changes detected.");
     }
   };
 
@@ -234,8 +239,8 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const HandleEndDate = (e) => {
-    setIsCurrentCompany(e.target.checked);
+  const handleIsCurrentCompany = () => {
+    setIsCurrentCompany(!isCurrentCompany);
   };
 
   const onDragEnd = ({ active, over }) => {
@@ -248,7 +253,6 @@ const Experience = ({ experienceData }) => {
         newItems.forEach((item, index) => {
           newOrder[String(item.id)] = index + 1;
         });
-        console.log("New Order:", newOrder);
         setDragged(true);
         setNewOrder(newOrder);
         return newItems;
@@ -276,6 +280,23 @@ const Experience = ({ experienceData }) => {
     }
   };
 
+  const handleExperiences = (action) => {
+    form
+      .validateFields()
+      .then(() => {
+        setAction(action);
+        form.submit();
+      })
+      .catch((errorInfo) => {
+        const errorFields = errorInfo.errorFields;
+        if (errorFields.length > 0) {
+          const firstErrorField = errorFields[0].name[0];
+          const keyWithError = firstErrorField.split("_")[1];
+          setActiveKey(keyWithError);
+        }
+      });
+  };
+
   return (
     <div>
       <div style={{ marginBottom: 16 }}>
@@ -301,6 +322,7 @@ const Experience = ({ experienceData }) => {
                   form={form}
                   name={`experience_${item.key}`}
                   onFinish={onFinish}
+                  onValuesChange={()=>setFormChange(true)}
                   key={item.key}
                 >
                   <Row>
@@ -342,13 +364,11 @@ const Experience = ({ experienceData }) => {
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
                     <Col>
-                      <Checkbox
-                        name={"isCurrentCompany"}
-                        checked={isCurrentCompany}
-                        onChange={HandleEndDate}
-                      >
-                        Is This A Current Company ?
-                      </Checkbox>
+                      <Form.Item name={[`experience_${index}`, "isCurrentCompany"]}>
+                        <Checkbox onChange={handleIsCurrentCompany} checked={isCurrentCompany}>
+                          Is This A Current Company?
+                        </Checkbox>
+                      </Form.Item>
                     </Col>
                   </Row>
                   <Row style={{ margin: "10px 0px 10px 0px" }}>
@@ -411,16 +431,16 @@ const Experience = ({ experienceData }) => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("create")}
+                        htmlType="button"
+                        onClick={()=>handleExperiences("create")}
                         disabled={item.isExisting}
                       >
                         Create Experiences
                       </Button>
                       <Button
                         type="primary"
-                        htmlType="submit"
-                        onClick={() => setAction("update")}
+                        htmlType="button"
+                        onClick={()=> handleExperiences("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Experience {Number(item.key) + 1}
