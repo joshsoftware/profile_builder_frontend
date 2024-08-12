@@ -146,10 +146,15 @@ const Experience = ({ experienceData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.error_message);
+        toast.error(error.response?.data?.message);
       }
+<<<<<<< Updated upstream
     } else {
       toast.success("No new changes detected.");
+=======
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+>>>>>>> Stashed changes
     }
   };
 
@@ -216,7 +221,7 @@ const Experience = ({ experienceData }) => {
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     form.resetFields([`experience_${modalState.key}`]);
     if (newPanes.length && modalState.key === activeKey) {

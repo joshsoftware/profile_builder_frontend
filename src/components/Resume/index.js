@@ -220,7 +220,7 @@ const Resume = forwardRef(({ data }, ref) => {
         } `}
       >
         <div className={styles.separate}></div>
-        <div className={`${styles.leftSection} pt-2`}>Educations</div>
+        <div className={`${styles.sectionTitle} pt-2`}>Educations</div>
         <div className={styles.content}>
           {educations?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
@@ -258,7 +258,7 @@ const Resume = forwardRef(({ data }, ref) => {
             : styles.hidden
         }`}
       >
-        <div className={styles.leftSection}>Skills</div>
+        <div className={styles.sectionTitle}>Skills</div>
         <div className={styles.content}>
           <div className={styles.educationItem}>
             {profile?.primary_skills?.length > 0 && (

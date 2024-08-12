@@ -114,7 +114,7 @@ const Project = ({ projectData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -135,10 +135,15 @@ const Project = ({ projectData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.error_message);
+        toast.error(error.response?.data?.message);
       }
+<<<<<<< Updated upstream
     } else {
       toast.success("No new changes detected.");
+=======
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+>>>>>>> Stashed changes
     }
   };
 
@@ -206,7 +211,7 @@ const Project = ({ projectData }) => {
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     form.resetFields([`project_${modalState.key}`]);
 

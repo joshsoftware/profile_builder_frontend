@@ -83,7 +83,7 @@ const ListProfiles = () => {
       });
       toast.success(response?.data?.message);
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     setToggleActiveModal({
       isVisibleToggleActive: false,
@@ -119,7 +119,7 @@ const ListProfiles = () => {
       });
       toast.success(response?.data?.message);
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
 
     setIsCurrentEmpModalState({
@@ -156,7 +156,7 @@ const ListProfiles = () => {
       }
     } catch (error) {
       console.error("Error deleting profile:", error);
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     setDeleteModal({
       ...deleteModal,

@@ -96,7 +96,7 @@ const Education = ({ educationData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
   };
 
@@ -119,8 +119,13 @@ const Education = ({ educationData }) => {
       } catch (error) {
         toast.error(error.response?.data?.message);
       }
+<<<<<<< Updated upstream
     } else {
       toast.success("No new changes detected.");
+=======
+    } catch (error) {
+      toast.error(error.response?.data?.message);
+>>>>>>> Stashed changes
     }
   };
 
@@ -186,7 +191,7 @@ const Education = ({ educationData }) => {
         }
       }
     } catch (error) {
-      toast.error(error.response?.data?.error_message);
+      toast.error(error.response?.data?.message);
     }
     form.resetFields([`education_${modalState.key}`]);
     if (newPanes.length && modalState.key === activeKey) {
