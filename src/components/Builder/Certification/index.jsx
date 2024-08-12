@@ -8,7 +8,7 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -16,16 +16,16 @@ import {
   certificationApi,
   useCreateCertificateMutation,
   useDeleteCertificateMutation,
-  useUpdateCertificateMutation
+  useUpdateCertificateMutation,
 } from "../../../api/certificationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
-  validateId
+  showConfirm,
+  validateId,
 } from "../../../helpers";
 
 const Certification = ({ certificationData }) => {
@@ -34,7 +34,6 @@ const Certification = ({ certificationData }) => {
   const [updateCertificateService] = useUpdateCertificateMutation();
   const [deleteCertificateService] = useDeleteCertificateMutation();
   const [updateSequence] = useUpdateSequenceMutation();
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -42,8 +41,8 @@ const Certification = ({ certificationData }) => {
       label: "Certificate 1",
       children: null,
       key: "0",
-      isExisting: false
-    }
+      isExisting: false,
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -52,7 +51,7 @@ const Certification = ({ certificationData }) => {
   const [newOrder, setNewOrder] = useState({});
   const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
-    activationConstraint: { distance: 10 }
+    activationConstraint: { distance: 10 },
   });
 
   useEffect(() => {
@@ -81,7 +80,7 @@ const Certification = ({ certificationData }) => {
               to_date: certificate.to_date ? dayjs(certificate.to_date) : null,
             };
             return acc;
-          }, {})
+          }, {}),
         );
         setActiveKey("0");
       } else {
@@ -96,7 +95,7 @@ const Certification = ({ certificationData }) => {
     try {
       const response = await createCertificateService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -108,14 +107,14 @@ const Certification = ({ certificationData }) => {
   };
 
   const handleUpdate = async (values) => {
-    if(formChange){
+    if (formChange) {
       try {
         for (const certificate of values) {
           if (certificate.id) {
             const response = await updateCertificateService({
               profile_id: profile_id,
               certificate_id: certificate.id,
-              values: certificate
+              values: certificate,
             });
             if (response.data?.message) {
               toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -164,57 +163,53 @@ const Certification = ({ certificationData }) => {
       {
         label: `Certification ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     form.resetFields([`certificate_${newActiveKey}`]);
+    setActiveKey(newActiveKey);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (certificationData[targetKey]?.id) {
+            const response = await deleteCertificateService({
+              profile_id,
+              certificate_id: certificationData[targetKey]?.id,
+            });
 
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
-
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
-    try {
-      if (certificationData[modalState.key]?.id) {
-        const response = await deleteCertificateService({
-          profile_id: profile_id,
-          certificate_id: certificationData[modalState.key]?.id
-        });
-
-        if (response?.data) {
-          console.log("data : ", response?.data);
-          toast.success(response?.data, SUCCESS_TOASTER);
-          window.location.reload(); // needs tobe remove after implement download popover
-        } 
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
-    form.resetFields([`certificate_${modalState.key}`]);
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
+        }
+        form.resetFields([`certificate_${targetKey}`]);
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this certificate?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -297,7 +292,7 @@ const Certification = ({ certificationData }) => {
                   form={form}
                   name={`certification_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Row>
@@ -311,8 +306,8 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Name is required"
-                          }
+                            message: "Name is required",
+                          },
                         ]}
                       >
                         <Input placeholder="Enter Certificate Name" />
@@ -345,18 +340,18 @@ const Certification = ({ certificationData }) => {
                         rules={[
                           {
                             required: true,
-                            message: "Issued date required"
+                            message: "Issued date required",
                           },
                           {
                             validator: (_, value) =>
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "Issued date cannot be in the future"
-                                    )
+                                      "Issued date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -372,11 +367,11 @@ const Certification = ({ certificationData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "Start date cannot be in the future"
-                                    )
+                                      "Start date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -394,11 +389,11 @@ const Certification = ({ certificationData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "End date cannot be in the future"
-                                    )
+                                      "End date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -410,7 +405,7 @@ const Certification = ({ certificationData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleCertificates("create")}
+                        onClick={() => handleCertificates("create")}
                         disabled={item.isExisting}
                       >
                         Create Certificates
@@ -418,7 +413,7 @@ const Certification = ({ certificationData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleCertificates("update")}
+                        onClick={() => handleCertificates("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Certificate {Number(item.key) + 1}
@@ -436,7 +431,7 @@ const Certification = ({ certificationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -450,18 +445,12 @@ const Certification = ({ certificationData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this certificate?"
-      />
     </div>
   );
 };
 
 Certification.propTypes = {
-  certificationData: PropTypes.object
+  certificationData: PropTypes.object,
 };
 
 export default Certification;

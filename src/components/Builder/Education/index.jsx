@@ -8,23 +8,23 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import PropTypes from "prop-types";
 import {
   educationApi,
   useCreateEducationMutation,
   useDeleteEducationMutation,
-  useUpdateEducationMutation
+  useUpdateEducationMutation,
 } from "../../../api/educationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatEducationFields,
-  validateId
+  showConfirm,
+  validateId,
 } from "../../../helpers";
 
 const Education = ({ educationData }) => {
@@ -34,7 +34,6 @@ const Education = ({ educationData }) => {
   const [deleteEducationService] = useDeleteEducationMutation();
   const [updateSequence] = useUpdateSequenceMutation();
   const dispatch = useDispatch();
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -43,7 +42,7 @@ const Education = ({ educationData }) => {
       children: null,
       key: "0",
       isExisting: false,
-    }
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -52,8 +51,8 @@ const Education = ({ educationData }) => {
   const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10
-    }
+      distance: 10,
+    },
   });
 
   useEffect(() => {
@@ -72,10 +71,10 @@ const Education = ({ educationData }) => {
           educationData.reduce((acc, education, index) => {
             acc[`education_${index}`] = {
               ...education,
-              id: education?.id
+              id: education?.id,
             };
             return acc;
-          }, {})
+          }, {}),
         );
         setActiveKey("0");
       } else {
@@ -90,7 +89,7 @@ const Education = ({ educationData }) => {
     try {
       const response = await createEducationService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -108,7 +107,7 @@ const Education = ({ educationData }) => {
             const response = await updateEducationService({
               profile_id: profile_id,
               education_id: education.id,
-              values: education
+              values: education,
             });
             if (response.data?.message) {
               toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -157,55 +156,53 @@ const Education = ({ educationData }) => {
       {
         label: `Education ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     form.resetFields([`education_${newActiveKey}`]);
+    setActiveKey(newActiveKey);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (educationData[targetKey]?.id) {
+            const response = await deleteEducationService({
+              profile_id: profile_id,
+              education_id: educationData[targetKey]?.id,
+            });
 
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
-
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
-    try {
-      if (educationData[modalState.key]?.id) {
-        const response = await deleteEducationService({
-          profile_id: profile_id,
-          education_id: educationData[modalState.key]?.id
-        });
-
-        if (response?.data) {
-          toast.success(response?.data, SUCCESS_TOASTER);
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
         }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.error_message);
-    }
-    form.resetFields([`education_${modalState.key}`]);
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+        form.resetFields([`education_${targetKey}`]);
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this education?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -288,7 +285,7 @@ const Education = ({ educationData }) => {
                   form={form}
                   name={`education_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`education_${index}`, "id"]} hidden>
@@ -300,8 +297,8 @@ const Education = ({ educationData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Degree required"
-                      }
+                        message: "Degree required",
+                      },
                     ]}
                   >
                     <Input placeholder="Eg. MCS, BTech in CS" />
@@ -347,7 +344,7 @@ const Education = ({ educationData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleEducations("create")}
+                        onClick={() => handleEducations("create")}
                         disabled={item.isExisting}
                       >
                         Create Educations
@@ -355,7 +352,7 @@ const Education = ({ educationData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleEducations("update")}
+                        onClick={() => handleEducations("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Education {Number(item.key) + 1}
@@ -373,7 +370,7 @@ const Education = ({ educationData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -387,18 +384,12 @@ const Education = ({ educationData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this education?"
-      />
     </div>
   );
 };
 
 Education.propTypes = {
-  educationData: PropTypes.array
+  educationData: PropTypes.array,
 };
 
 export default Education;

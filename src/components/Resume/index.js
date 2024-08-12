@@ -1,9 +1,12 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Menu } from "antd";
+import { Button, Dropdown, Menu, Tag } from "antd";
 import {
   CalendarOutlined,
+  CheckOutlined,
   CheckSquareOutlined,
   DownloadOutlined,
   DownOutlined,
@@ -13,12 +16,21 @@ import {
   MobileOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useCompleteProfileMutation } from "../../api/profileApi";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
-import { getMonthString, PRESENT_VALUE } from "../../Constants";
-import { calculateTotalExperience } from "../../helpers";
+import {
+  getMonthString,
+  PRESENT_VALUE,
+  ROOT_ROUTE,
+  SUCCESS_TOASTER,
+} from "../../Constants";
+import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const role = useSelector((state) => state.auth.role);
+  const [completeProfileService] = useCompleteProfileMutation();
+  const navigate = useNavigate();
   const location = useLocation();
   const { is_josh_employee } = location.state || {};
 
@@ -40,142 +52,6 @@ const Resume = forwardRef(({ data }, ref) => {
     content: () => ref.current,
   });
 
-  // const handleDownload = () => {
-  //   try {
-  //     const doc = new Document();
-
-  //     const formatDate = (date) => {
-  //       if (!date) {
-  //         return "";
-  //       }
-  //       const d = new Date(date);
-  //       return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-  //     };
-
-  //     const profileParagraph = new Paragraph({
-  //       children: [
-  //         new TextRun(profile?.name || "").bold().break(),
-  //         new TextRun(profile?.designation || ""),
-  //         profile?.gender && new TextRun(` (${profile.gender})`),
-  //         new TextRun().break(),
-  //         new TextRun(
-  //           `${profile?.years_of_experience || ""} Year of Experience`,
-  //         ),
-  //         new TextRun().break(),
-  //         new TextRun(profile?.email || ""),
-  //         profile?.mobile && new TextRun().break(),
-  //         profile?.mobile && new TextRun(profile.mobile),
-  //         profile?.github_link && new TextRun().break(),
-  //         profile?.github_link && new TextRun(`GitHub: ${profile.github_link}`),
-  //         profile?.linkedin_link && new TextRun().break(),
-  //         profile?.linkedin_link &&
-  //           new TextRun(`LinkedIn: ${profile.linkedin_link}`),
-  //       ].filter(Boolean),
-  //     });
-
-  //     const sections = [
-  //       ...(educations || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Education:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.degree || ""} - ${item.university_name || ""}, ${
-  //                   item.place || ""
-  //                 }`,
-  //               ),
-  //               new TextRun(
-  //                 `\nPassing Year: ${new Date(item.passing_year).getFullYear()}`,
-  //               ),
-  //               item.percent_or_cgpa &&
-  //                 new TextRun(`\nCGPA / Percentage: ${item.percent_or_cgpa}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(certifications || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Certification:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.name || ""} - ${item.organization_name || ""}`,
-  //               ),
-  //               new TextRun(`\nIssue Date: ${formatDate(item.issued_date)}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(achievements || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Achievement:`).bold(),
-  //               new TextRun(`\n${item.name || ""}`),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(experiences || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Experience:`).bold(),
-  //               new TextRun(
-  //                 `\n${item.designation || ""} - ${item.company_name || ""}`,
-  //               ),
-  //               new TextRun(
-  //                 `\n${formatDate(item.from_date)} - ${formatDate(
-  //                   item.to_date,
-  //                 )}`,
-  //               ),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //       ...(projects || []).map(
-  //         (item) =>
-  //           new Paragraph({
-  //             children: [
-  //               new TextRun(`Project:`).bold(),
-  //               new TextRun(`\n${item.name || ""}`),
-  //               new TextRun(
-  //                 `\n${formatDate(item.working_start_date)} - ${formatDate(
-  //                   item.working_end_date,
-  //                 )}`,
-  //               ),
-  //               item.duration && new TextRun(`\nDuration: ${item.duration}`),
-  //               item.description &&
-  //                 new TextRun(`\nDescription: ${item.description}`),
-  //               item.role && new TextRun(`\nRole: ${item.role}`),
-  //               item.responsibilities &&
-  //                 new TextRun(`\nResponsibilities: ${item.responsibilities}`),
-  //               item.technologies &&
-  //                 new TextRun(
-  //                   `\nTechnologies: ${(item.technologies || []).join(", ")}`,
-  //                 ),
-  //               item.tech_worked_on &&
-  //                 new TextRun(
-  //                   `\nContribution: ${(item.tech_worked_on || []).join(", ")}`,
-  //                 ),
-  //             ].filter(Boolean),
-  //           }),
-  //       ),
-  //     ];
-
-  //     doc.addSection({
-  //       properties: {},
-  //       children: [profileParagraph, ...sections],
-  //     });
-
-  //     Packer.toBlob(doc)
-  //       .then((blob) => {
-  //         saveAs(blob, "Resume.docx");
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error creating DOCX file:", error);
-  //       });
-  //   } catch (error) {
-  //     console.error("Error in handleDownload function:", error);
-  //   }
-  // };
-
   const getMonthYear = (value) => {
     if (!value) {
       return;
@@ -192,7 +68,7 @@ const Resume = forwardRef(({ data }, ref) => {
     ) {
       return PRESENT_VALUE;
     }
-    return `${getMonthString(givenMonth)} ${givenYear}`;
+    return ` ${getMonthString(givenMonth)} ${givenYear}   `;
   };
 
   const sectionDiv = {
@@ -214,8 +90,8 @@ const Resume = forwardRef(({ data }, ref) => {
               {item?.company_name && (
                 <div className={styles.date}>
                   <span className={styles.subtitle}>{item.company_name}</span>
-                  | <CalendarOutlined /> {getMonthYear(item.from_date)} - {' '}
-                  {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
+                  | <CalendarOutlined /> {getMonthYear(item.from_date)} -
+                  {item.to_date === PRESENT_VALUE ? " Present" : item.to_date}
                 </div>
               )}
             </div>
@@ -240,50 +116,52 @@ const Resume = forwardRef(({ data }, ref) => {
                   <b className={styles.underline}>{item.name}</b>
                   {item?.working_start_date && item?.working_end_date && (
                     <span className="px-2">
-                      | {getMonthYear(item.working_start_date)} - {' '}
-                      {getMonthYear(item.working_end_date) === PRESENT_VALUE ? "Present" : getMonthYear(item.working_end_date)}
+                      | {getMonthYear(item.working_start_date)} -
+                      {getMonthYear(item.working_end_date)}
                     </span>
                   )}
                 </h2>
               )}
+
               {item?.duration && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Duration: </b>
-                  {item.duration} years
+                  <b className={styles.overview}>Duration : </b>
+                  {item.duration}
                 </span>
               )}
               {item?.description && (
                 <div>
                   <span className={styles.duration}>
                     <b className={styles.overview}>Project Description: </b>
-                    <span style={{ whiteSpace: 'pre-line' }}>{item.description}</span>
+                    <span style={{ whiteSpace: "pre-line" }}>
+                      {item.description}
+                    </span>
                   </span>
                 </div>
               )}
               {item?.role && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Role: </b>
-                    <ul>
-                      {item.role.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <b className={styles.overview}>Role : </b>
+                  <ul>
+                    {item.role.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
               {item?.responsibilities && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Responsibility: </b>
-                    <ul>
-                      {item.responsibilities.split('\n').map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                  <b className={styles.overview}>Responsibility : </b>
+                  <ul>
+                    {item.responsibilities.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
                 </span>
               )}
-
               {item?.technologies && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Project Techstack: </b>
+                  <b className={styles.overview}>Project Techstack : </b>
                   {Array.isArray(item.technologies)
                     ? item.technologies.join(", ")
                     : item.technologies}
@@ -291,7 +169,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.tech_worked_on && (
                 <span className={styles.duration}>
-                  <b className={styles.overview}>Technology Worked On: </b>
+                  <b className={styles.overview}>Technology Worked On : </b>
                   {Array.isArray(item.tech_worked_on)
                     ? item.tech_worked_on.join(", ")
                     : item.tech_worked_on}
@@ -314,10 +192,7 @@ const Resume = forwardRef(({ data }, ref) => {
         <div className={styles.title} style={{ textAlign: "right" }}>
           <ul className={styles.achievement}>
             {achievements?.map((item) => (
-              <>
-                <li key={item.id}>{item?.name && <span style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>{item.name}</span>}</li>
-                <div style={{ width: "120px", height: "3px", backgroundColor: "white", marginTop: "4px" }}></div>
-              </>
+              <li key={item.id}>{item?.name && <span>• {item.name}</span>}</li>
             ))}
           </ul>
         </div>
@@ -340,17 +215,17 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {(item?.university_name || item?.place) && (
                 <div className={styles.subtitle}>
-                  {item.university_name}{item.place && `, ${item.place}`}
+                  {item.university_name} {item.place && `, ${item.place}`}
                 </div>
               )}
               {item?.passing_year && (
                 <div className={styles.passingDate}>
-                  Passing Year: {new Date(item.passing_year).getFullYear()}
+                  Passing Year : {new Date(item.passing_year).getFullYear()}
                 </div>
               )}
               {item?.percent_or_cgpa && (
                 <div className={styles.passingDate}>
-                  CGPA/Percentage: {item.percent_or_cgpa}
+                  CGPA / Percentage : {item.percent_or_cgpa}
                 </div>
               )}
             </div>
@@ -373,28 +248,32 @@ const Resume = forwardRef(({ data }, ref) => {
           <div className={styles.educationItem}>
             {profile?.primary_skills?.length > 0 && (
               <div>
-                <div className={styles.subtitleHeading}>Primary</div>
-                <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
-                  {profile?.primary_skills.map((elem, index) => (
-                    <li className={styles.point} key={"primary" + elem + index} style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}>
+                <div className={styles.subtitleHeading}>Primary Skills</div>
+                <ul className={styles.skillNumbered}>
+                  {profile?.primary_skills?.map((elem, index) => (
+                    <Tag
+                      color="blue"
+                      key={"primary" + elem + index}
+                      style={{ margin: "1px" }}
+                    >
                       {elem}
-                    </li>
+                    </Tag>
                   ))}
                 </ul>
               </div>
             )}
             {profile?.secondary_skills?.length > 0 && (
               <div>
-                <div className={styles.subtitleHeading}>Secondary</div>
-                <ul className={`${styles.skillNumbered} ${styles.wrap_box}`}>
+                <div className={styles.subtitleHeading}>Secondary Skills</div>
+                <ul className={styles.skillNumbered}>
                   {profile?.secondary_skills?.map((elem, index) => (
-                    <li
-                    className={styles.point}
-                    key={"secondary" + elem + index}
-                    style={{display: "inline-block", width: "120px", wordWrap: "break-word"}}
-                  >
-                    {elem}
-                  </li>
+                    <Tag
+                      color="blue"
+                      key={"secondary" + elem + index}
+                      style={{ margin: "1px" }}
+                    >
+                      {elem}
+                    </Tag>
                   ))}
                 </ul>
               </div>
@@ -423,7 +302,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  Issue Date: {getMonthYear(item.issued_date)}
+                  Issue Date : {item.issued_date}
                 </div>
               )}
             </div>
@@ -444,7 +323,7 @@ const Resume = forwardRef(({ data }, ref) => {
 
     const rightColumn = ["experiences", "projects"].filter(Boolean);
     setColumns([leftColumn, rightColumn]);
-  }, [achievements, certifications]);  
+  }, [achievements, certifications]);
 
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
@@ -471,14 +350,47 @@ const Resume = forwardRef(({ data }, ref) => {
     </Menu>
   );
 
+  const handleCompleteProfile = () => {
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (profile?.id) {
+            const response = await completeProfileService({
+              profile_id: profile?.id,
+            });
+            if (response?.data) {
+              toast.success(response?.data?.message, SUCCESS_TOASTER);
+              navigate(ROOT_ROUTE);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.message);
+        }
+      },
+      onCancel() {},
+      message:
+        "Are you certain you want to finalize the profile? Once completed, changes cannot be undone.",
+    });
+  };
+
   return (
     <>
       <div className="header" style={{ marginTop: "10px" }}>
-        <Dropdown overlay={downloadMenu} trigger={["click"]}>
-          <Button type="primary" icon={<DownloadOutlined />}>
-            Download <DownOutlined />
+        {role.toLowerCase() === "admin" ? (
+          <Dropdown overlay={downloadMenu} trigger={["click"]}>
+            <Button type="primary" icon={<DownloadOutlined />}>
+              Download <DownOutlined />
+            </Button>
+          </Dropdown>
+        ) : (
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            onClick={handleCompleteProfile}
+          >
+            Complete Profile
           </Button>
-        </Dropdown>
+        )}
       </div>
       <div ref={ref}>
         <style>{getPageMargins()}</style>
@@ -494,10 +406,18 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
             </div>
             <div className={styles.experienceHeading}>
-              {profile?.years_of_experience && <div>
-                <CheckSquareOutlined />{" "}
-                <span>{calculateTotalExperience(profile?.years_of_experience, profile?.josh_joining_date?.String)}+ Years of Experience</span>
-              </div>}
+              {profile?.years_of_experience && (
+                <div>
+                  <CheckSquareOutlined />{" "}
+                  <span>
+                    {calculateTotalExperience(
+                      profile?.years_of_experience,
+                      profile?.josh_joining_date,
+                    )}
+                    + Years of Experience
+                  </span>
+                </div>
+              )}
               {profile?.email && (
                 <div>
                   <MailOutlined /> {profile?.email}
@@ -554,7 +474,9 @@ const Resume = forwardRef(({ data }, ref) => {
                       </h4>
                     </div>
                     <div className={`${styles.profiledetails} pb-3`}>
-                      <span style={{ whiteSpace: 'pre-line' }}>{profile?.description}</span>
+                      <span style={{ whiteSpace: "pre-line" }}>
+                        {profile?.description}
+                      </span>
                     </div>
                   </div>
                 )}

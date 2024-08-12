@@ -10,7 +10,7 @@ const axiosBaseQuery =
         data,
         params,
         headers,
-        body
+        body,
       });
       return Promise.resolve(result);
     } catch (axiosError) {

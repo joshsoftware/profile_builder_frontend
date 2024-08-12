@@ -39,7 +39,7 @@ export const achievementApi = createApi({
       query: ({ profile_id, achievement_id, values }) => ({
         url: UPDATE_ACHIEVEMENT_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":achievement_id", achievement_id),
         method: HTTP_METHODS.PUT,
         data: { achievement: values },
@@ -51,7 +51,7 @@ export const achievementApi = createApi({
       query: ({ profile_id, achievement_id }) => ({
         url: DELETE_ACHIEVEMENT_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":achievement_id", achievement_id),
         method: HTTP_METHODS.DELETE,
       }),

@@ -27,11 +27,14 @@ const BasicInfo = ({ profileData }) => {
   useEffect(() => {
     if (profileData) {
       const profileDataCopy = { ...profileData };
-      if (profileDataCopy.josh_joining_date &&
-          profileDataCopy.josh_joining_date.Valid &&
-          profileDataCopy.josh_joining_date.String !== ""
+      if (
+        profileDataCopy.josh_joining_date &&
+        profileDataCopy.josh_joining_date.Valid &&
+        profileDataCopy.josh_joining_date.String !== ""
       ) {
-        profileDataCopy.josh_joining_date = dayjs(profileDataCopy?.josh_joining_date?.String);
+        profileDataCopy.josh_joining_date = dayjs(
+          profileDataCopy?.josh_joining_date?.String,
+        );
       } else {
         profileDataCopy.josh_joining_date = null;
       }
@@ -47,12 +50,13 @@ const BasicInfo = ({ profileData }) => {
           if (!dayjs.isDayjs(values.josh_joining_date)) {
             values.josh_joining_date = dayjs(values.josh_joining_date);
           }
-          values.josh_joining_date = values.josh_joining_date.format("MMM-YYYY");
+          values.josh_joining_date =
+            values.josh_joining_date.format("MMM-YYYY");
         }
       }
       let response;
       if (profileData) {
-        if(formChange){
+        if (formChange) {
           response = await updateProfileService({
             profile_id: profileData.id,
             values,
@@ -67,7 +71,10 @@ const BasicInfo = ({ profileData }) => {
       if (response?.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
         navigate(
-          EDITOR_PROFILE_ROUTE.replace(":profile_id", response.data?.profile_id)
+          EDITOR_PROFILE_ROUTE.replace(
+            ":profile_id",
+            response.data?.profile_id,
+          ),
         );
         setFormChange(false);
       }
@@ -82,7 +89,7 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
-      onValuesChange={()=>setFormChange(true)}
+      onValuesChange={() => setFormChange(true)}
       initialValues={
         profileData?.profile || { profileDetails: PROFILE_DETAILS }
       }
@@ -145,8 +152,8 @@ const BasicInfo = ({ profileData }) => {
               {
                 pattern: WHOLE_NO_VALIDATOR,
                 message: "Experience must be a whole number",
-              }
-            ]}           
+              },
+            ]}
           >
             <Input
               type="number"
@@ -178,10 +185,7 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       <Row gutter={16}>
         <Col span={12}>
-          <Form.Item
-            name="josh_joining_date"
-            label="JOSH Joining Date"
-          >
+          <Form.Item name="josh_joining_date" label="JOSH Joining Date">
             <DatePicker style={{ width: "100%" }} picker="month" />
           </Form.Item>
         </Col>
@@ -214,7 +218,7 @@ const BasicInfo = ({ profileData }) => {
               style={{ width: "100%" }}
               placeholder="Select primary skills"
               options={SKILLS}
-              tokenSeparators={[',']}
+              tokenSeparators={[","]}
               rules={[
                 {
                   required: true,
@@ -230,7 +234,7 @@ const BasicInfo = ({ profileData }) => {
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Add secondary skills"
-              tokenSeparators={[',']}
+              tokenSeparators={[","]}
             />
           </Form.Item>
         </Col>

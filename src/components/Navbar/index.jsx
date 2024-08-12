@@ -1,28 +1,36 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React from "react";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
-import { Button, Layout, Menu, Modal } from "antd";
+import { Button, Layout, Menu } from "antd";
 import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
+import { useLogoutMutation } from "../../api/loginApi";
 import { logout } from "../../api/store/authSlice";
 import joshLogo from "../../assets/Josh-new-logo.png";
 import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
+import { showConfirm } from "../../helpers";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const { Header } = Layout;
   const location = useLocation();
-  const [isModalVisible, setIsModalVisible] = useState(false);
+  const role = useSelector((state) => state.auth.role);
+  const [logoutService] = useLogoutMutation();
   const showModal = () => {
-    setIsModalVisible(true);
-  };
-  const handleOk = () => {
-    setIsModalVisible(false);
-    dispatch(logout());
-    window.localStorage.removeItem("token");
-  };
-
-  const handleCancel = () => {
-    setIsModalVisible(false);
+    showConfirm({
+      onOk: async () => {
+        try {
+          await logoutService();
+          dispatch(logout());
+          window.localStorage.removeItem("token");
+          toast.success("Logged out successfully");
+        } catch (error) {
+          toast.error("Failed to logout");
+        }
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to logout?",
+    });
   };
 
   const selectedKey = location.pathname;
@@ -30,7 +38,7 @@ const Navbar = () => {
   const getButtonStyle = (route) => ({
     color: selectedKey === route ? "white" : "#ffffff",
     border: selectedKey === route ? "2px solid white" : "none",
-    fontSize: "15px"
+    fontSize: "15px",
   });
 
   return (
@@ -42,7 +50,7 @@ const Navbar = () => {
           zIndex: 100,
           width: "100%",
           display: "block",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <img
@@ -50,24 +58,28 @@ const Navbar = () => {
           alt="josh-logo"
           style={{ marginRight: "50px", paddingBottom: "10px" }}
         />
-        <Link to={PROFILE_LIST_ROUTE}>
-          <Button
-            type="text"
-            icon={<UserOutlined />}
-            style={getButtonStyle(PROFILE_LIST_ROUTE)}
-          >
-            Profiles
-          </Button>
-        </Link>
-        <Link to={EDITOR_ROUTE}>
-          <Button
-            type="text"
-            icon={<EditOutlined />}
-            style={getButtonStyle(EDITOR_ROUTE)}
-          >
-            Editor
-          </Button>
-        </Link>
+        {role.toLowerCase() === "admin" && (
+          <>
+            <Link to={PROFILE_LIST_ROUTE}>
+              <Button
+                type="text"
+                icon={<UserOutlined />}
+                style={getButtonStyle(PROFILE_LIST_ROUTE)}
+              >
+                Profiles
+              </Button>
+            </Link>
+            <Link to={EDITOR_ROUTE}>
+              <Button
+                type="text"
+                icon={<EditOutlined />}
+                style={getButtonStyle(EDITOR_ROUTE)}
+              >
+                Editor
+              </Button>
+            </Link>
+          </>
+        )}
         <Button
           type="text"
           icon={<LogoutOutlined />}
@@ -76,7 +88,7 @@ const Navbar = () => {
             paddingTop: "16px",
             color: "white",
             fontSize: "17px",
-            float: "right"
+            float: "right",
           }}
           onClick={showModal}
         >
@@ -88,21 +100,10 @@ const Navbar = () => {
           defaultSelectedKeys={["2"]}
           style={{
             flex: 1,
-            minWidth: 0
+            minWidth: 0,
           }}
         />
       </Header>
-      <Modal
-        title="Confirm Logout"
-        centered
-        open={isModalVisible}
-        onOk={handleOk}
-        onCancel={handleCancel}
-        okText="Yes"
-        cancelText="No"
-      >
-        Are you sure you want to logout?
-      </Modal>
     </Layout>
   );
 };
