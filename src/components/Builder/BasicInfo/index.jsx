@@ -153,14 +153,6 @@ const BasicInfo = ({ profileData }) => {
                 pattern: WHOLE_NO_VALIDATOR,
                 message: "Experience must be a whole number",
               },
-              {
-                validator: (_, value) =>
-                  value <= 30 && value >= 0
-                    ? Promise.resolve()
-                    : Promise.reject(
-                        "Experience must be between 0 and 30 years",
-                      ),
-              },
             ]}
           >
             <Input
