@@ -19,6 +19,7 @@
 .main {
   margin-left: 14px;
   margin-right: 12px;
+  margin-top: 15px;
 }
 
 .employeeInfo {
@@ -88,6 +89,7 @@
 }
 
 .profiledetails {
+  margin-top: 15px;
   font-size: 0.875rem;
 }
 
@@ -171,7 +173,7 @@
 
 .sectionTitle {
   font-size: 1rem;
-  width: 17%;
+  width: 20%;
   background: #E9695E;
   padding: 5px;
   border-radius: 15px;
@@ -195,20 +197,30 @@
   text-align: right;
 }
 
-.skillSection .skillsContent {
+.skillSection {
+  font-size: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  gap: 5px;
+  margin: 10px 0 5px 0;
 }
 
 .section .content .item {
   border-bottom: 1px dotted lightgray;
-  padding: 0.5rem 0;
+  padding: 1rem 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  /* font-weight: bold; */
+  gap: 3px;
   font-size: 1000;
+}
+
+.content .subtitleHeading,
+.content .customSubHeading,
+.content .blury,
+.content .overview,
+.content .duration,
+.content .points {
+  margin-bottom: 0.01px;
 }
 
 .content .educationItem:not(:last-child) {
@@ -248,12 +260,16 @@
 }
 
 .content .subtitle {
-  font-size: 0.875rem;
+  font-size: 16px;
+  max-width: 250px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal; 
 }
 
 .content .subtitleHeading {
   font-weight: bold;
-  font-size: 0.875rem;
+  font-size: 18px;
 }
 .underline {
   text-decoration-line: underline;
@@ -350,6 +366,7 @@
   margin: 0;
   padding: 0;
   margin-top: 3px;
+  font-size: 20px;
 }
 
 .separateRight {
@@ -365,6 +382,17 @@
   text-align: right;
 }
 
+.customHeading{
+  color: #9A281E;
+}
+
+.customSubHeading{
+  font-size: 15px;
+}
+
+.blury{
+  opacity: 0.7;
+}
 .wrap_box {
   display: inline-block;
   margin: 0;
