@@ -126,13 +126,8 @@ const Certification = ({ certificationData }) => {
       } catch (error) {
         toast.error(error.response?.data?.message);
       }
-<<<<<<< Updated upstream
     } else {
       toast.success("No new changes detected.");
-=======
-    } catch (error) {
-      toast.error(error.response?.data?.message);
->>>>>>> Stashed changes
     }
   };
 

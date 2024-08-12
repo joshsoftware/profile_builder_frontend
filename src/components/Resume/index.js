@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Dropdown, Menu } from "antd";
@@ -269,11 +269,6 @@ const Resume = forwardRef(({ data }, ref) => {
                     <li
                       className={styles.point}
                       key={"primary" + elem + index}
-                      style={{
-                        display: "inline-block",
-                        width: "120px",
-                        wordWrap: "break-word",
-                      }}
                     >
                       {elem}
                     </li>
@@ -455,9 +450,7 @@ const Resume = forwardRef(({ data }, ref) => {
               {profile?.description && (
                 <div>
                   <div>
-                    <h4>
-                      <b className={`${styles.sectionTitle}`}>Profile</b>
-                    </h4>
+                    <div className={styles.sectionTitle}>Profile</div>
                   </div>
                   <div className={`${styles.profiledetails} `}>
                     <span style={{ whiteSpace: "pre-line" }}>
