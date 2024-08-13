@@ -1,7 +1,7 @@
-import React, { forwardRef, useEffect, useRef } from "react";
+import React, { forwardRef, useEffect, useRef, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
-import { Button, Dropdown, Menu } from "antd";
+import { Button, Checkbox, Dropdown, Menu } from "antd";
 import {
   CalendarOutlined,
   CheckSquareOutlined,
@@ -19,6 +19,7 @@ import { calculateTotalExperience } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const [contactDetails, setContactDetails] = useState(true);
   const location = useLocation();
   const { is_josh_employee } = location.state || {};
 
@@ -35,7 +36,6 @@ const Resume = forwardRef(({ data }, ref) => {
   } = data;
 
   const containerRef = useRef();
-  // const [columns, setColumns] = useState([[], []]);
   const handlePrint = useReactToPrint({
     content: () => ref.current,
   });
@@ -69,24 +69,30 @@ const Resume = forwardRef(({ data }, ref) => {
       >
         <div className={styles.sectionTitle}>Experiences</div>
         <div className={styles.content}>
-          {experiences?.map((item) => (
-            <div className={styles.item} key={item.id}>
-              {item?.designation && (
-                <div className={styles.title}>{item.designation}</div>
-              )}
-              {item?.company_name && (
-                <>
-                <span className={styles.subtitle}>{item.company_name}</span>
-                <div className={styles.date}>
-                  <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
-                  {item.to_date === PRESENT_VALUE
-                    ? " Present"
-                    : getMonthYear(item.to_date)}
-                </div>
-                </>
-              )}
-            </div>
-          ))}
+          <div className={styles.partionedItems}>
+            {experiences?.map((item) => (
+              <div className={styles.item} key={item.id}>
+                {item?.designation && (
+                  <div
+                    className={`${styles.subtitleHeading} ${styles.customHeading}`}
+                  >
+                    {item.designation}
+                  </div>
+                )}
+                {item?.company_name && (
+                  <>
+                    <span className={styles.subtitle}>{item.company_name}</span>
+                    <div className={styles.date}>
+                      <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
+                      {item.to_date === PRESENT_VALUE
+                        ? " Present"
+                        : getMonthYear(item.to_date)}
+                    </div>
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     ),
@@ -186,20 +192,18 @@ const Resume = forwardRef(({ data }, ref) => {
         {/* <div className={styles.separate}></div> */}
         <div className={styles.sectionTitle}>Achievements</div>
         <div className={styles.content}>
-            {achievements?.map((item) => (
-              <>
-                {item?.name && (
-                  <p className={`${styles.subtitleHeading} ${styles.customHeading}`}>
-                    {item.name}
-                  </p>
-                )}
-                {item?.description && (
-                  <p>
-                    {item.description}
-                  </p>
-                )}
-              </>
-            ))}
+          {achievements?.map((item) => (
+            <>
+              {item?.name && (
+                <p
+                  className={`${styles.subtitleHeading} ${styles.customHeading}`}
+                >
+                  {item.name}
+                </p>
+              )}
+              {item?.description && <p>{item.description}</p>}
+            </>
+          ))}
         </div>
       </div>
     ),
@@ -210,72 +214,62 @@ const Resume = forwardRef(({ data }, ref) => {
           educations?.length > 0 ? "" : styles.hidden
         } `}
       >
-        <div className={`${styles.sectionTitle}`}>Educations</div>
+        <div className={`${styles.sectionTitle}`}>Education</div>
         <div className={styles.content}>
-          {educations?.map((item) => (
-            <div className={styles.educationItem} key={item.id}>
-              {item?.degree && (
-                <p
-                  className={`${styles.subtitleHeading} ${styles.customHeading}`}
-                >
-                  {item.degree}
-                </p>
-              )}
-              {(item?.university_name || item?.place) && (
-                <div className={styles.subtitle}>
-                  {item.university_name}
-                  {item.place && `, ${item.place}`}
-                </div>
-              )}
-              {item?.passing_year && (
-                <div className={styles.passingDate}>
-                  Passing Year: {new Date(item.passing_year).getFullYear()}
-                </div>
-              )}
-              {item?.percent_or_cgpa && (
-                <div className={styles.passingDate}>
-                  CGPA/Percentage: {item.percent_or_cgpa}
-                </div>
-              )}
-            </div>
-          ))}
+          <div className={styles.partionedItems}>
+            {educations?.map((item) => (
+              <div className={styles.educationItem} key={item.id}>
+                {item?.degree && (
+                  <p
+                    className={`${styles.subtitleHeading} ${styles.customHeading}`}
+                  >
+                    {item.degree}
+                  </p>
+                )}
+                {(item?.university_name || item?.place) && (
+                  <div className={styles.subtitle}>
+                    {item.university_name}
+                    {item.place && `, ${item.place}`}
+                  </div>
+                )}
+                {item?.passing_year && (
+                  <div className={styles.passingDate}>
+                    <div className={styles.subtitle}>Passing Year:</div>{" "}
+                    {new Date(item.passing_year).getFullYear()}
+                  </div>
+                )}
+                {item?.percent_or_cgpa && (
+                  <div className={styles.passingDate}>
+                    <div className={styles.subtitle}>Score:</div>{" "}
+                    {item.percent_or_cgpa}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     ),
     skills: (
-      <div
-        key={"skills"}
-        className={`${styles.section} ${
-          profile?.primary_skills?.length > 0 ||
-          profile?.secondary_skills?.length > 0
-            ? ""
-            : styles.hidden
-        }`}
-      >
+      <div key={"skills"}>
         <div className={styles.sectionTitle}>Skills</div>
-        <div className={styles.content}>
-          <div className={styles.skillSection}>
-            {profile?.primary_skills?.length > 0 && (
-              <div>
-                <b>Primary</b>{" "}
-                {
-                  Array.isArray(profile?.primary_skills)
-                  ? profile?.primary_skills.join(", ")
-                  : profile?.primary_skills
-                }
-              </div>
-            )}
-            {profile?.secondary_skills?.length > 0 && (
-              <div>
-                <b>Secondary</b>{" "}
-                {
-                  Array.isArray(profile?.secondary_skills)
-                  ? profile?.secondary_skills.join(", ")
-                  : profile?.secondary_skills
-                }
-              </div>
-            )}
-          </div>
+        <div className={styles.skillSection}>
+          {profile?.primary_skills?.length > 0 && (
+            <div>
+              <b>Primary</b>{" "}
+              {Array.isArray(profile?.primary_skills)
+                ? profile?.primary_skills.join(", ")
+                : profile?.primary_skills}
+            </div>
+          )}
+          {profile?.secondary_skills?.length > 0 && (
+            <div>
+              <b>Secondary</b>{" "}
+              {Array.isArray(profile?.secondary_skills)
+                ? profile?.secondary_skills.join(", ")
+                : profile?.secondary_skills}
+            </div>
+          )}
         </div>
       </div>
     ),
@@ -292,15 +286,20 @@ const Resume = forwardRef(({ data }, ref) => {
             <div className={styles.educationItem} key={item.id}>
               {item?.name && (
                 <>
-                <div className={styles.date}>
-                  <p className={`${styles.subtitleHeading} ${styles.customHeading}`}>
-                    {item.name}
-                  </p>
-                  {item?.from_date && item?.to_date && (
-                      <>{"| "}
-                      <CalendarOutlined />
-                      {getMonthYear(item.from_date)} -{" "}
-                      {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
+                  <div className={styles.date}>
+                    <p
+                      className={`${styles.subtitleHeading} ${styles.customHeading}`}
+                    >
+                      {item.name}
+                    </p>
+                    {item?.from_date && item?.to_date && (
+                      <>
+                        {"| "}
+                        <CalendarOutlined />
+                        {getMonthYear(item.from_date)} -{" "}
+                        {item.to_date === PRESENT_VALUE
+                          ? " Present"
+                          : getMonthYear(item.to_date)}
                       </>
                     )}
                   </div>
@@ -308,36 +307,22 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.organization_name && (
                 <div className={styles.date}>
-                <b>Issued By: </b>{item.organization_name}
+                  <b>Issued By: </b>
+                  {item.organization_name}
                 </div>
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
                   <b>Issued Date: </b> {getMonthYear(item.issued_date)}
                 </div>
-              )}  
-              {item?.description && (
-                <div>{item.description}</div>
-              )}            
+              )}
+              {item?.description && <div>{item.description}</div>}
             </div>
           ))}
         </div>
       </div>
     ),
   };
-
-  //At component mount which section of resume contains which tab details.
-  // useEffect(() => {
-  //   const leftColumn = [
-  //     "skills",
-  //     "educations",
-  //     certifications ? "certifications" : null,
-  //     achievements ? "achievements" : null,
-  //   ].filter(Boolean);
-
-  //   const rightColumn = ["experiences", "projects"].filter(Boolean);
-  //   setColumns([leftColumn, rightColumn]);
-  // }, [achievements, certifications]);
 
   //Whenever active colour changes from Body component then this effect will be called.
   useEffect(() => {
@@ -355,17 +340,24 @@ const Resume = forwardRef(({ data }, ref) => {
 
   const downloadMenu = (
     <Menu>
-      <Menu.Item key="1" onClick={handlePrint}>
-        Download as PDF
+      <Menu.Item key="1">
+        <Checkbox onChange={() => setContactDetails(!contactDetails)} /> Do you
+        want hide contact details ?
+      </Menu.Item>
+      <Menu.Item key="2" onClick={handlePrint}>
+        Download
       </Menu.Item>
     </Menu>
   );
 
   return (
     <>
-      <div className="header" style={{ marginTop: "10px", marginLeft:"20px" }}>
+      <div className="header" style={{ marginTop: "10px", marginLeft: "20px" }}>
         <Dropdown overlay={downloadMenu} trigger={["click"]}>
-          <Button type="primary" icon={<DownloadOutlined />} style={{background:"#e34435"}}>
+          <Button
+            icon={<DownloadOutlined />}
+            style={{ background: "#e34435", color:"white" }}
+          >
             Download <DownOutlined />
           </Button>
         </Dropdown>
@@ -396,12 +388,12 @@ const Resume = forwardRef(({ data }, ref) => {
                       </span>
                     </div>
                   )}
-                  {profile?.email && (
+                  {profile?.email && contactDetails && (
                     <div className={styles.iconTextWrapper}>
                       <MailOutlined /> <span>{profile?.email}</span>
                     </div>
                   )}
-                  {profile?.mobile && (
+                  {profile?.mobile && contactDetails && (
                     <div className={styles.iconTextWrapper}>
                       <MobileOutlined /> <span>{profile?.mobile}</span>
                     </div>

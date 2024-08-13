@@ -75,7 +75,6 @@
   font-size: 3rem;
   font-weight: 500;
   padding-top: 0.75rem;
-  /* padding-left: 2rem; */
   text-transform: capitalize;
   color: #e7c799;
 }
@@ -199,19 +198,22 @@
 
 .skillSection {
   font-size: 15px;
-  display: flex;
-  flex-direction: column;
   gap: 5px;
   margin: 10px 0 5px 0;
 }
 
+.section .content .partionedItems{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 15px;
+}
+
 .section .content .item {
-  border-bottom: 1px dotted lightgray;
-  padding: 1rem 0;
+  padding: 1rem;
   display: flex;
   flex-direction: column;
   gap: 3px;
-  font-size: 1000;
+  font-size: 1rem;
 }
 
 .content .subtitleHeading,
@@ -223,9 +225,8 @@
   margin-bottom: 0.01px;
 }
 
-.content .educationItem:not(:last-child) {
-  border-bottom: 1px dotted lightgray;
-  margin-bottom: 13px;
+.section .content .educationItem:not(:last-child) {
+  margin-bottom: 8px;
   padding: 0.3rem 0;
   display: flex;
   flex-direction: column;
@@ -261,7 +262,9 @@
 }
 
 .content .subtitle {
-  font-size: 16px;
+  font-size: 15px;
+  font-weight: 500 !important;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3) !important;
   max-width: 250px;
   word-wrap: break-word;
   overflow-wrap: break-word;
@@ -270,7 +273,7 @@
 
 .content .subtitleHeading {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 16px;
 }
 .underline {
   text-decoration-line: underline;
