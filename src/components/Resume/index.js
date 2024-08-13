@@ -30,12 +30,12 @@ import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
-  const dispatch = useDispatch();
+  const [logoutService] = useLogoutMutation();
   const role = useSelector((state) => state.auth.role);
   const [completeProfileService] = useCompleteProfileMutation();
   const navigate = useNavigate();
   const location = useLocation();
-  const [logoutService] = useLogoutMutation();
+  const dispatch = useDispatch();
   const { is_josh_employee } = location.state || {};
 
   Resume.propTypes = {
@@ -364,9 +364,8 @@ const Resume = forwardRef(({ data }, ref) => {
             });
             await logoutService();
             dispatch(logout());
-            window.localStorage.removeItem("token");
-            window.localStorage.removeItem("role");
-            window.localStorage.removeItem("profile_id");
+            window.localStorage.clear();
+
             if (response?.data) {
               toast.success(response?.data?.message, SUCCESS_TOASTER);
               navigate(ROOT_ROUTE);
@@ -378,7 +377,7 @@ const Resume = forwardRef(({ data }, ref) => {
       },
       onCancel() {},
       message:
-        "Are you sure you want to finalize the profile? once marked as completed, you wan't be able to login or modify!",
+        "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
     });
   };
 
