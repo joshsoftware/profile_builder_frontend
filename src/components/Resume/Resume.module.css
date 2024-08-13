@@ -174,7 +174,7 @@
 .sectionTitle {
   font-size: 1rem;
   width: 20%;
-  background: #E9695E;
+  background: #9a281e;
   padding: 5px;
   border-radius: 15px;
   color: white;
@@ -225,6 +225,7 @@
 
 .content .educationItem:not(:last-child) {
   border-bottom: 1px dotted lightgray;
+  margin-bottom: 13px;
   padding: 0.3rem 0;
   display: flex;
   flex-direction: column;

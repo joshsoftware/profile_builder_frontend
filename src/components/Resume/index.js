@@ -67,7 +67,6 @@ const Resume = forwardRef(({ data }, ref) => {
           experiences?.length > 0 ? "" : styles.hidden
         } `}
       >
-        <div className={styles.separateRight}></div>
         <div className={styles.sectionTitle}>Experiences</div>
         <div className={styles.content}>
           {experiences?.map((item) => (
@@ -76,13 +75,15 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.title}>{item.designation}</div>
               )}
               {item?.company_name && (
+                <>
+                <span className={styles.subtitle}>{item.company_name}</span>
                 <div className={styles.date}>
-                  <span className={styles.subtitle}>{item.company_name}</span>
-                  | <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
+                  <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
                   {item.to_date === PRESENT_VALUE
                     ? " Present"
                     : getMonthYear(item.to_date)}
                 </div>
+                </>
               )}
             </div>
           ))}
@@ -96,7 +97,6 @@ const Resume = forwardRef(({ data }, ref) => {
           projects?.length > 0 ? "" : styles.hidden
         }`}
       >
-        <div className={styles.separateRight}></div>
         <div className={styles.sectionTitle}>Projects</div>
         <div className={styles.content}>
           {projects?.map((item) => (
@@ -183,7 +183,7 @@ const Resume = forwardRef(({ data }, ref) => {
           achievements?.length > 0 ? "" : styles.hidden
         }`}
       >
-        <div className={styles.separate}></div>
+        {/* <div className={styles.separate}></div> */}
         <div className={styles.sectionTitle}>Achievements</div>
         <div className={styles.content}>
             {achievements?.map((item) => (
@@ -210,7 +210,6 @@ const Resume = forwardRef(({ data }, ref) => {
           educations?.length > 0 ? "" : styles.hidden
         } `}
       >
-        <div className={styles.separate}></div>
         <div className={`${styles.sectionTitle}`}>Educations</div>
         <div className={styles.content}>
           {educations?.map((item) => (
@@ -287,42 +286,39 @@ const Resume = forwardRef(({ data }, ref) => {
           certifications?.length > 0 ? "" : styles.hidden
         }`}
       >
-        <div className={styles.separate}></div>
         <div className={styles.sectionTitle}>Certifications</div>
         <div className={styles.content}>
           {certifications?.map((item) => (
             <div className={styles.educationItem} key={item.id}>
               {item?.name && (
-                <p
-                  className={`${styles.subtitleHeading} ${styles.customHeading}`}
-                >
-                  {item.name}
-                </p>
+                <>
+                <div className={styles.date}>
+                  <p className={`${styles.subtitleHeading} ${styles.customHeading}`}>
+                    {item.name}
+                  </p>
+                  {item?.from_date && item?.to_date && (
+                      <>{"| "}
+                      <CalendarOutlined />
+                      {getMonthYear(item.from_date)} -{" "}
+                      {item.to_date === PRESENT_VALUE ? " Present" : getMonthYear(item.to_date)}
+                      </>
+                    )}
+                  </div>
+                </>
               )}
               {item?.organization_name && (
-                <div className={styles.subtitle}>{item.organization_name}</div>
-              )}
-              {item?.description && (
-                <div>{item.description}</div>
+                <div className={styles.date}>
+                <b>Issued By: </b>{item.organization_name}
+                </div>
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  <b>Issue Date: </b> {getMonthYear(item.issued_date)}
+                  <b>Issued Date: </b> {getMonthYear(item.issued_date)}
                 </div>
-              )}
-              {
-                item?.from_date && item?.to_date && (
-                  <div className={styles.date}><CalendarOutlined />
-                    {getMonthYear(item.from_date)} -{" "}
-                    {
-                      item.to_date === PRESENT_VALUE
-                      ? " Present"
-                      : getMonthYear(item.to_date)
-                    }
-                  </div>
-                )
-              }
-              
+              )}  
+              {item?.description && (
+                <div>{item.description}</div>
+              )}            
             </div>
           ))}
         </div>
