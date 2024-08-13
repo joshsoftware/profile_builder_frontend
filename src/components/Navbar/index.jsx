@@ -22,7 +22,7 @@ const Navbar = () => {
         try {
           await logoutService();
           dispatch(logout());
-          window.localStorage.removeItem("token");
+          window.localStorage.clear();
           toast.success("Logged out successfully");
         } catch (error) {
           toast.error("Failed to logout");

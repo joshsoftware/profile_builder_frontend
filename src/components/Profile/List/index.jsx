@@ -320,7 +320,7 @@ const ListProfiles = () => {
           <Tooltip title="Delete">
             <DeleteOutlined onClick={() => showDeleteModal(record?.id)} />
           </Tooltip>
-          <Tooltip title="This button will change the active status of the profile">
+          <Tooltip title="Active/Deactive user">
             <Button
               type={"primary"}
               size="small"
@@ -331,7 +331,7 @@ const ListProfiles = () => {
               {record.is_active === "YES" ? "Inactive" : "Active"}
             </Button>
           </Tooltip>
-          <Tooltip title="This button will send an invite to the profile's email">
+          <Tooltip title="Send invite. Disabled button indicates that invitation has been already sent.">
             <Button
               type={"primary"}
               size="small"

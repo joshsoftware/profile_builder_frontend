@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Dropdown, Menu, Tag } from "antd";
@@ -16,7 +16,9 @@ import {
   MobileOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useLogoutMutation } from "../../api/loginApi";
 import { useCompleteProfileMutation } from "../../api/profileApi";
+import { logout } from "../../api/store/authSlice";
 import joshImage from "../../assets/Josh-Logo-White-bg.svg";
 import {
   getMonthString,
@@ -28,10 +30,12 @@ import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const [logoutService] = useLogoutMutation();
   const role = useSelector((state) => state.auth.role);
   const [completeProfileService] = useCompleteProfileMutation();
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { is_josh_employee } = location.state || {};
 
   Resume.propTypes = {
@@ -358,6 +362,10 @@ const Resume = forwardRef(({ data }, ref) => {
             const response = await completeProfileService({
               profile_id: profile?.id,
             });
+            await logoutService();
+            dispatch(logout());
+            window.localStorage.clear();
+
             if (response?.data) {
               toast.success(response?.data?.message, SUCCESS_TOASTER);
               navigate(ROOT_ROUTE);
@@ -369,7 +377,7 @@ const Resume = forwardRef(({ data }, ref) => {
       },
       onCancel() {},
       message:
-        "Are you certain you want to finalize the profile? Once completed, changes cannot be undone.",
+        "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
     });
   };
 

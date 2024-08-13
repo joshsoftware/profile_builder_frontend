@@ -158,6 +158,7 @@ const BasicInfo = ({ profileData }) => {
             <Input
               type="number"
               placeholder="Enter experience (e.g., 24, 36)"
+              min={1}
             />
           </Form.Item>
         </Col>
