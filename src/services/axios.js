@@ -33,7 +33,7 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       store.dispatch(logout());
       window.localStorage.clear();
-      toast.error("Session Expired. Please login again.");
+      toast.error("Unauthorized Access");
       history.push(ROOT_ROUTE);
       return Promise.reject(error);
     }

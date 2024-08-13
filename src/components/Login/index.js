@@ -28,7 +28,9 @@ const Login = () => {
         const token = response?.data?.token;
         const role = response?.data?.role;
         const profile_id = response?.data?.profile_id;
-        toast.success(response?.data?.message);
+        if (response?.data) {
+          toast.success(response?.data?.message);
+        }
 
         if (token && role) {
           dispatch(loginAction({ token, role, profile_id }));
