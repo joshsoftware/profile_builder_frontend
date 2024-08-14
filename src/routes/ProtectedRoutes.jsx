@@ -19,7 +19,7 @@ const ProtectedRoutes = (props) => {
 };
 
 ProtectedRoutes.propTypes = {
-  Component: PropTypes.func.isRequired
+  Component: PropTypes.func.isRequired,
 };
 
 export default ProtectedRoutes;

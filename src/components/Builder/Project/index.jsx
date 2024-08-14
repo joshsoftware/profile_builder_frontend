@@ -18,7 +18,7 @@ import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
   arrayMove,
   horizontalListSortingStrategy,
-  SortableContext
+  SortableContext,
 } from "@dnd-kit/sortable";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -27,7 +27,7 @@ import {
   projectApi,
   useCreateProjectMutation,
   useDeleteProjectMutation,
-  useUpdateProjectMutation
+  useUpdateProjectMutation,
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import Modals from "../../../common-components/Modals";
@@ -35,7 +35,7 @@ import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatProjectsFields,
-  validateId
+  validateId,
 } from "../../../helpers";
 
 const Project = ({ projectData }) => {
@@ -54,7 +54,7 @@ const Project = ({ projectData }) => {
       children: null,
       key: "0",
       isExisting: false,
-    }
+    },
   ]);
   const newTabIndex = useRef(1);
   const { profile_id } = useParams();
@@ -63,8 +63,8 @@ const Project = ({ projectData }) => {
   const [formChange, setFormChange] = useState(false);
   const sensor = useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 10
-    }
+      distance: 10,
+    },
   });
   const options = [];
 
@@ -90,10 +90,10 @@ const Project = ({ projectData }) => {
                 : null,
               working_end_date: project.working_end_date
                 ? dayjs(project.working_end_date)
-                : null
+                : null,
             };
             return acc;
-          }, {})
+          }, {}),
         );
         setActiveKey("0");
       } else {
@@ -108,7 +108,7 @@ const Project = ({ projectData }) => {
     try {
       const response = await createProjectService({
         profile_id: profile_id,
-        values: values
+        values: values,
       });
       if (response.data?.message) {
         toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -119,14 +119,14 @@ const Project = ({ projectData }) => {
   };
 
   const handleUpdate = async (values) => {
-    if(formChange){
+    if (formChange) {
       try {
         for (const project of values) {
           if (project.id) {
             const response = await updateProjectService({
               profile_id: profile_id,
               project_id: project.id,
-              values: project
+              values: project,
             });
             if (response.data?.message) {
               toast.success(response.data?.message, SUCCESS_TOASTER);
@@ -175,8 +175,8 @@ const Project = ({ projectData }) => {
       {
         label: `Project ${newTabIndex.current}`,
         children: null,
-        key: newActiveKey
-      }
+        key: newActiveKey,
+      },
     ]);
     setActiveKey(newActiveKey);
     form.resetFields([`project_${newActiveKey}`]);
@@ -198,7 +198,7 @@ const Project = ({ projectData }) => {
       if (projectData[modalState.key]?.id) {
         const response = await deleteProjectService({
           profile_id: profile_id,
-          project_id: projectData[modalState.key]?.id
+          project_id: projectData[modalState.key]?.id,
         });
 
         if (response?.data) {
@@ -309,7 +309,7 @@ const Project = ({ projectData }) => {
                   form={form}
                   name={`project_${item.key}`}
                   onFinish={onFinish}
-                  onValuesChange={()=>setFormChange(true)}
+                  onValuesChange={() => setFormChange(true)}
                   key={item.key}
                 >
                   <Form.Item name={[`project_${index}`, "id"]} hidden>
@@ -321,8 +321,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Name required"
-                      }
+                        message: "Name required",
+                      },
                     ]}
                   >
                     <Input placeholder="Enter project name" />
@@ -351,8 +351,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Responsibilities required"
-                      }
+                        message: "Responsibilities required",
+                      },
                     ]}
                   >
                     <Input.TextArea
@@ -367,8 +367,8 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Description required"
-                      }
+                        message: "Description required",
+                      },
                     ]}
                   >
                     <Input.TextArea
@@ -385,7 +385,7 @@ const Project = ({ projectData }) => {
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
-                      tokenSeparators={[',']}
+                      tokenSeparators={[","]}
                       options={options}
                     />
                   </Form.Item>
@@ -395,15 +395,15 @@ const Project = ({ projectData }) => {
                     rules={[
                       {
                         required: true,
-                        message: "Worked technology is required"
-                      }
+                        message: "Worked technology is required",
+                      },
                     ]}
                   >
                     <Select
                       mode="tags"
                       style={{ width: "100%" }}
                       placeholder="Tags Mode"
-                      tokenSeparators={[',']}
+                      tokenSeparators={[","]}
                       options={options}
                     />
                   </Form.Item>
@@ -418,11 +418,11 @@ const Project = ({ projectData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "Start date cannot be in the future"
-                                    )
+                                      "Start date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -438,11 +438,11 @@ const Project = ({ projectData }) => {
                               value && value > dayjs()
                                 ? Promise.reject(
                                     new Error(
-                                      "End date cannot be in the future"
-                                    )
+                                      "End date cannot be in the future",
+                                    ),
                                   )
-                                : Promise.resolve()
-                          }
+                                : Promise.resolve(),
+                          },
                         ]}
                       >
                         <DatePicker style={{ width: "100%" }} picker="month" />
@@ -454,7 +454,7 @@ const Project = ({ projectData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleProjects("create")}
+                        onClick={() => handleProjects("create")}
                         disabled={item.isExisting}
                       >
                         Create Projects
@@ -462,7 +462,7 @@ const Project = ({ projectData }) => {
                       <Button
                         type="primary"
                         htmlType="button"
-                        onClick={()=> handleProjects("update")}
+                        onClick={() => handleProjects("update")}
                         disabled={items.length === 0 || !item.isExisting}
                       >
                         Update Project {Number(item.key) + 1}
@@ -480,7 +480,7 @@ const Project = ({ projectData }) => {
                     </Space>
                   </Form.Item>
                 </Form>
-              )
+              ),
             }))}
             renderTabBar={(tabBarProps, DefaultTabBar) => (
               <DefaultTabBar {...tabBarProps}>
@@ -504,6 +504,6 @@ const Project = ({ projectData }) => {
   );
 };
 Project.propTypes = {
-  projectData: PropTypes.array
+  projectData: PropTypes.array,
 };
 export default Project;

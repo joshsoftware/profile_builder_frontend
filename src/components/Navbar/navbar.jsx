@@ -30,7 +30,7 @@ const Navbar = () => {
   const getButtonStyle = (route) => ({
     color: selectedKey === route ? "white" : "#ffffff",
     border: selectedKey === route ? "2px solid white" : "none",
-    fontSize: "15px"
+    fontSize: "15px",
   });
 
   return (
@@ -42,7 +42,7 @@ const Navbar = () => {
           zIndex: 100,
           width: "100%",
           display: "block",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <img
@@ -76,7 +76,7 @@ const Navbar = () => {
             paddingTop: "16px",
             color: "white",
             fontSize: "17px",
-            float: "right"
+            float: "right",
           }}
           onClick={showModal}
         >
@@ -88,7 +88,7 @@ const Navbar = () => {
           defaultSelectedKeys={["2"]}
           style={{
             flex: 1,
-            minWidth: 0
+            minWidth: 0,
           }}
         />
       </Header>

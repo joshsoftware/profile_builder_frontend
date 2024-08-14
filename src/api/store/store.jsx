@@ -11,8 +11,8 @@ import authReducer from "./authSlice";
 const token = window.localStorage.getItem("token");
 const preloadedState = {
   auth: {
-    token: token ? token : null
-  }
+    token: token ? token : null,
+  },
 };
 const rootReducer = combineReducers({
   [loginApi.reducerPath]: loginApi.reducer,
@@ -22,7 +22,7 @@ const rootReducer = combineReducers({
   [educationApi.reducerPath]: educationApi.reducer,
   [experienceApi.reducerPath]: experienceApi.reducer,
   [projectApi.reducerPath]: projectApi.reducer,
-  auth: authReducer
+  auth: authReducer,
 });
 
 const store = configureStore({
@@ -36,8 +36,8 @@ const store = configureStore({
       certificationApi.middleware,
       educationApi.middleware,
       experienceApi.middleware,
-      projectApi.middleware
-    )
+      projectApi.middleware,
+    ),
 });
 
 export default store;

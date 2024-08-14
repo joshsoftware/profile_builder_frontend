@@ -39,7 +39,7 @@ export const experienceApi = createApi({
       query: ({ profile_id, experience_id, values }) => ({
         url: UPDATE_EXPERIENCE_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":experience_id", experience_id),
         method: HTTP_METHODS.PUT,
         data: { experience: values },
@@ -51,7 +51,7 @@ export const experienceApi = createApi({
       query: ({ profile_id, experience_id }) => ({
         url: DELETE_EXPERIENCE_ENDPOINT.replace(
           ":profile_id",
-          profile_id
+          profile_id,
         ).replace(":experience_id", experience_id),
         method: HTTP_METHODS.DELETE,
       }),

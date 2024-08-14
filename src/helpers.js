@@ -25,7 +25,7 @@ export const formatProjectsFields = (projects) => {
     working_end_date: project.working_end_date
       ? project.working_end_date.format("MMM-YYYY")
       : null,
-    duration: project.duration
+    duration: project.duration,
   }));
 };
 
@@ -37,7 +37,7 @@ export const formatExperienceFields = (experiences) => {
     from_date: experience?.from_date?.format("MMM-YYYY"),
     to_date: experience?.to_date
       ? experience?.to_date?.format("MMM-YYYY")
-      : PRESENT_VALUE
+      : PRESENT_VALUE,
   }));
 };
 
@@ -48,7 +48,7 @@ export const formatEducationFields = (educations) => {
     university_name: education?.university_name,
     place: education?.place,
     percent_or_cgpa: education?.percent_or_cgpa,
-    passing_year: education?.passing_year
+    passing_year: education?.passing_year,
   }));
 };
 
@@ -60,7 +60,7 @@ export const formatCertificationFields = (certifications) => {
     description: certificate?.description,
     issued_date: certificate?.issued_date?.format("MMM-YYYY"),
     from_date: certificate?.from_date?.format("MMM-YYYY"),
-    to_date: certificate?.to_date?.format("MMM-YYYY")
+    to_date: certificate?.to_date?.format("MMM-YYYY"),
   }));
 };
 
@@ -68,7 +68,7 @@ export const formatCertificationFields = (certifications) => {
 export const formatAchievementFields = (achievements) => {
   return achievements.map((achievement) => ({
     name: achievement?.name,
-    description: achievement?.description
+    description: achievement?.description,
   }));
 };
 
@@ -78,25 +78,26 @@ export const validateId = (id) => {
 
 export const disabledDate = (current) => {
   // Can not select month before today and today
-  return current && current < dayjs().endOf('month');
+  return current && current < dayjs().endOf("month");
 };
 
 export const calculateTotalExperience = (pastExp, joinDate) => {
-  const pastExperienceInMonths = (pastExp || 0);
+  const pastExperienceInMonths = pastExp || 0;
   const joiningDate = joinDate ? new Date(joinDate) : new Date();
   const currentDate = new Date();
 
   const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
   const diffMonths = currentDate.getMonth() - joiningDate.getMonth();
-  const monthsSinceJoining = (diffYears * 12) + diffMonths;
-  
-  const totalExperienceInMonths = Number(pastExperienceInMonths) + Number(monthsSinceJoining);
+  const monthsSinceJoining = diffYears * 12 + diffMonths;
+
+  const totalExperienceInMonths =
+    Number(pastExperienceInMonths) + Number(monthsSinceJoining);
   const totalExperienceInYears = totalExperienceInMonths / 12;
   const result = Math.floor(totalExperienceInYears);
 
-  if(result === 0){
-    return 1
+  if (result === 0) {
+    return 1;
   } else {
-    return result
+    return result;
   }
-}; 
+};
