@@ -38,7 +38,7 @@
   padding: 12px 22px 12.02px 21px;
   gap: 0px;
   border-radius: 12px 12px 12px 12px;
-  opacity: 0px;
+  /* opacity: 0px; */
   background: linear-gradient(180deg, #cf4338 0%, #9a281e 100%);
 }
 
