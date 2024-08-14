@@ -16,6 +16,7 @@ export const ERROR_ROUTE = "*";
 
 // API ROUTES
 export const LOGIN_ENDPOINT = "/login";
+export const LOGOUT_ENDPOINT = "/api/logout";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
 export const CREATE_ACHIEVEMENT_ENDPOINTS =
@@ -27,6 +28,10 @@ export const CREATE_EDUCATION_ENDPOINTS =
 export const CREATE_EXPERIENCE_ENDPOINTS =
   "/api/profiles/:profile_id/experiences";
 export const CREATE_PROJECT_ENDPOINTS = "/api/profiles/:profile_id/projects";
+export const EMPLOYEE_INVITE_ENDPOINT =
+  "/api/profiles/:profile_id/employee_invite";
+export const PROFILE_COMPLETE_ENDPOINT =
+  "/api/profiles/:profile_id/profile_complete";
 
 export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
 export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
@@ -78,6 +83,7 @@ export const CERTIFICATE_REDUCER_PATH = "certificateApi";
 export const EDUCATION_REDUCER_PATH = "educationApi";
 export const EXPERIENCE_REDUCER_PATH = "experienceApi";
 export const PROJECT_REDUCER_PATH = "projectApi";
+export const USER_EMAIL_REDUCER_PATH = "userEmailApi";
 
 // ERRORS
 export const INVALID_ID_ERROR = "Invalid or missing ID";
@@ -109,6 +115,19 @@ export const GENDER = [
 
 export const SUCCESS_TOASTER = {
   icon: "✅",
+  style: {
+    border: "1px solid #000000",
+    padding: "16px",
+    color: "#000000",
+  },
+  iconTheme: {
+    primary: "#713200",
+    secondary: "#FFFAEE",
+  },
+};
+
+export const WARNING_TOASTER = {
+  icon: "⚠️",
   style: {
     border: "1px solid #000000",
     padding: "16px",

@@ -20,11 +20,11 @@ import {
 } from "../../../api/certificationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
+  showConfirm,
   validateId,
 } from "../../../helpers";
 
@@ -34,7 +34,6 @@ const Certification = ({ certificationData }) => {
   const [updateCertificateService] = useUpdateCertificateMutation();
   const [deleteCertificateService] = useDeleteCertificateMutation();
   const [updateSequence] = useUpdateSequenceMutation();
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -103,7 +102,7 @@ const Certification = ({ certificationData }) => {
         window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -124,7 +123,7 @@ const Certification = ({ certificationData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response?.data?.error_message);
       }
     } else {
       toast.success("No new changes detected.");
@@ -168,53 +167,49 @@ const Certification = ({ certificationData }) => {
       },
     ]);
     form.resetFields([`certificate_${newActiveKey}`]);
+    setActiveKey(newActiveKey);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (certificationData[targetKey]?.id) {
+            const response = await deleteCertificateService({
+              profile_id,
+              certificate_id: certificationData[targetKey]?.id,
+            });
 
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
-
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
-    try {
-      if (certificationData[modalState.key]?.id) {
-        const response = await deleteCertificateService({
-          profile_id: profile_id,
-          certificate_id: certificationData[modalState.key]?.id,
-        });
-
-        if (response?.data) {
-          console.log("data : ", response?.data);
-          toast.success(response?.data, SUCCESS_TOASTER);
-          window.location.reload(); // needs tobe remove after implement download popover
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
         }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
-    form.resetFields([`certificate_${modalState.key}`]);
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+        form.resetFields([`certificate_${targetKey}`]);
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this certificate?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -251,7 +246,7 @@ const Certification = ({ certificationData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -450,12 +445,6 @@ const Certification = ({ certificationData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this certificate?"
-      />
     </div>
   );
 };

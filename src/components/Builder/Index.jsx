@@ -22,7 +22,7 @@ import {
   PROJECTS_KEY,
   PROJECTS_LABEL,
 } from "../../Constants";
-import Navbar from "../Navbar/navbar";
+import Navbar from "../Navbar";
 import Resume from "../Resume";
 import Achievement from "./Achievement";
 import BasicInfo from "./BasicInfo";

@@ -31,7 +31,6 @@ import {
 } from "../../../api/experienceApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import {
   DESIGNATION,
   INVALID_ID_ERROR,
@@ -41,6 +40,7 @@ import {
 import {
   filterSection,
   formatExperienceFields,
+  showConfirm,
   validateId,
 } from "../../../helpers";
 
@@ -51,7 +51,6 @@ const Experience = ({ experienceData }) => {
   const [deleteExperienceService] = useDeleteExperienceMutation();
   const [updateSequence] = useUpdateSequenceMutation();
   const dispatch = useDispatch();
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [isCurrentCompany, setIsCurrentCompany] = useState(true);
@@ -121,7 +120,7 @@ const Experience = ({ experienceData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -148,7 +147,7 @@ const Experience = ({ experienceData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response?.data?.error_message);
       }
     } else {
       toast.success("No new changes detected.");
@@ -195,49 +194,46 @@ const Experience = ({ experienceData }) => {
     form.resetFields([`experience_${newActiveKey}`]);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (experienceData[targetKey]?.id) {
+            const response = await deleteExperienceService({
+              profile_id: profile_id,
+              experience_id: experienceData[targetKey]?.id,
+            });
 
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
-
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
-    try {
-      if (experienceData[modalState.key]?.id) {
-        const response = await deleteExperienceService({
-          profile_id: profile_id,
-          experience_id: experienceData[modalState.key]?.id,
-        });
-
-        if (response?.data) {
-          toast.success(response?.data, SUCCESS_TOASTER);
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
         }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
-    form.resetFields([`experience_${modalState.key}`]);
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+        form.resetFields([`experience_${targetKey}`]);
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel: () => {},
+      message: "Are you sure you want to delete this experience?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -278,7 +274,7 @@ const Experience = ({ experienceData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -479,12 +475,6 @@ const Experience = ({ experienceData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this experience?"
-      />
     </div>
   );
 };

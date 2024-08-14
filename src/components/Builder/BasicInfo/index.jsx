@@ -79,7 +79,7 @@ const BasicInfo = ({ profileData }) => {
         setFormChange(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -158,6 +158,7 @@ const BasicInfo = ({ profileData }) => {
             <Input
               type="number"
               placeholder="Enter experience (e.g., 24, 36)"
+              min={1}
             />
           </Form.Item>
         </Col>
@@ -244,7 +245,7 @@ const BasicInfo = ({ profileData }) => {
           <Form.Item name="career_objectives" label="Career Objectives">
             <Input.TextArea
               placeholder="Provide career objectives"
-              maxLength={300}
+              minLength={50}
               showCount
             />
           </Form.Item>

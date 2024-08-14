@@ -1,3 +1,8 @@
+import React from "react";
+import { Modal } from "antd";
+import { ExclamationCircleFilled } from "@ant-design/icons";
+const { confirm } = Modal;
+
 import dayjs from "dayjs";
 import { PRESENT_VALUE } from "./Constants";
 
@@ -77,13 +82,39 @@ export const validateId = (id) => {
 };
 
 export const disabledDate = (current) => {
-  // Can not select month before today and today
   return current && current < dayjs().endOf("month");
+};
+
+export const showConfirm = ({ onOk, onCancel, message }) => {
+  confirm({
+    title: "Confirm",
+    icon: <ExclamationCircleFilled />,
+    centered: true,
+    content: message,
+    okText: "Yes",
+    okType: "danger",
+    cancelText: "No",
+    onOk() {
+      onOk();
+    },
+    onCancel() {
+      onCancel();
+    },
+  });
 };
 
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInMonths = pastExp || 0;
-  const joiningDate = joinDate ? new Date(joinDate) : new Date();
+  let joiningDate;
+  if (typeof joinDate === "string" && joinDate) {
+    joiningDate = new Date(joinDate);
+  } else if (joinDate && joinDate.String) {
+    joiningDate = new Date(joinDate.String);
+  } else if (!joinDate) {
+    joiningDate = new Date();
+  } else {
+    joiningDate = new Date();
+  }
   const currentDate = new Date();
 
   const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
@@ -100,4 +131,8 @@ export const calculateTotalExperience = (pastExp, joinDate) => {
   } else {
     return result;
   }
+};
+
+export const formatDate = (date) => {
+  return dayjs(date).format("MMM D, YYYY");
 };

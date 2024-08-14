@@ -19,11 +19,11 @@ import {
 } from "../../../api/achievementApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import Modals from "../../../common-components/Modals";
 import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
 import {
   filterSection,
   formatAchievementFields,
+  showConfirm,
   validateId,
 } from "../../../helpers";
 
@@ -33,7 +33,6 @@ const Achievement = ({ achievementData }) => {
   const [updateAchievementService] = useUpdateAchievementMutation();
   const [deleteAchievementService] = useDeleteAchievementMutation();
   const [updateSequence] = useUpdateSequenceMutation();
-  const [modalState, setModalState] = useState({ isVisible: false, key: null });
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
@@ -94,11 +93,11 @@ const Achievement = ({ achievementData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message, SUCCESS_TOASTER);
+        toast.success(response.data?.error_message, SUCCESS_TOASTER);
         window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -119,7 +118,7 @@ const Achievement = ({ achievementData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response?.data?.error_message);
       }
     } else {
       toast.success("No new changes detected.");
@@ -152,14 +151,6 @@ const Achievement = ({ achievementData }) => {
     setActiveKey(key);
   };
 
-  const showModal = (key) => {
-    setModalState({ isVisible: true, key });
-  };
-
-  const handleCancel = () => {
-    setModalState({ isVisible: false, key: null });
-  };
-
   const add = () => {
     const newActiveKey = `${newTabIndex.current++}`;
     setItems([
@@ -170,49 +161,54 @@ const Achievement = ({ achievementData }) => {
         key: newActiveKey,
       },
     ]);
-    setActiveKey(newActiveKey);
     form.resetFields([`achievement_${newActiveKey}`]);
+    setActiveKey(newActiveKey);
   };
 
-  const remove = async () => {
-    const targetIndex = items.findIndex((pane) => pane.key === modalState.key);
-    const newPanes = items.filter((pane) => pane.key !== modalState.key);
+  const remove = (targetKey) => {
+    const targetIndex = items.findIndex((pane) => pane.key === targetKey);
+    const newPanes = items.filter((pane) => pane.key !== targetKey);
 
-    try {
-      if (achievementData[modalState.key]?.id) {
-        const response = await deleteAchievementService({
-          profile_id: profile_id,
-          achievement_id: achievementData[modalState.key]?.id,
-        });
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (achievementData[targetKey]?.id) {
+            const response = await deleteAchievementService({
+              profile_id: profile_id,
+              achievement_id: achievementData[targetKey]?.id,
+            });
 
-        if (response?.data) {
-          toast.success(response?.data, SUCCESS_TOASTER);
-          window.location.reload(); // needs tobe remove after implement download popover
+            if (response?.data) {
+              toast.success(response?.data, SUCCESS_TOASTER);
+              window.location.reload(); // needs tobe remove after implement download popover
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
         }
-      }
-    } catch (error) {
-      toast.error(error.response?.data?.message);
-    }
 
-    form.resetFields([`achievement_${modalState.key}`]);
+        form.resetFields([`achievement_${targetKey}`]);
 
-    if (newPanes.length && modalState.key === activeKey) {
-      const { key } =
-        newPanes[
-          targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
-        ];
-      setActiveKey(key);
-    }
-    setItems(newPanes);
-    setModalState({ isVisible: false, key: null });
-    newTabIndex.current--;
+        if (newPanes.length && targetKey === activeKey) {
+          const { key } =
+            newPanes[
+              targetIndex === newPanes.length ? targetIndex - 1 : targetIndex
+            ];
+          setActiveKey(key);
+        }
+        setItems(newPanes);
+        newTabIndex.current--;
+      },
+      onCancel() {},
+      message: "Are you sure you want to delete this achievement?",
+    });
   };
 
   const onEdit = (targetKey, action) => {
     if (action === "add") {
       add();
     } else {
-      showModal(targetKey);
+      remove(targetKey);
     }
   };
 
@@ -249,7 +245,7 @@ const Achievement = ({ achievementData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -368,18 +364,12 @@ const Achievement = ({ achievementData }) => {
           />
         </SortableContext>
       </DndContext>
-      <Modals
-        isVisible={modalState.isVisible}
-        onOk={remove}
-        onCancel={handleCancel}
-        message="Are you sure you want to delete this achievement?"
-      />
     </div>
   );
 };
 
 Achievement.propTypes = {
-  achievementData: PropTypes.object,
+  achievementData: PropTypes.array,
 };
 
 export default Achievement;

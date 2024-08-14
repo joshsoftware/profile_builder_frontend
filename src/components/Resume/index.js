@@ -1,9 +1,12 @@
 import React, { forwardRef, useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useDispatch, useSelector } from "react-redux";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useReactToPrint } from "react-to-print";
 import { Button, Checkbox } from "antd";
 import {
   CalendarOutlined,
+  CheckOutlined,
   CheckSquareOutlined,
   DownloadOutlined,
   GithubOutlined,
@@ -12,14 +15,27 @@ import {
   MobileOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
+import { useLogoutMutation } from "../../api/loginApi";
+import { useCompleteProfileMutation } from "../../api/profileApi";
+import { logout } from "../../api/store/authSlice";
 import joshImage from "../../assets/josh-black-logo.png";
-import { getMonthString, PRESENT_VALUE } from "../../Constants";
-import { calculateTotalExperience } from "../../helpers";
+import {
+  getMonthString,
+  PRESENT_VALUE,
+  ROOT_ROUTE,
+  SUCCESS_TOASTER,
+} from "../../Constants";
+import { calculateTotalExperience, showConfirm } from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
+  const [logoutService] = useLogoutMutation();
+  const role = useSelector((state) => state.auth.role);
+  const [completeProfileService] = useCompleteProfileMutation();
   const [contactDetails, setContactDetails] = useState(true);
+  const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const { is_josh_employee } = location.state || {};
 
   Resume.propTypes = {
@@ -167,7 +183,6 @@ const Resume = forwardRef(({ data }, ref) => {
                   </span>
                 </div>
               )}
-
               {item?.technologies && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Project Techstack: </b>
@@ -259,7 +274,12 @@ const Resume = forwardRef(({ data }, ref) => {
       </div>
     ),
     skills: (
-      <div key={"skills"}>
+      <div
+        key={"skills"}
+        className={`${styles.section} ${
+          profile?.primary_skills?.length > 0 ? "" : styles.hidden
+        }`}
+      >
         {profile && (
           <>
             <div className={styles.sectionTitle}>Skills</div>
@@ -353,23 +373,63 @@ const Resume = forwardRef(({ data }, ref) => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
   };
 
+  const handleCompleteProfile = () => {
+    showConfirm({
+      onOk: async () => {
+        try {
+          if (profile?.id) {
+            const response = await completeProfileService({
+              profile_id: profile?.id,
+            });
+            await logoutService();
+            dispatch(logout());
+            window.localStorage.clear();
+
+            if (response?.data) {
+              toast.success(response?.data?.message, SUCCESS_TOASTER);
+              navigate(ROOT_ROUTE);
+            }
+          }
+        } catch (error) {
+          toast.error(error.response?.data?.error_message);
+        }
+      },
+      onCancel() {},
+      message:
+        "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
+    });
+  };
+
   return (
     <>
       <div
         className={styles.headerMenu}
         style={{ marginTop: "10px", marginLeft: "20px" }}
       >
-        <Button
-          icon={<DownloadOutlined />}
-          style={{ background: "#e34435", color: "white" }}
-          onClick={handlePrint}
-        >
-          Download
-        </Button>
-        <div style={{ marginTop: "6px" }}>
-          <Checkbox onChange={() => setContactDetails(!contactDetails)} /> Do
-          you want hide contact details ?
-        </div>
+        {role.toLowerCase() === "admin" ? (
+          <>
+            <Button
+              icon={<DownloadOutlined />}
+              style={{ background: "#e34435", color: "white" }}
+              onClick={handlePrint}
+            >
+              Download
+            </Button>
+            <div style={{ marginTop: "6px" }}>
+              <Checkbox onChange={() => setContactDetails(!contactDetails)} />{" "}
+              Do you want hide contact details ?
+            </div>
+          </>
+        ) : (
+          <Button
+            type="primary"
+            icon={<CheckOutlined />}
+            style={{ background: "#e34435", color: "white" }}
+            onClick={handleCompleteProfile}
+          >
+            Complete Profile
+          </Button>
+        )}
       </div>
       <div ref={ref} className={styles.main}>
         <style>{getPageMargins()}</style>

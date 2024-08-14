@@ -184,7 +184,7 @@
 }
 
 .content .subtitle {
-  font-size: 15px;
+  font-size: 15.5px;
   font-weight: medium !important;
   max-width: 250px;
   word-wrap: break-word;
@@ -302,13 +302,13 @@
   }
 
   .sectionTitle {
-    width: 30%;
+    width: 21%;
   }
 }
 
 @media (min-width: 1024px) {
   .container {
-    min-height: 200px;
+    min-height: 140px;
   }
 
   .section .content .partionedItems {
