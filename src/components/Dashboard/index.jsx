@@ -13,7 +13,8 @@ const Dashboard = () => {
       </p>
 
       <Link to={`/profiles`}>
-      <button className={styles.createBtn}>Get it started!</button></Link>
+        <button className={styles.createBtn}>Get it started!</button>
+      </Link>
     </div>
   );
 };

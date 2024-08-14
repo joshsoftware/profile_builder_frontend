@@ -49,7 +49,7 @@ describe("ListProfiles Component", () => {
     render(<ListProfiles />);
     await waitFor(() => {
       expect(
-        screen.getByText("Failed to fetch list of Profile!")
+        screen.getByText("Failed to fetch list of Profile!"),
       ).toBeInTheDocument();
     });
   });

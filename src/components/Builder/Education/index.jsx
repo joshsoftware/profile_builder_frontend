@@ -116,7 +116,7 @@ const Education = ({ educationData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response?.data?.error_message);
       }
     } else {
       toast.success("No new changes detected.");
@@ -239,7 +239,7 @@ const Education = ({ educationData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 

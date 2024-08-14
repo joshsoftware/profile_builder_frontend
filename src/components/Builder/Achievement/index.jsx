@@ -93,11 +93,11 @@ const Achievement = ({ achievementData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.message, SUCCESS_TOASTER);
+        toast.success(response.data?.error_message, SUCCESS_TOASTER);
         window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -118,7 +118,7 @@ const Achievement = ({ achievementData }) => {
           }
         }
       } catch (error) {
-        toast.error(error.response?.data?.message);
+        toast.error(error.response?.data?.error_message);
       }
     } else {
       toast.success("No new changes detected.");
@@ -245,7 +245,7 @@ const Achievement = ({ achievementData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 

@@ -120,7 +120,7 @@ const Experience = ({ experienceData }) => {
         toast.success(response.data?.message, SUCCESS_TOASTER);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 
@@ -274,7 +274,7 @@ const Experience = ({ experienceData }) => {
         setDragged(false);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.error_message);
     }
   };
 

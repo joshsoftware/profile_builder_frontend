@@ -36,7 +36,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
     expect(screen.getByText("Sign In With Google")).toBeInTheDocument();
   });
@@ -52,7 +52,7 @@ describe("Login Component", () => {
     render(
       <MemoryRouter>
         <Login />
-      </MemoryRouter>
+      </MemoryRouter>,
     );
 
     const button = screen.getByRole("button", { name: /Login With Google/i });

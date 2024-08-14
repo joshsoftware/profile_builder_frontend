@@ -106,10 +106,12 @@ export const showConfirm = ({ onOk, onCancel, message }) => {
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInMonths = pastExp || 0;
   let joiningDate;
-  if (typeof joinDate === 'string') {
+  if (typeof joinDate === "string" && joinDate) {
     joiningDate = new Date(joinDate);
   } else if (joinDate && joinDate.String) {
     joiningDate = new Date(joinDate.String);
+  } else if (!joinDate) {
+    joiningDate = new Date();
   } else {
     joiningDate = new Date();
   }
