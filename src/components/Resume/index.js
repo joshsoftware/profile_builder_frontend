@@ -101,9 +101,9 @@ const Resume = forwardRef(({ data }, ref) => {
                   <>
                     <span className={styles.subtitle}>{item.company_name}</span>
                     <div className={styles.date}>
-                      <CalendarOutlined /> {getMonthYear(item.from_date)} -{" "}
-                      {item.to_date === PRESENT_VALUE
-                        ? " Present"
+                      <CalendarOutlined />{getMonthYear(item.from_date)} - {" "}
+                      {getMonthYear(item.to_date) === PRESENT_VALUE
+                        ? "Present"
                         : getMonthYear(item.to_date)}
                     </div>
                   </>
@@ -137,15 +137,15 @@ const Resume = forwardRef(({ data }, ref) => {
                 )}
                 {item?.working_start_date && item?.working_end_date && (
                   <p className={styles.customSubHeading}>
-                    {getMonthYear(item.working_start_date)} -{" "}
+                    <CalendarOutlined /> {getMonthYear(item.working_start_date)} -  {" "}
                     {getMonthYear(item.working_end_date) === PRESENT_VALUE
                       ? "Present"
                       : getMonthYear(item.working_end_date)}
                   </p>
                 )}
                 {item?.duration && (
-                  <div className={styles.blury}>
-                    Duration: {item.duration} years
+                  <div className={styles.overview}>
+                    <b>Duration:</b> {item.duration} years
                   </div>
                 )}
               </div>
@@ -163,11 +163,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 <div className={styles.avoidBreak}>
                   <span className={styles.duration}>
                     <b className={styles.overview}>Role: </b>
-                    <ul>
-                      {item.role.split("\n").map((line, index) => (
-                        <li key={index}>{line}</li>
-                      ))}
-                    </ul>
+                    {item.role}
                   </span>
                 </div>
               )}
@@ -286,7 +282,7 @@ const Resume = forwardRef(({ data }, ref) => {
             <div className={styles.skillSection}>
               {profile?.primary_skills?.length > 0 && (
                 <div>
-                  <b>Primary</b>{" "}
+                  <b>Primary:</b>{" "}
                   {Array.isArray(profile?.primary_skills)
                     ? profile?.primary_skills.join(", ")
                     : profile?.primary_skills}
@@ -294,7 +290,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {profile?.secondary_skills?.length > 0 && (
                 <div>
-                  <b>Secondary</b>{" "}
+                  <b>Secondary:</b>{" "}
                   {Array.isArray(profile?.secondary_skills)
                     ? profile?.secondary_skills.join(", ")
                     : profile?.secondary_skills}

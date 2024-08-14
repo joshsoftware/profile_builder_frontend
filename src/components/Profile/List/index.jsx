@@ -233,6 +233,13 @@ const ListProfiles = () => {
       key: "name",
       width: "13%",
       ...getColumnSearchProps("name"),
+      render: (_, record) => (
+        <Typography.Link
+          onClick={() =>
+            handleClick(record?.id, record?.is_current_employee)
+          }
+        >{record.name}</Typography.Link>
+        )
     },
     {
       title: "Email",
@@ -253,6 +260,7 @@ const ListProfiles = () => {
       title: "Primary Skills",
       key: "primary_skills",
       dataIndex: "primary_skills",
+      width: '15%',
       ...getColumnSearchProps("primary_skills"),
       render: (_, { primary_skills }) => (
         <>
