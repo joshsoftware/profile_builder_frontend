@@ -56,7 +56,7 @@ const Experience = ({ experienceData }) => {
     useUpdateExperienceMutation();
   const [deleteExperienceService, { isLoading: isDeleting }] =
     useDeleteExperienceMutation();
-  const [updateSequence, { isLoading: isUpdatingSequence }] =
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
     useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -474,7 +474,7 @@ const Experience = ({ experienceData }) => {
                           type="primary"
                           onClick={handleUpdateOrder}
                           disabled={!dragged}
-                          loading={isUpdatingSequence}
+                          loading={isSequenceUpdating}
                         >
                           Update Order
                         </Button>

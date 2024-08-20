@@ -53,7 +53,7 @@ const Project = ({ projectData }) => {
     useUpdateProjectMutation();
   const [deleteProjectService, { isLoading: isDeleting }] =
     useDeleteProjectMutation();
-  const [updateSequence, { isLoading: isUpdatingSequence }] =
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
     useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -495,7 +495,7 @@ const Project = ({ projectData }) => {
                           type="primary"
                           onClick={handleUpdateOrder}
                           disabled={!dragged}
-                          loading={isUpdatingSequence}
+                          loading={isSequenceUpdating}
                         >
                           Update Order
                         </Button>

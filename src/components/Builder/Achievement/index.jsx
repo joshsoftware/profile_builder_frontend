@@ -41,7 +41,7 @@ const Achievement = ({ achievementData }) => {
     useUpdateAchievementMutation();
   const [deleteAchievementService, { isLoading: isDeleting }] =
     useDeleteAchievementMutation();
-  const [updateSequence, { isLoading: isUpdatingSequence }] =
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
     useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
@@ -362,7 +362,7 @@ const Achievement = ({ achievementData }) => {
                           type="primary"
                           onClick={handleUpdateOrder}
                           disabled={!dragged}
-                          loading={isUpdatingSequence}
+                          loading={isSequenceUpdating}
                         >
                           Update Order
                         </Button>

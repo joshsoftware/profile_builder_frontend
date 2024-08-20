@@ -41,7 +41,7 @@ const Education = ({ educationData }) => {
     useUpdateEducationMutation();
   const [deleteEducationService, { isLoading: isDeleting }] =
     useDeleteEducationMutation();
-  const [updateSequence, { isLoading: isUpdatingSequence }] =
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
     useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
@@ -382,7 +382,7 @@ const Education = ({ educationData }) => {
                           type="primary"
                           onClick={handleUpdateOrder}
                           disabled={!dragged}
-                          loading={isUpdatingSequence}
+                          loading={isSequenceUpdating}
                         >
                           Update Order
                         </Button>

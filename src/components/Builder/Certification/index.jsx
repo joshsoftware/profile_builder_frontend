@@ -52,7 +52,7 @@ const Certification = ({ certificationData }) => {
     useUpdateCertificateMutation();
   const [deleteCertificateService, { isLoading: isDeleting }] =
     useDeleteCertificateMutation();
-  const [updateSequence, { isLoading: isUpdatingSequence }] =
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
     useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -462,7 +462,7 @@ const Certification = ({ certificationData }) => {
                           type="primary"
                           onClick={handleUpdateOrder}
                           disabled={!dragged}
-                          loading={isUpdatingSequence}
+                          loading={isSequenceUpdating}
                         >
                           Update Order
                         </Button>
