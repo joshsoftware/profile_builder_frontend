@@ -328,7 +328,7 @@ const Resume = forwardRef(({ data }, ref) => {
                         {"| "}
                         <CalendarOutlined />
                         {getMonthYear(item.from_date)} -{" "}
-                        {item.to_date === PRESENT_VALUE
+                        {getMonthYear(item.to_date) === PRESENT_VALUE
                           ? " Present"
                           : getMonthYear(item.to_date)}
                       </>
