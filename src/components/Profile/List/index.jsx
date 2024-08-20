@@ -29,7 +29,11 @@ import {
   useGetProfileListQuery,
   useUpdateProfileStatusMutation,
 } from "../../../api/profileApi";
-import { EDITOR_PROFILE_ROUTE, EDITOR_ROUTE } from "../../../Constants";
+import {
+  EDITOR_PROFILE_ROUTE,
+  EDITOR_ROUTE,
+  SPIN_SIZE,
+} from "../../../Constants";
 import {
   calculateTotalExperience,
   formatDate,
@@ -235,11 +239,11 @@ const ListProfiles = () => {
       ...getColumnSearchProps("name"),
       render: (_, record) => (
         <Typography.Link
-          onClick={() =>
-            handleClick(record?.id, record?.is_current_employee)
-          }
-        >{record.name}</Typography.Link>
-        )
+          onClick={() => handleClick(record?.id, record?.is_current_employee)}
+        >
+          {record.name}
+        </Typography.Link>
+      ),
     },
     {
       title: "Email",
@@ -260,7 +264,7 @@ const ListProfiles = () => {
       title: "Primary Skills",
       key: "primary_skills",
       dataIndex: "primary_skills",
-      width: '15%',
+      width: "15%",
       ...getColumnSearchProps("primary_skills"),
       render: (_, { primary_skills }) => (
         <>
@@ -370,7 +374,7 @@ const ListProfiles = () => {
 
   return (
     <>
-      <Spin spinning={isLoading} size="large" tip={"Just a moment.."}>
+      <Spin spinning={isLoading} size={SPIN_SIZE} tip={"Just a moment.."}>
         <Navbar />
         <Row className={styles.rowStyle}>
           <Typography.Title level={1} className={styles.profile_header}>

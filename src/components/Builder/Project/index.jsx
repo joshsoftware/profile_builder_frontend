@@ -11,6 +11,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tabs,
 } from "antd";
 import { DragOutlined } from "@ant-design/icons";
@@ -30,20 +31,30 @@ import {
   useUpdateProjectMutation,
 } from "../../../api/projectApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
+import {
+  DELETING_SPIN,
+  INVALID_ID_ERROR,
+  SPIN_SIZE,
+  SUCCESS_TOASTER,
+} from "../../../Constants";
 import {
   filterSection,
   formatProjectsFields,
   showConfirm,
   validateId,
 } from "../../../helpers";
+import styles from "../Builder.module.css";
 
 const Project = ({ projectData }) => {
   const [action, setAction] = useState("create");
-  const [createProjectService] = useCreateProjectMutation();
-  const [updateProjectService] = useUpdateProjectMutation();
-  const [deleteProjectService] = useDeleteProjectMutation();
-  const [updateSequence] = useUpdateSequenceMutation(); // Add this line
+  const [createProjectService, { isLoading: isCreating }] =
+    useCreateProjectMutation();
+  const [updateProjectService, { isLoading: isUpdating }] =
+    useUpdateProjectMutation();
+  const [deleteProjectService, { isLoading: isDeleting }] =
+    useDeleteProjectMutation();
+  const [updateSequence, { isLoading: isUpdatingSequence }] =
+    useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
@@ -281,216 +292,232 @@ const Project = ({ projectData }) => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Project</Button>
+    <Spin
+      tip={DELETING_SPIN}
+      size={SPIN_SIZE}
+      spinning={isDeleting}
+      className={styles.spin}
+    >
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Project</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                icon: <DragOutlined />,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`project_${item.key}`}
+                    onFinish={onFinish}
+                    onValuesChange={() => setFormChange(true)}
+                    key={item.key}
+                  >
+                    <Form.Item name={[`project_${index}`, "id"]} hidden>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`project_${index}`, "name"]}
+                      label="Project Name"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Name required",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Enter project name" />
+                    </Form.Item>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`project_${index}`, "role"]}
+                          label="Role"
+                        >
+                          <Input placeholder="Enter role" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`project_${index}`, "duration"]}
+                          label="Project Duration (in years)"
+                        >
+                          <Input type="number" placeholder="Eg. 1, 2.5" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item
+                      name={[`project_${index}`, "responsibilities"]}
+                      label="Responsibilities"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Responsibilities required",
+                        },
+                      ]}
+                    >
+                      <Input.TextArea
+                        placeholder="Please provide responsibilities"
+                        showCount
+                        minLength={50}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`project_${index}`, "description"]}
+                      label="Description of Project"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Description required",
+                        },
+                      ]}
+                    >
+                      <Input.TextArea
+                        placeholder="Please provide a basic overview of the project"
+                        showCount
+                        minLength={50}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`project_${index}`, "technologies"]}
+                      label="Technologies"
+                    >
+                      <Select
+                        mode="tags"
+                        style={{ width: "100%" }}
+                        placeholder="Tags Mode"
+                        tokenSeparators={[","]}
+                        options={options}
+                      />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`project_${index}`, "tech_worked_on"]}
+                      label="Technology You Worked On"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Worked technology is required",
+                        },
+                      ]}
+                    >
+                      <Select
+                        mode="tags"
+                        style={{ width: "100%" }}
+                        placeholder="Tags Mode"
+                        tokenSeparators={[","]}
+                        options={options}
+                      />
+                    </Form.Item>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`project_${index}`, "working_start_date"]}
+                          label="Project Start Date"
+                          rules={[
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "Start date cannot be in the future",
+                                      ),
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`project_${index}`, "working_end_date"]}
+                          label="Project End Date"
+                          rules={[
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "End date cannot be in the future",
+                                      ),
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item>
+                      <Space>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleProjects("create")}
+                          disabled={item.isExisting}
+                          loading={isCreating}
+                        >
+                          Create Projects
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleProjects("update")}
+                          disabled={items.length === 0 || !item.isExisting}
+                          loading={isUpdating}
+                        >
+                          Update Project {Number(item.key) + 1}
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleUpdateOrder}
+                          disabled={!dragged}
+                          loading={isUpdatingSequence}
+                        >
+                          Update Order
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
       </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              icon: <DragOutlined />,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`project_${item.key}`}
-                  onFinish={onFinish}
-                  onValuesChange={() => setFormChange(true)}
-                  key={item.key}
-                >
-                  <Form.Item name={[`project_${index}`, "id"]} hidden>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "name"]}
-                    label="Project Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Name required",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Enter project name" />
-                  </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`project_${index}`, "role"]}
-                        label="Role"
-                      >
-                        <Input placeholder="Enter role" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`project_${index}`, "duration"]}
-                        label="Project Duration (in years)"
-                      >
-                        <Input type="number" placeholder="Eg. 1, 2.5" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Form.Item
-                    name={[`project_${index}`, "responsibilities"]}
-                    label="Responsibilities"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Responsibilities required",
-                      },
-                    ]}
-                  >
-                    <Input.TextArea
-                      placeholder="Please provide responsibilities"
-                      showCount
-                      minLength={50}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "description"]}
-                    label="Description of Project"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Description required",
-                      },
-                    ]}
-                  >
-                    <Input.TextArea
-                      placeholder="Please provide a basic overview of the project"
-                      showCount
-                      minLength={50}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "technologies"]}
-                    label="Technologies"
-                  >
-                    <Select
-                      mode="tags"
-                      style={{ width: "100%" }}
-                      placeholder="Tags Mode"
-                      tokenSeparators={[","]}
-                      options={options}
-                    />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`project_${index}`, "tech_worked_on"]}
-                    label="Technology You Worked On"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Worked technology is required",
-                      },
-                    ]}
-                  >
-                    <Select
-                      mode="tags"
-                      style={{ width: "100%" }}
-                      placeholder="Tags Mode"
-                      tokenSeparators={[","]}
-                      options={options}
-                    />
-                  </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`project_${index}`, "working_start_date"]}
-                        label="Project Start Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "Start date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`project_${index}`, "working_end_date"]}
-                        label="Project End Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "End date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleProjects("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Projects
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleProjects("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Project {Number(item.key) + 1}
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateOrder}
-                        disabled={!dragged}
-                      >
-                        Update Order
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+    </Spin>
   );
 };
 Project.propTypes = {

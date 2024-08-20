@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Col, Row, Space, Switch, Tabs, Typography } from "antd";
+import { Col, Row, Space, Spin, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetAchievementsQuery } from "../../api/achievementApi";
 import { useGetCertificatesQuery } from "../../api/certificationApi";
@@ -19,8 +19,10 @@ import {
   EDUCATION_LABEL,
   EXPERIENCE_KEY,
   EXPERIENCE_LABEL,
+  LOADING_SPIN,
   PROJECTS_KEY,
   PROJECTS_LABEL,
+  SPIN_SIZE,
 } from "../../Constants";
 import Navbar from "../Navbar";
 import Resume from "../Resume";
@@ -85,20 +87,18 @@ export const Editor = () => {
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
-  const { data: profileData } = useGetBasicInfoQuery(profile_id ?? skipToken);
-  const { data: projectData } = useGetProjectQuery(profile_id ?? skipToken);
-  const { data: experienceData } = useGetExperiencesQuery(
-    profile_id ?? skipToken,
-  );
-  const { data: educationData } = useGetEducationsQuery(
-    profile_id ?? skipToken,
-  );
-  const { data: achievementData } = useGetAchievementsQuery(
-    profile_id ?? skipToken,
-  );
-  const { data: certificationData } = useGetCertificatesQuery(
-    profile_id ?? skipToken,
-  );
+  const { data: profileData, isLoading: isGettingBasicInfo } =
+    useGetBasicInfoQuery(profile_id ?? skipToken);
+  const { data: projectData, isLoading: isGettingProjects } =
+    useGetProjectQuery(profile_id ?? skipToken);
+  const { data: experienceData, isLoading: isGettingExperiences } =
+    useGetExperiencesQuery(profile_id ?? skipToken);
+  const { data: educationData, isLoading: isGettingEducations } =
+    useGetEducationsQuery(profile_id ?? skipToken);
+  const { data: achievementData, isLoading: isGettingAchievements } =
+    useGetAchievementsQuery(profile_id ?? skipToken);
+  const { data: certificationData, isLoading: isGettingCertificates } =
+    useGetCertificatesQuery(profile_id ?? skipToken);
 
   useEffect(() => {
     if (profile_id) {
@@ -145,77 +145,91 @@ export const Editor = () => {
   return (
     <>
       <Navbar />
-      <Row>
-        <Col
-          xs={{ span: 24 }}
-          sm={{ span: 24 }}
-          md={{ span: 12 }}
-          lg={{ span: 12 }}
-          className={styles["hide-scrollbar"]}
-          style={{
-            minHeight: "98vh",
-            maxHeight: "98vh",
-            overflow: "auto",
-            padding: "2rem",
-            top: "2rem",
-          }}
-        >
-          <Typography.Title
-            level={2}
+      <Spin
+        tip={LOADING_SPIN}
+        size={SPIN_SIZE}
+        spinning={
+          isGettingBasicInfo &&
+          isGettingProjects &&
+          isGettingEducations &&
+          isGettingExperiences &&
+          isGettingAchievements &&
+          isGettingCertificates
+        }
+        className={styles.spin}
+      >
+        <Row>
+          <Col
+            xs={{ span: 24 }}
+            sm={{ span: 24 }}
+            md={{ span: 12 }}
+            lg={{ span: 12 }}
+            className={styles["hide-scrollbar"]}
             style={{
-              display: "flex",
-              justifyContent: "center",
-              marginTop: "10px",
+              minHeight: "98vh",
+              maxHeight: "98vh",
+              overflow: "auto",
+              padding: "2rem",
+              top: "2rem",
             }}
           >
-            Profile Builder
-          </Typography.Title>
-          <hr />
+            <Typography.Title
+              level={2}
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "10px",
+              }}
+            >
+              Profile Builder
+            </Typography.Title>
+            <hr />
 
-          <Space direction="vertical">
-            <Space>
-              <Switch size="small" onChange={handleAchievement} />
-              <Typography.Text>
-                Do you want to include achievements?
-              </Typography.Text>
+            <Space direction="vertical">
+              <Space>
+                <Switch size="small" onChange={handleAchievement} />
+                <Typography.Text>
+                  Do you want to include achievements?
+                </Typography.Text>
+              </Space>
+              <Space>
+                <Switch size="small" onChange={handleCertification} />
+                <Typography.Text>
+                  Do you want to include certifications?
+                </Typography.Text>
+              </Space>
             </Space>
-            <Space>
-              <Switch size="small" onChange={handleCertification} />
-              <Typography.Text>
-                Do you want to include certifications?
-              </Typography.Text>
-            </Space>
-          </Space>
-          <hr />
-          <Tabs size="small" defaultActiveKey="basic-info" items={items} />
-        </Col>
-        <Col
-          xs={{ span: 24 }}
-          sm={{ span: 24 }}
-          md={{ span: 12 }}
-          lg={{ span: 12 }}
-          className={styles["hide-scrollbar"]}
-          style={{
-            overflow: "auto",
-            minHeight: "98vh",
-            maxHeight: "98vh",
-            padding: "2rem",
-            top: "2rem",
-          }}
-        >
-          <Resume
-            data={{
-              profileData,
-              projectData,
-              experienceData,
-              educationData,
-              achievementData: showAchievement ? achievementData : null,
-              certificationData: showCertification ? certificationData : null,
+            <hr />
+            <Tabs size="small" defaultActiveKey="basic-info" items={items} />
+          </Col>
+          <Col
+            xs={{ span: 24 }}
+            sm={{ span: 24 }}
+            md={{ span: 12 }}
+            lg={{ span: 12 }}
+            className={styles["hide-scrollbar"]}
+            style={{
+              overflow: "auto",
+              minHeight: "98vh",
+              maxHeight: "98vh",
+              padding: "2rem",
+              top: "2rem",
             }}
-            ref={resumeRef}
-          />
-        </Col>
-      </Row>
+          >
+            <Resume
+              data={{
+                profileData,
+                projectData,
+                experienceData,
+                educationData,
+                achievementData: showAchievement ? achievementData : null,
+                certificationData: showCertification ? certificationData : null,
+              }}
+              ref={resumeRef}
+            />
+          </Col>
+        </Row>
+      </Spin>
     </>
   );
 };

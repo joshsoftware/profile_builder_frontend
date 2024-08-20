@@ -101,8 +101,9 @@ const Resume = forwardRef(({ data }, ref) => {
                   <>
                     <span className={styles.subtitle}>{item.company_name}</span>
                     <div className={styles.date}>
-                      <CalendarOutlined />{getMonthYear(item.from_date)} - {" "}
-                      {getMonthYear(item.to_date) === PRESENT_VALUE
+                      <CalendarOutlined />
+                      {getMonthYear(item.from_date)} -{" "}
+                      {item.to_date === PRESENT_VALUE
                         ? "Present"
                         : getMonthYear(item.to_date)}
                     </div>
@@ -137,15 +138,16 @@ const Resume = forwardRef(({ data }, ref) => {
                 )}
                 {item?.working_start_date && item?.working_end_date && (
                   <p className={styles.customSubHeading}>
-                    <CalendarOutlined /> {getMonthYear(item.working_start_date)} -  {" "}
+                    <CalendarOutlined /> {getMonthYear(item.working_start_date)}{" "}
+                    -{" "}
                     {getMonthYear(item.working_end_date) === PRESENT_VALUE
                       ? "Present"
                       : getMonthYear(item.working_end_date)}
                   </p>
                 )}
                 {item?.duration && (
-                  <div className={styles.overview}>
-                    <b>Duration:</b> {item.duration} years
+                  <div className={styles.blury}>
+                    Duration: {item.duration} years
                   </div>
                 )}
               </div>
@@ -187,7 +189,6 @@ const Resume = forwardRef(({ data }, ref) => {
                     : item.technologies}
                 </span>
               )}
-
               {item?.tech_worked_on && (
                 <span className={styles.duration}>
                   <b className={styles.overview}>Technology Worked On: </b>

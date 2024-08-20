@@ -106,6 +106,9 @@ export const EDUCATION_LABEL = "Education";
 export const EXPERIENCE_LABEL = "Experience";
 export const ACHIEVEMENT_LABEL = "Achievement";
 export const CERTIFICATION_LABEL = "Certification";
+export const DELETING_SPIN = "Deleting...";
+export const LOADING_SPIN = "Loading...";
+export const SPIN_SIZE = "large";
 
 export const GENDER = [
   { label: "MALE", value: "Male" },
