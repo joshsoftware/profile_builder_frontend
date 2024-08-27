@@ -255,7 +255,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 {item?.passing_year && (
                   <div className={styles.passingDate}>
                     <div className={styles.subtitle}>Passing Year:</div>{" "}
-                    {new Date(item.passing_year).getFullYear()}
+                    {item.passing_year}
                   </div>
                 )}
                 {item?.percent_or_cgpa && (
@@ -324,7 +324,7 @@ const Resume = forwardRef(({ data }, ref) => {
                     >
                       {item.name}
                     </p>
-                    {item?.from_date && item?.to_date && (
+                    {/* {item?.from_date && item?.to_date && (
                       <>
                         {"| "}
                         <CalendarOutlined />
@@ -333,7 +333,7 @@ const Resume = forwardRef(({ data }, ref) => {
                           ? " Present"
                           : getMonthYear(item.to_date)}
                       </>
-                    )}
+                    )} */}
                   </div>
                 </>
               )}
@@ -345,7 +345,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  <b>Issued Date: </b> {getMonthYear(item.issued_date)}
+                  <b>Issued Date: </b> {item.issued_date}
                 </div>
               )}
               {item?.description && <div>{item.description}</div>}

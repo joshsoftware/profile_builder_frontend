@@ -63,7 +63,7 @@ export const formatCertificationFields = (certifications) => {
     name: certificate?.name,
     organization_name: certificate?.organization_name,
     description: certificate?.description,
-    issued_date: certificate?.issued_date?.format("MMM-YYYY"),
+    issued_date: certificate?.issued_date,
     from_date: certificate?.from_date?.format("MMM-YYYY"),
     to_date: certificate?.to_date?.format("MMM-YYYY"),
   }));

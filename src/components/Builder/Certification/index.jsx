@@ -2,17 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import {
-  Button,
-  Col,
-  DatePicker,
-  Form,
-  Input,
-  Row,
-  Space,
-  Spin,
-  Tabs,
-} from "antd";
+import { Button, Col, Form, Input, Row, Space, Spin, Tabs } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
@@ -91,9 +81,9 @@ const Certification = ({ certificationData }) => {
             acc[`certificate_${index}`] = {
               ...certificate,
               id: certificate?.id,
-              issued_date: certificate.issued_date
-                ? dayjs(certificate.issued_date)
-                : null,
+              // issued_date: certificate.issued_date
+              //   ? dayjs(certificate.issued_date)
+              //   : null,
               from_date: certificate.from_date
                 ? dayjs(certificate.from_date)
                 : null,
@@ -380,13 +370,14 @@ const Certification = ({ certificationData }) => {
                             },
                           ]}
                         >
-                          <DatePicker
+                          {/* <DatePicker
                             style={{ width: "100%" }}
                             picker="month"
-                          />
+                          /> */}
+                          <Input />
                         </Form.Item>
                       </Col>
-                      <Col span={11} offset={2}>
+                      {/* <Col span={11} offset={2}>
                         <Form.Item
                           name={[`certificate_${index}`, "from_date"]}
                           label="Start Date"
@@ -408,9 +399,9 @@ const Certification = ({ certificationData }) => {
                             picker="month"
                           />
                         </Form.Item>
-                      </Col>
+                      </Col> */}
                     </Row>
-                    <Row>
+                    {/* <Row>
                       <Col span={11}>
                         <Form.Item
                           name={[`certificate_${index}`, "to_date"]}
@@ -434,7 +425,7 @@ const Certification = ({ certificationData }) => {
                           />
                         </Form.Item>
                       </Col>
-                    </Row>
+                    </Row> */}
                     <Form.Item>
                       <Space>
                         <Button
