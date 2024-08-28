@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Button, Col, Form, Input, Row, Space, Tabs } from "antd";
+import { Button, Col, Form, Input, Row, Space, Spin, Tabs } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
@@ -19,20 +19,30 @@ import {
 } from "../../../api/educationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
+import {
+  DELETING_SPIN,
+  INVALID_ID_ERROR,
+  SPIN_SIZE,
+  SUCCESS_TOASTER,
+} from "../../../Constants";
 import {
   filterSection,
   formatEducationFields,
   showConfirm,
   validateId,
 } from "../../../helpers";
+import styles from "../Builder.module.css";
 
 const Education = ({ educationData }) => {
   const [action, setAction] = useState("create");
-  const [createEducationService] = useCreateEducationMutation();
-  const [updateEducationService] = useUpdateEducationMutation();
-  const [deleteEducationService] = useDeleteEducationMutation();
-  const [updateSequence] = useUpdateSequenceMutation();
+  const [createEducationService, { isLoading: isCreating }] =
+    useCreateEducationMutation();
+  const [updateEducationService, { isLoading: isUpdating }] =
+    useUpdateEducationMutation();
+  const [deleteEducationService, { isLoading: isDeleting }] =
+    useDeleteEducationMutation();
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
+    useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
@@ -261,130 +271,140 @@ const Education = ({ educationData }) => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Education</Button>
-      </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              icon: <DragOutlined />,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`education_${item.key}`}
-                  onFinish={onFinish}
-                  onValuesChange={() => setFormChange(true)}
-                  key={item.key}
-                >
-                  <Form.Item name={[`education_${index}`, "id"]} hidden>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`education_${index}`, "degree"]}
-                    label="Degree"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Degree required",
-                      },
-                    ]}
+    <Spin
+      tip={DELETING_SPIN}
+      size={SPIN_SIZE}
+      spinning={isDeleting}
+      className={styles.spin}
+    >
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Education</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                icon: <DragOutlined />,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`education_${item.key}`}
+                    onFinish={onFinish}
+                    onValuesChange={() => setFormChange(true)}
+                    key={item.key}
                   >
-                    <Input placeholder="Eg. MCS, BTech in CS" />
-                  </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`education_${index}`, "university_name"]}
-                        label="University/College Name"
-                      >
-                        <Input placeholder="Eg. Savitribai Phule Pune University" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`education_${index}`, "place"]}
-                        label="Place"
-                      >
-                        <Input placeholder="Eg. Pune" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`education_${index}`, "percent_or_cgpa"]}
-                        label="CGPA/Percentage (%)"
-                      >
-                        <Input placeholder="9.2 or 92%" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`education_${index}`, "passing_year"]}
-                        label="Passout Year"
-                      >
-                        <Input placeholder="2024" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleEducations("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Educations
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleEducations("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Education {Number(item.key) + 1}
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateOrder}
-                        disabled={!dragged}
-                      >
-                        Update Order
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+                    <Form.Item name={[`education_${index}`, "id"]} hidden>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`education_${index}`, "degree"]}
+                      label="Degree"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Degree required",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Eg. MCS, BTech in CS" />
+                    </Form.Item>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`education_${index}`, "university_name"]}
+                          label="University/College Name"
+                        >
+                          <Input placeholder="Eg. Savitribai Phule Pune University" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`education_${index}`, "place"]}
+                          label="Place"
+                        >
+                          <Input placeholder="Eg. Pune" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`education_${index}`, "percent_or_cgpa"]}
+                          label="CGPA/Percentage (%)"
+                        >
+                          <Input placeholder="9.2 or 92%" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`education_${index}`, "passing_year"]}
+                          label="Passout Year"
+                        >
+                          <Input placeholder="2024" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item>
+                      <Space>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleEducations("create")}
+                          disabled={item.isExisting}
+                          loading={isCreating}
+                        >
+                          Create Educations
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleEducations("update")}
+                          disabled={items.length === 0 || !item.isExisting}
+                          loading={isUpdating}
+                        >
+                          Update Education {Number(item.key) + 1}
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleUpdateOrder}
+                          disabled={!dragged}
+                          loading={isSequenceUpdating}
+                        >
+                          Update Order
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
+      </div>
+    </Spin>
   );
 };
 

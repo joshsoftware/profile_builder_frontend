@@ -28,3 +28,9 @@
 .hide-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+.spin {
+  display: "flex";
+  justify-content: center;
+  align-items: "center";
+}

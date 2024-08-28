@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Space, Tabs } from "antd";
+import { Button, Col, Form, Input, Row, Space, Spin, Tabs } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
@@ -20,20 +20,30 @@ import {
 } from "../../../api/certificationApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
+import {
+  DELETING_SPIN,
+  INVALID_ID_ERROR,
+  SPIN_SIZE,
+  SUCCESS_TOASTER,
+} from "../../../Constants";
 import {
   filterSection,
   formatCertificationFields,
   showConfirm,
   validateId,
 } from "../../../helpers";
+import styles from "../Builder.module.css";
 
 const Certification = ({ certificationData }) => {
   const [action, setAction] = useState("create");
-  const [createCertificateService] = useCreateCertificateMutation();
-  const [updateCertificateService] = useUpdateCertificateMutation();
-  const [deleteCertificateService] = useDeleteCertificateMutation();
-  const [updateSequence] = useUpdateSequenceMutation();
+  const [createCertificateService, { isLoading: isCreating }] =
+    useCreateCertificateMutation();
+  const [updateCertificateService, { isLoading: isUpdating }] =
+    useUpdateCertificateMutation();
+  const [deleteCertificateService, { isLoading: isDeleting }] =
+    useDeleteCertificateMutation();
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
+    useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
@@ -71,9 +81,9 @@ const Certification = ({ certificationData }) => {
             acc[`certificate_${index}`] = {
               ...certificate,
               id: certificate?.id,
-              issued_date: certificate.issued_date
-                ? dayjs(certificate.issued_date)
-                : null,
+              // issued_date: certificate.issued_date
+              //   ? dayjs(certificate.issued_date)
+              //   : null,
               from_date: certificate.from_date
                 ? dayjs(certificate.from_date)
                 : null,
@@ -268,184 +278,204 @@ const Certification = ({ certificationData }) => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Certification</Button>
-      </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              icon: <DragOutlined />,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`certification_${item.key}`}
-                  onFinish={onFinish}
-                  onValuesChange={() => setFormChange(true)}
-                  key={item.key}
-                >
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item name={[`certificate_${index}`, "id"]} hidden>
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                        name={[`certificate_${index}`, "name"]}
-                        label="Certificate Name"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Name is required",
-                          },
-                        ]}
-                      >
-                        <Input placeholder="Enter Certificate Name" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`certificate_${index}`, "organization_name"]}
-                        label="Organization Name"
-                      >
-                        <Input placeholder="Enter Organization Name" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Form.Item
-                    name={[`certificate_${index}`, "description"]}
-                    label="Description"
+    <Spin
+      tip={DELETING_SPIN}
+      size={SPIN_SIZE}
+      spinning={isDeleting}
+      className={styles.spin}
+    >
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Certification</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                icon: <DragOutlined />,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`certification_${item.key}`}
+                    onFinish={onFinish}
+                    onValuesChange={() => setFormChange(true)}
+                    key={item.key}
                   >
-                    <Input.TextArea
-                      placeholder="Provide a basic overview of the certificate"
-                      showCount
-                      minLength={50}
-                    />
-                  </Form.Item>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`certificate_${index}`, "issued_date"]}
-                        label="Issued Date"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Issued date required",
-                          },
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "Issued date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`certificate_${index}`, "from_date"]}
-                        label="Start Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "Start date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`certificate_${index}`, "to_date"]}
-                        label="End Date"
-                        rules={[
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "End date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleCertificates("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Certificates
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleCertificates("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Certificate {Number(item.key) + 1}
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateOrder}
-                        disabled={!dragged}
-                      >
-                        Update Order
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item name={[`certificate_${index}`, "id"]} hidden>
+                          <Input />
+                        </Form.Item>
+                        <Form.Item
+                          name={[`certificate_${index}`, "name"]}
+                          label="Certificate Name"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Name is required",
+                            },
+                          ]}
+                        >
+                          <Input placeholder="Enter Certificate Name" />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`certificate_${index}`, "organization_name"]}
+                          label="Organization Name"
+                        >
+                          <Input placeholder="Enter Organization Name" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Form.Item
+                      name={[`certificate_${index}`, "description"]}
+                      label="Description"
+                    >
+                      <Input.TextArea
+                        placeholder="Provide a basic overview of the certificate"
+                        showCount
+                        minLength={50}
+                      />
+                    </Form.Item>
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`certificate_${index}`, "issued_date"]}
+                          label="Issued On"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Issued on required",
+                            },
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "Issued on cannot be in the future",
+                                      ),
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          {/* <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          /> */}
+                          <Input />
+                        </Form.Item>
+                      </Col>
+                      {/* <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`certificate_${index}`, "from_date"]}
+                          label="Start Date"
+                          rules={[
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "Start date cannot be in the future",
+                                      ),
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      </Col> */}
+                    </Row>
+                    {/* <Row>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`certificate_${index}`, "to_date"]}
+                          label="End Date"
+                          rules={[
+                            {
+                              validator: (_, value) =>
+                                value && value > dayjs()
+                                  ? Promise.reject(
+                                      new Error(
+                                        "End date cannot be in the future",
+                                      ),
+                                    )
+                                  : Promise.resolve(),
+                            },
+                          ]}
+                        >
+                          <DatePicker
+                            style={{ width: "100%" }}
+                            picker="month"
+                          />
+                        </Form.Item>
+                      </Col>
+                    </Row> */}
+                    <Form.Item>
+                      <Space>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleCertificates("create")}
+                          disabled={item.isExisting}
+                          loading={isCreating}
+                        >
+                          Create Certificates
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleCertificates("update")}
+                          disabled={items.length === 0 || !item.isExisting}
+                          loading={isUpdating}
+                        >
+                          Update Certificate {Number(item.key) + 1}
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleUpdateOrder}
+                          disabled={!dragged}
+                          loading={isSequenceUpdating}
+                        >
+                          Update Order
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
+      </div>
+    </Spin>
   );
 };
 

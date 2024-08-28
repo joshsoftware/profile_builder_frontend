@@ -12,6 +12,7 @@ import {
   Row,
   Select,
   Space,
+  Spin,
   Tabs,
 } from "antd";
 import { DragOutlined } from "@ant-design/icons";
@@ -32,9 +33,11 @@ import {
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import {
+  DELETING_SPIN,
   DESIGNATION,
   INVALID_ID_ERROR,
   PRESENT_VALUE,
+  SPIN_SIZE,
   SUCCESS_TOASTER,
 } from "../../../Constants";
 import {
@@ -43,17 +46,22 @@ import {
   showConfirm,
   validateId,
 } from "../../../helpers";
+import styles from "../Builder.module.css";
 
 const Experience = ({ experienceData }) => {
   const [action, setAction] = useState("create");
-  const [createExperienceService] = useCreateExperienceMutation();
-  const [updateExperienceService] = useUpdateExperienceMutation();
-  const [deleteExperienceService] = useDeleteExperienceMutation();
-  const [updateSequence] = useUpdateSequenceMutation();
+  const [createExperienceService, { isLoading: isCreating }] =
+    useCreateExperienceMutation();
+  const [updateExperienceService, { isLoading: isUpdating }] =
+    useUpdateExperienceMutation();
+  const [deleteExperienceService, { isLoading: isDeleting }] =
+    useDeleteExperienceMutation();
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
+    useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [isCurrentCompany, setIsCurrentCompany] = useState(true);
+  const [isCurrentCompany, setIsCurrentCompany] = useState({});
   const [items, setItems] = useState([
     {
       label: "Experience 1",
@@ -85,8 +93,10 @@ const Experience = ({ experienceData }) => {
         setItems(tabs);
         newTabIndex.current = experienceData.length;
         form.setFieldsValue(
-          experienceData.reduce((acc, experience, index) => {
-            acc[`experience_${index}`] = {
+          experienceData.reduce((acc, experience, key) => {
+            const isCurrent = experience.to_date === PRESENT_VALUE;
+
+            acc[`experience_${key}`] = {
               ...experience,
               id: experience?.id,
               from_date: experience.from_date
@@ -97,6 +107,10 @@ const Experience = ({ experienceData }) => {
                   ? dayjs(experience.to_date)
                   : "",
             };
+            setIsCurrentCompany((prevState) => ({
+              ...prevState,
+              [key]: isCurrent,
+            }));
             return acc;
           }, {}),
         );
@@ -135,7 +149,7 @@ const Experience = ({ experienceData }) => {
               values: {
                 ...experience,
                 from_date: experience.from_date.format("MMM-YYYY"),
-                to_date: isCurrentCompany
+                to_date: isCurrentCompany[activeKey]
                   ? PRESENT_VALUE
                   : experience.to_date.format("MMM-YYYY"),
               },
@@ -237,8 +251,11 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const handleIsCurrentCompany = () => {
-    setIsCurrentCompany(!isCurrentCompany);
+  const handleIsCurrentCompany = (key) => {
+    setIsCurrentCompany((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
   };
 
   const onDragEnd = ({ active, over }) => {
@@ -296,126 +313,106 @@ const Experience = ({ experienceData }) => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Experience</Button>
-      </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              icon: <DragOutlined />,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`experience_${item.key}`}
-                  onFinish={onFinish}
-                  onValuesChange={() => setFormChange(true)}
-                  key={item.key}
-                >
-                  <Row>
-                    <Col span={11}>
-                      <Form.Item name={[`experience_${index}`, "id"]} hidden>
-                        <Input />
-                      </Form.Item>
-                      <Form.Item
-                        name={[`experience_${index}`, "designation"]}
-                        label="Designation"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Designation is required",
-                          },
-                        ]}
-                      >
-                        <Select
-                          placeholder="Select designation"
-                          options={DESIGNATION}
-                          allowClear
-                        />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      <Form.Item
-                        name={[`experience_${index}`, "company_name"]}
-                        label="Company Name"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Company Name required",
-                          },
-                        ]}
-                      >
-                        <Input placeholder="Enter Company Name eg. Amazon" />
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row style={{ margin: "10px 0px 10px 0px" }}>
-                    <Col>
-                      <Form.Item
-                        name={[`experience_${index}`, "isCurrentCompany"]}
-                      >
-                        <Checkbox
-                          onChange={handleIsCurrentCompany}
-                          checked={isCurrentCompany}
-                        >
-                          Is This A Current Company?
-                        </Checkbox>
-                      </Form.Item>
-                    </Col>
-                  </Row>
-                  <Row style={{ margin: "10px 0px 10px 0px" }}>
-                    <Col span={11}>
-                      <Form.Item
-                        name={[`experience_${index}`, "from_date"]}
-                        label="Employment Start Date"
-                        rules={[
-                          {
-                            required: true,
-                            message: "Start date is required",
-                          },
-                          {
-                            validator: (_, value) =>
-                              value && value > dayjs()
-                                ? Promise.reject(
-                                    new Error(
-                                      "Start date cannot be in the future",
-                                    ),
-                                  )
-                                : Promise.resolve(),
-                          },
-                        ]}
-                      >
-                        <DatePicker style={{ width: "100%" }} picker="month" />
-                      </Form.Item>
-                    </Col>
-                    <Col span={11} offset={2}>
-                      {!isCurrentCompany && (
+    <Spin
+      tip={DELETING_SPIN}
+      size={SPIN_SIZE}
+      spinning={isDeleting}
+      className={styles.spin}
+    >
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Experience</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                icon: <DragOutlined />,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`experience_${item.key}`}
+                    onFinish={onFinish}
+                    onValuesChange={() => setFormChange(true)}
+                    key={item.key}
+                  >
+                    <Row>
+                      <Col span={11}>
+                        <Form.Item name={[`experience_${index}`, "id"]} hidden>
+                          <Input />
+                        </Form.Item>
                         <Form.Item
-                          name={[`experience_${index}`, "to_date"]}
-                          label="Employment End Date"
+                          name={[`experience_${index}`, "designation"]}
+                          label="Designation"
                           rules={[
                             {
-                              type: "object",
                               required: true,
-                              message: "End date is required",
+                              message: "Designation is required",
+                            },
+                          ]}
+                        >
+                          <Select
+                            placeholder="Select designation"
+                            options={DESIGNATION}
+                            allowClear
+                          />
+                        </Form.Item>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        <Form.Item
+                          name={[`experience_${index}`, "company_name"]}
+                          label="Company Name"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Company Name required",
+                            },
+                          ]}
+                        >
+                          <Input placeholder="Enter Company Name eg. Amazon" />
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row style={{ margin: "10px 0px 10px 0px" }}>
+                      <Col>
+                        <Form.Item
+                          name={[`experience_${index}`, "isCurrentCompany"]}
+                        >
+                          <Checkbox
+                            onChange={() => handleIsCurrentCompany(item.key)}
+                            checked={isCurrentCompany[item.key]}
+                          >
+                            Is This A Current Company?
+                          </Checkbox>
+                        </Form.Item>
+                      </Col>
+                    </Row>
+                    <Row style={{ margin: "10px 0px 10px 0px" }}>
+                      <Col span={11}>
+                        <Form.Item
+                          name={[`experience_${index}`, "from_date"]}
+                          label="Employment Start Date"
+                          rules={[
+                            {
+                              required: true,
+                              message: "Start date is required",
                             },
                             {
                               validator: (_, value) =>
                                 value && value > dayjs()
                                   ? Promise.reject(
                                       new Error(
-                                        "End date cannot be in the future",
+                                        "Start date cannot be in the future",
                                       ),
                                     )
                                   : Promise.resolve(),
@@ -427,55 +424,88 @@ const Experience = ({ experienceData }) => {
                             picker="month"
                           />
                         </Form.Item>
-                      )}
-                    </Col>
-                  </Row>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleExperiences("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Experiences
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleExperiences("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Experience {Number(item.key) + 1}
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateOrder}
-                        disabled={!dragged}
-                      >
-                        Update Order
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+                      </Col>
+                      <Col span={11} offset={2}>
+                        {!isCurrentCompany[item.key] && (
+                          <Form.Item
+                            name={[`experience_${index}`, "to_date"]}
+                            label="Employment End Date"
+                            rules={[
+                              {
+                                type: "object",
+                                required: true,
+                                message: "End date is required",
+                              },
+                              {
+                                validator: (_, value) =>
+                                  value && value > dayjs()
+                                    ? Promise.reject(
+                                        new Error(
+                                          "End date cannot be in the future",
+                                        ),
+                                      )
+                                    : Promise.resolve(),
+                              },
+                            ]}
+                          >
+                            <DatePicker
+                              style={{ width: "100%" }}
+                              picker="month"
+                            />
+                          </Form.Item>
+                        )}
+                      </Col>
+                    </Row>
+                    <Form.Item>
+                      <Space>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleExperiences("create")}
+                          disabled={item.isExisting}
+                          loading={isCreating}
+                        >
+                          Create Experiences
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleExperiences("update")}
+                          disabled={items.length === 0 || !item.isExisting}
+                          loading={isUpdating}
+                        >
+                          Update Experience {Number(item.key) + 1}
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleUpdateOrder}
+                          disabled={!dragged}
+                          loading={isSequenceUpdating}
+                        >
+                          Update Order
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
+      </div>
+    </Spin>
   );
 };
 

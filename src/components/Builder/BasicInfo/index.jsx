@@ -18,8 +18,10 @@ import {
 } from "../../../Constants";
 
 const BasicInfo = ({ profileData }) => {
-  const [createProfileService] = useCreateProfileMutation();
-  const [updateProfileService] = useUpdateProfileMutation();
+  const [createProfileService, { isLoading: isCreating }] =
+    useCreateProfileMutation();
+  const [updateProfileService, { isLoading: isUpdating }] =
+    useUpdateProfileMutation();
   const [formChange, setFormChange] = useState(false);
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -253,10 +255,20 @@ const BasicInfo = ({ profileData }) => {
       </Row>
       <Form.Item>
         <Space>
-          <Button type="primary" htmlType="submit" disabled={!!profileData}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isCreating}
+            disabled={!!profileData}
+          >
             Create
           </Button>
-          <Button type="primary" htmlType="submit" disabled={!profileData}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            loading={isUpdating}
+            disabled={!profileData}
+          >
             Update
           </Button>
         </Space>

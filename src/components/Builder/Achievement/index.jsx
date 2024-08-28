@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
-import { Button, Form, Input, Space, Tabs } from "antd";
+import { Button, Form, Input, Space, Spin, Tabs } from "antd";
 import { DragOutlined } from "@ant-design/icons";
 import { DndContext, PointerSensor, useSensor } from "@dnd-kit/core";
 import {
@@ -19,20 +19,30 @@ import {
 } from "../../../api/achievementApi";
 import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
-import { INVALID_ID_ERROR, SUCCESS_TOASTER } from "../../../Constants";
+import {
+  DELETING_SPIN,
+  INVALID_ID_ERROR,
+  SPIN_SIZE,
+  SUCCESS_TOASTER,
+} from "../../../Constants";
 import {
   filterSection,
   formatAchievementFields,
   showConfirm,
   validateId,
 } from "../../../helpers";
+import styles from "../Builder.module.css";
 
 const Achievement = ({ achievementData }) => {
   const { profile_id } = useParams();
-  const [createAchievementService] = useCreateAchievementMutation();
-  const [updateAchievementService] = useUpdateAchievementMutation();
-  const [deleteAchievementService] = useDeleteAchievementMutation();
-  const [updateSequence] = useUpdateSequenceMutation();
+  const [createAchievementService, { isLoading: isCreating }] =
+    useCreateAchievementMutation();
+  const [updateAchievementService, { isLoading: isUpdating }] =
+    useUpdateAchievementMutation();
+  const [deleteAchievementService, { isLoading: isDeleting }] =
+    useDeleteAchievementMutation();
+  const [updateSequence, { isLoading: isSequenceUpdating }] =
+    useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
   const [activeKey, setActiveKey] = useState("0");
@@ -93,7 +103,7 @@ const Achievement = ({ achievementData }) => {
         values: values,
       });
       if (response.data?.message) {
-        toast.success(response.data?.error_message, SUCCESS_TOASTER);
+        toast.success(response.data?.message, SUCCESS_TOASTER);
         window.location.reload(); // needs tobe remove after implement download popover
       }
     } catch (error) {
@@ -267,104 +277,114 @@ const Achievement = ({ achievementData }) => {
   };
 
   return (
-    <div>
-      <div style={{ marginBottom: 16 }}>
-        <Button onClick={add}>Add Achievement</Button>
+    <Spin
+      tip={DELETING_SPIN}
+      size={SPIN_SIZE}
+      spinning={isDeleting}
+      className={styles.spin}
+    >
+      <div>
+        <div style={{ marginBottom: 16 }}>
+          <Button onClick={add}>Add Achievement</Button>
+        </div>
+        <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
+          <SortableContext
+            items={items.map((i) => i.key)}
+            strategy={horizontalListSortingStrategy}
+          >
+            <Tabs
+              hideAdd
+              onChange={onChange}
+              activeKey={activeKey}
+              type="editable-card"
+              onEdit={onEdit}
+              items={items.map((item, index) => ({
+                ...item,
+                icon: <DragOutlined />,
+                children: (
+                  <Form
+                    layout="vertical"
+                    form={form}
+                    name={`achievement_${item.key}`}
+                    onFinish={onFinish}
+                    onValuesChange={() => setFormChange(true)}
+                    key={item.key}
+                  >
+                    <Form.Item name={[`achievement_${index}`, "id"]} hidden>
+                      <Input />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`achievement_${index}`, "name"]}
+                      label="Achievement Name"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Name is required",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Achievement name e.g. Star Performer" />
+                    </Form.Item>
+                    <Form.Item
+                      name={[`achievement_${index}`, "description"]}
+                      label="Description"
+                    >
+                      <Input.TextArea
+                        placeholder="Please provide a basic overview of the above achievement"
+                        showCount
+                        minLength={50}
+                      />
+                    </Form.Item>
+                    <Form.Item>
+                      <Space>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleAchievements("create")}
+                          disabled={item.isExisting}
+                          loading={isCreating}
+                        >
+                          Create Achievements
+                        </Button>
+                        <Button
+                          type="primary"
+                          htmlType="button"
+                          onClick={() => handleAchievements("update")}
+                          disabled={items.length === 0 || !item.isExisting}
+                          loading={isUpdating}
+                        >
+                          Update Achievement {Number(item.key) + 1}
+                        </Button>
+                        <Button htmlType="button" onClick={onReset}>
+                          Reset
+                        </Button>
+                        <Button
+                          type="primary"
+                          onClick={handleUpdateOrder}
+                          disabled={!dragged}
+                          loading={isSequenceUpdating}
+                        >
+                          Update Order
+                        </Button>
+                      </Space>
+                    </Form.Item>
+                  </Form>
+                ),
+              }))}
+              renderTabBar={(tabBarProps, DefaultTabBar) => (
+                <DefaultTabBar {...tabBarProps}>
+                  {(node) => (
+                    <DraggableTabNode {...node.props} key={node.key}>
+                      {node}
+                    </DraggableTabNode>
+                  )}
+                </DefaultTabBar>
+              )}
+            />
+          </SortableContext>
+        </DndContext>
       </div>
-      <DndContext sensors={[sensor]} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={items.map((i) => i.key)}
-          strategy={horizontalListSortingStrategy}
-        >
-          <Tabs
-            hideAdd
-            onChange={onChange}
-            activeKey={activeKey}
-            type="editable-card"
-            onEdit={onEdit}
-            items={items.map((item, index) => ({
-              ...item,
-              icon: <DragOutlined />,
-              children: (
-                <Form
-                  layout="vertical"
-                  form={form}
-                  name={`achievement_${item.key}`}
-                  onFinish={onFinish}
-                  onValuesChange={() => setFormChange(true)}
-                  key={item.key}
-                >
-                  <Form.Item name={[`achievement_${index}`, "id"]} hidden>
-                    <Input />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`achievement_${index}`, "name"]}
-                    label="Achievement Name"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Name is required",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Achievement name e.g. Star Performer" />
-                  </Form.Item>
-                  <Form.Item
-                    name={[`achievement_${index}`, "description"]}
-                    label="Description"
-                  >
-                    <Input.TextArea
-                      placeholder="Please provide a basic overview of the above achievement"
-                      showCount
-                      minLength={50}
-                    />
-                  </Form.Item>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleAchievements("create")}
-                        disabled={item.isExisting}
-                      >
-                        Create Achievements
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={() => handleAchievements("update")}
-                        disabled={items.length === 0 || !item.isExisting}
-                      >
-                        Update Achievement {Number(item.key) + 1}
-                      </Button>
-                      <Button htmlType="button" onClick={onReset}>
-                        Reset
-                      </Button>
-                      <Button
-                        type="primary"
-                        onClick={handleUpdateOrder}
-                        disabled={!dragged}
-                      >
-                        Update Order
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Form>
-              ),
-            }))}
-            renderTabBar={(tabBarProps, DefaultTabBar) => (
-              <DefaultTabBar {...tabBarProps}>
-                {(node) => (
-                  <DraggableTabNode {...node.props} key={node.key}>
-                    {node}
-                  </DraggableTabNode>
-                )}
-              </DefaultTabBar>
-            )}
-          />
-        </SortableContext>
-      </DndContext>
-    </div>
+    </Spin>
   );
 };
 
