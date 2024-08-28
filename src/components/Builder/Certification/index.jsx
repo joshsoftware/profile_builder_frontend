@@ -352,18 +352,18 @@ const Certification = ({ certificationData }) => {
                       <Col span={11}>
                         <Form.Item
                           name={[`certificate_${index}`, "issued_date"]}
-                          label="Issued Date"
+                          label="Issued On"
                           rules={[
                             {
                               required: true,
-                              message: "Issued date required",
+                              message: "Issued on required",
                             },
                             {
                               validator: (_, value) =>
                                 value && value > dayjs()
                                   ? Promise.reject(
                                       new Error(
-                                        "Issued date cannot be in the future",
+                                        "Issued on cannot be in the future",
                                       ),
                                     )
                                   : Promise.resolve(),
