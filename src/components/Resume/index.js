@@ -69,7 +69,7 @@ const Resume = forwardRef(({ data }, ref) => {
       givenYear === currDate.getFullYear() &&
       givenMonth === currDate.getMonth()
     ) {
-      return PRESENT_VALUE;
+      return "Present";
     }
     return `${getMonthString(givenMonth)} ${givenYear}`;
   };
@@ -324,16 +324,6 @@ const Resume = forwardRef(({ data }, ref) => {
                     >
                       {item.name}
                     </p>
-                    {/* {item?.from_date && item?.to_date && (
-                      <>
-                        {"| "}
-                        <CalendarOutlined />
-                        {getMonthYear(item.from_date)} -{" "}
-                        {getMonthYear(item.to_date) === PRESENT_VALUE
-                          ? " Present"
-                          : getMonthYear(item.to_date)}
-                      </>
-                    )} */}
                   </div>
                 </>
               )}
@@ -345,7 +335,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  <b>Issued Date: </b> {item.issued_date}
+                  <b>Issued On: </b> {item.issued_date}
                 </div>
               )}
               {item?.description && <div>{item.description}</div>}

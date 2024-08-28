@@ -61,7 +61,7 @@ const Experience = ({ experienceData }) => {
   const dispatch = useDispatch();
   const [form] = Form.useForm();
   const [activeKey, setActiveKey] = useState("0");
-  const [isCurrentCompany, setIsCurrentCompany] = useState(true);
+  const [isCurrentCompany, setIsCurrentCompany] = useState({});
   const [items, setItems] = useState([
     {
       label: "Experience 1",
@@ -93,8 +93,10 @@ const Experience = ({ experienceData }) => {
         setItems(tabs);
         newTabIndex.current = experienceData.length;
         form.setFieldsValue(
-          experienceData.reduce((acc, experience, index) => {
-            acc[`experience_${index}`] = {
+          experienceData.reduce((acc, experience, key) => {
+            const isCurrent = experience.to_date === PRESENT_VALUE;
+
+            acc[`experience_${key}`] = {
               ...experience,
               id: experience?.id,
               from_date: experience.from_date
@@ -105,6 +107,10 @@ const Experience = ({ experienceData }) => {
                   ? dayjs(experience.to_date)
                   : "",
             };
+            setIsCurrentCompany((prevState) => ({
+              ...prevState,
+              [key]: isCurrent,
+            }));
             return acc;
           }, {}),
         );
@@ -143,7 +149,7 @@ const Experience = ({ experienceData }) => {
               values: {
                 ...experience,
                 from_date: experience.from_date.format("MMM-YYYY"),
-                to_date: isCurrentCompany
+                to_date: isCurrentCompany[activeKey]
                   ? PRESENT_VALUE
                   : experience.to_date.format("MMM-YYYY"),
               },
@@ -245,8 +251,11 @@ const Experience = ({ experienceData }) => {
     }
   };
 
-  const handleIsCurrentCompany = () => {
-    setIsCurrentCompany(!isCurrentCompany);
+  const handleIsCurrentCompany = (key) => {
+    setIsCurrentCompany((prevState) => ({
+      ...prevState,
+      [key]: !prevState[key],
+    }));
   };
 
   const onDragEnd = ({ active, over }) => {
@@ -380,8 +389,8 @@ const Experience = ({ experienceData }) => {
                           name={[`experience_${index}`, "isCurrentCompany"]}
                         >
                           <Checkbox
-                            onChange={handleIsCurrentCompany}
-                            checked={isCurrentCompany}
+                            onChange={() => handleIsCurrentCompany(item.key)}
+                            checked={isCurrentCompany[item.key]}
                           >
                             Is This A Current Company?
                           </Checkbox>
@@ -417,7 +426,7 @@ const Experience = ({ experienceData }) => {
                         </Form.Item>
                       </Col>
                       <Col span={11} offset={2}>
-                        {!isCurrentCompany && (
+                        {!isCurrentCompany[item.key] && (
                           <Form.Item
                             name={[`experience_${index}`, "to_date"]}
                             label="Employment End Date"
