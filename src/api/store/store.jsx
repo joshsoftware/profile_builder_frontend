@@ -1,4 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
+import { GetLocalStorage } from "../../helpers";
 import { achievementApi } from "../achievementApi";
 import { certificationApi } from "../certificationApi";
 import { educationApi } from "../educationApi";
@@ -9,15 +10,22 @@ import { profileApi } from "../profileApi";
 import { projectApi } from "../projectApi";
 import authReducer from "./authSlice";
 
-const token = window.localStorage.getItem("token");
-const role = window.localStorage.getItem("role");
-const profile_id = window.localStorage.getItem("profile_id");
+const {
+  profile_id = null,
+  name = null,
+  email = null,
+  role = null,
+  token = null,
+} = GetLocalStorage() || {};
 
+// Initialize preloadedState
 const preloadedState = {
   auth: {
-    token: token ? token : null,
-    role: role ? role : null,
-    profile_id: profile_id ? profile_id : null,
+    profile_id,
+    name,
+    email,
+    role,
+    token,
   },
 };
 

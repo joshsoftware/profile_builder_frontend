@@ -14,6 +14,7 @@ import {
   PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
 } from "../../Constants";
+import { SetLocalStorage } from "../../helpers";
 import styles from "./Login.module.css";
 
 const Login = () => {
@@ -28,15 +29,15 @@ const Login = () => {
         const token = response?.data?.token;
         const role = response?.data?.role;
         const profile_id = response?.data?.profile_id;
+        const name = response?.data?.name;
+        const email = response?.data?.email;
         if (response?.data) {
           toast.success(response?.data?.message);
         }
 
         if (token && role) {
-          dispatch(loginAction({ token, role, profile_id }));
-          window.localStorage.setItem("token", token);
-          window.localStorage.setItem("role", role);
-          window.localStorage.setItem("profile_id", profile_id);
+          dispatch(loginAction({ token, role, profile_id, name, email }));
+          SetLocalStorage(profile_id, name, email, role, token);
 
           if (role.toLowerCase() === "admin") {
             navigate(PROFILE_LIST_ROUTE);
