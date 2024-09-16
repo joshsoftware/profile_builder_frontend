@@ -22,6 +22,7 @@ import joshImage from "../../assets/josh-black-logo.png";
 import {
   getMonthString,
   PRESENT_VALUE,
+  PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
   SUCCESS_TOASTER,
 } from "../../Constants";
@@ -31,6 +32,7 @@ import styles from "./Resume.module.css";
 const Resume = forwardRef(({ data }, ref) => {
   const [logoutService] = useLogoutMutation();
   const role = useSelector((state) => state.auth.role);
+  const email = useSelector((state) => state.auth.email);
   const [completeProfileService] = useCompleteProfileMutation();
   const [contactDetails, setContactDetails] = useState(true);
   const navigate = useNavigate();
@@ -360,6 +362,11 @@ const Resume = forwardRef(({ data }, ref) => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
   };
 
+  const showProfileButton =
+    role.toLowerCase() === "admin" &&
+    email === profile?.email &&
+    profile?.is_invited === "YES";
+
   const handleCompleteProfile = () => {
     showConfirm({
       onOk: async () => {
@@ -368,13 +375,17 @@ const Resume = forwardRef(({ data }, ref) => {
             const response = await completeProfileService({
               profile_id: profile?.id,
             });
-            await logoutService();
-            dispatch(logout());
-            window.localStorage.clear();
 
             if (response?.data) {
               toast.success(response?.data?.message, SUCCESS_TOASTER);
-              navigate(ROOT_ROUTE);
+              if (role.toLowerCase() === "admin") {
+                navigate(PROFILE_LIST_ROUTE);
+              } else {
+                await logoutService();
+                dispatch(logout());
+                window.localStorage.clear();
+                navigate(ROOT_ROUTE);
+              }
             }
           }
         } catch (error) {
@@ -383,7 +394,9 @@ const Resume = forwardRef(({ data }, ref) => {
       },
       onCancel() {},
       message:
-        "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
+        role.toLowerCase() === "admin"
+          ? "Are you sure you want to finalize the profile?"
+          : "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
     });
   };
 
@@ -395,6 +408,16 @@ const Resume = forwardRef(({ data }, ref) => {
       >
         {role.toLowerCase() === "admin" ? (
           <>
+            {showProfileButton && (
+              <Button
+                type="primary"
+                icon={<CheckOutlined />}
+                style={{ background: "#e34435", color: "white" }}
+                onClick={handleCompleteProfile}
+              >
+                Complete Profile
+              </Button>
+            )}
             <Button
               icon={<DownloadOutlined />}
               style={{ background: "#e34435", color: "white" }}
