@@ -136,3 +136,18 @@ export const calculateTotalExperience = (pastExp, joinDate) => {
 export const formatDate = (date) => {
   return dayjs(date).format("MMM D, YYYY");
 };
+
+export const SetLocalStorage = (profile_id, name, email, role, token) => {
+  const userData = {
+    profile_id: profile_id,
+    name: name,
+    email: email,
+    role: role,
+    token: token,
+  };
+  window.localStorage.setItem("userData", JSON.stringify(userData));
+};
+
+export const GetLocalStorage = () => {
+  return JSON.parse(window.localStorage.getItem("userData"));
+};
