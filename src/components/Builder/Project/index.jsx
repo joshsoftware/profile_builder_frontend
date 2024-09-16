@@ -354,7 +354,11 @@ const Project = ({ projectData }) => {
                           name={[`project_${index}`, "duration"]}
                           label="Project Duration (in years)"
                         >
-                          <Input type="number" placeholder="Eg. 1, 2.5" />
+                          <Input
+                            type="number"
+                            placeholder="Eg. 1, 2.5"
+                            min={0}
+                          />
                         </Form.Item>
                       </Col>
                     </Row>
