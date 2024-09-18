@@ -362,7 +362,7 @@ const Resume = forwardRef(({ data }, ref) => {
     return `@page { margin: ${"1rem"} ${"0"} ${"1rem"} ${"0"} !important }`;
   };
 
-  const showProfileButton =
+  const showCompleteProfileButton =
     role.toLowerCase() === "admin" &&
     email === profile?.email &&
     profile?.is_invited === "YES";
@@ -408,7 +408,7 @@ const Resume = forwardRef(({ data }, ref) => {
       >
         {role.toLowerCase() === "admin" ? (
           <>
-            {showProfileButton && (
+            {showCompleteProfileButton && (
               <Button
                 type="primary"
                 icon={<CheckOutlined />}
