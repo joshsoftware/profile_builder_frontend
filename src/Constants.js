@@ -109,6 +109,8 @@ export const CERTIFICATION_LABEL = "Certification";
 export const DELETING_SPIN = "Deleting...";
 export const LOADING_SPIN = "Loading...";
 export const SPIN_SIZE = "large";
+export const ADMIN = "admin";
+export const EMPLOYEE = "employee";
 
 export const GENDER = [
   { label: "MALE", value: "Male" },

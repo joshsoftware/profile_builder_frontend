@@ -20,6 +20,7 @@ import { useCompleteProfileMutation } from "../../api/profileApi";
 import { logout } from "../../api/store/authSlice";
 import joshImage from "../../assets/josh-black-logo.png";
 import {
+  ADMIN,
   getMonthString,
   PRESENT_VALUE,
   PROFILE_LIST_ROUTE,
@@ -363,7 +364,7 @@ const Resume = forwardRef(({ data }, ref) => {
   };
 
   const showCompleteProfileButton =
-    role.toLowerCase() === "admin" &&
+    role.toLowerCase() === ADMIN &&
     email === profile?.email &&
     profile?.is_invited === "YES";
 
@@ -378,7 +379,7 @@ const Resume = forwardRef(({ data }, ref) => {
 
             if (response?.data) {
               toast.success(response?.data?.message, SUCCESS_TOASTER);
-              if (role.toLowerCase() === "admin") {
+              if (role.toLowerCase() === ADMIN) {
                 navigate(PROFILE_LIST_ROUTE);
               } else {
                 await logoutService();
@@ -394,7 +395,7 @@ const Resume = forwardRef(({ data }, ref) => {
       },
       onCancel() {},
       message:
-        role.toLowerCase() === "admin"
+        role.toLowerCase() === ADMIN
           ? "Are you sure you want to finalize the profile?"
           : "Are you sure you want to finalize the profile? once marked as completed, you won't be able to login or modify!",
     });
@@ -406,7 +407,7 @@ const Resume = forwardRef(({ data }, ref) => {
         className={styles.headerMenu}
         style={{ marginTop: "10px", marginLeft: "20px" }}
       >
-        {role.toLowerCase() === "admin" ? (
+        {role.toLowerCase() === ADMIN ? (
           <>
             {showCompleteProfileButton && (
               <Button

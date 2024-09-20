@@ -10,7 +10,9 @@ import resumeSvg from "../../assets/banner.svg";
 import googleIcon from "../../assets/Google Logo.webp";
 import logo from "../../assets/Josh-Logo-With-Tagline-Black-1.png";
 import {
+  ADMIN,
   EDITOR_PROFILE_ROUTE,
+  EMPLOYEE,
   PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
 } from "../../Constants";
@@ -39,9 +41,9 @@ const Login = () => {
           dispatch(loginAction({ token, role, profile_id, name, email }));
           setLocalStorage(profile_id, name, email, role, token);
 
-          if (role.toLowerCase() === "admin") {
+          if (role.toLowerCase() === ADMIN) {
             navigate(PROFILE_LIST_ROUTE);
-          } else if (role.toLowerCase() === "employee") {
+          } else if (role.toLowerCase() === EMPLOYEE) {
             navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
           } else {
             navigate(ROOT_ROUTE);

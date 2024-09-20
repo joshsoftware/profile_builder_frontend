@@ -32,6 +32,7 @@ import {
 import {
   EDITOR_PROFILE_ROUTE,
   EDITOR_ROUTE,
+  LOADING_SPIN,
   SPIN_SIZE,
 } from "../../../Constants";
 import {
@@ -379,7 +380,7 @@ const ListProfiles = () => {
       <Spin
         spinning={isLoading || profileStatusUpdating || deletingProfile}
         size={SPIN_SIZE}
-        tip={"Just a moment.."}
+        tip={LOADING_SPIN}
       >
         <Navbar />
         <Row className={styles.rowStyle}>

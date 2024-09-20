@@ -7,7 +7,7 @@ import { EditOutlined, LogoutOutlined, UserOutlined } from "@ant-design/icons";
 import { useLogoutMutation } from "../../api/loginApi";
 import { logout } from "../../api/store/authSlice";
 import joshLogo from "../../assets/Josh-new-logo.png";
-import { EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
+import { ADMIN, EDITOR_ROUTE, PROFILE_LIST_ROUTE } from "../../Constants";
 import { showConfirm } from "../../helpers";
 
 const Navbar = () => {
@@ -58,7 +58,7 @@ const Navbar = () => {
           alt="josh-logo"
           style={{ marginRight: "50px", paddingBottom: "10px" }}
         />
-        {role.toLowerCase() === "admin" && (
+        {role.toLowerCase() === ADMIN && (
           <>
             <Link to={PROFILE_LIST_ROUTE}>
               <Button
