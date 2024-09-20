@@ -137,7 +137,7 @@ export const formatDate = (date) => {
   return dayjs(date).format("MMM D, YYYY");
 };
 
-export const SetLocalStorage = (profile_id, name, email, role, token) => {
+export const setLocalStorage = (profile_id, name, email, role, token) => {
   const userData = {
     profile_id: profile_id,
     name: name,
@@ -148,6 +148,6 @@ export const SetLocalStorage = (profile_id, name, email, role, token) => {
   window.localStorage.setItem("userData", JSON.stringify(userData));
 };
 
-export const GetLocalStorage = () => {
+export const getLocalStorage = () => {
   return JSON.parse(window.localStorage.getItem("userData"));
 };

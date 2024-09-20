@@ -14,7 +14,7 @@ import {
   PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
 } from "../../Constants";
-import { SetLocalStorage } from "../../helpers";
+import { setLocalStorage } from "../../helpers";
 import styles from "./Login.module.css";
 
 const Login = () => {
@@ -37,7 +37,7 @@ const Login = () => {
 
         if (token && role) {
           dispatch(loginAction({ token, role, profile_id, name, email }));
-          SetLocalStorage(profile_id, name, email, role, token);
+          setLocalStorage(profile_id, name, email, role, token);
 
           if (role.toLowerCase() === "admin") {
             navigate(PROFILE_LIST_ROUTE);

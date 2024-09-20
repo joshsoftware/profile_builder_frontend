@@ -1,5 +1,5 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
-import { GetLocalStorage } from "../../helpers";
+import { getLocalStorage } from "../../helpers";
 import { achievementApi } from "../achievementApi";
 import { certificationApi } from "../certificationApi";
 import { educationApi } from "../educationApi";
@@ -16,7 +16,7 @@ const {
   email = null,
   role = null,
   token = null,
-} = GetLocalStorage() || {};
+} = getLocalStorage() || {};
 
 // Initialize preloadedState
 const preloadedState = {
