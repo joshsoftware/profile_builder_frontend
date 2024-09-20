@@ -10,10 +10,13 @@ import resumeSvg from "../../assets/banner.svg";
 import googleIcon from "../../assets/Google Logo.webp";
 import logo from "../../assets/Josh-Logo-With-Tagline-Black-1.png";
 import {
+  ADMIN,
   EDITOR_PROFILE_ROUTE,
+  EMPLOYEE,
   PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
 } from "../../Constants";
+import { setLocalStorage } from "../../helpers";
 import styles from "./Login.module.css";
 
 const Login = () => {
@@ -28,19 +31,19 @@ const Login = () => {
         const token = response?.data?.token;
         const role = response?.data?.role;
         const profile_id = response?.data?.profile_id;
+        const name = response?.data?.name;
+        const email = response?.data?.email;
         if (response?.data) {
           toast.success(response?.data?.message);
         }
 
         if (token && role) {
-          dispatch(loginAction({ token, role, profile_id }));
-          window.localStorage.setItem("token", token);
-          window.localStorage.setItem("role", role);
-          window.localStorage.setItem("profile_id", profile_id);
+          dispatch(loginAction({ token, role, profile_id, name, email }));
+          setLocalStorage(profile_id, name, email, role, token);
 
-          if (role.toLowerCase() === "admin") {
+          if (role.toLowerCase() === ADMIN) {
             navigate(PROFILE_LIST_ROUTE);
-          } else if (role.toLowerCase() === "employee") {
+          } else if (role.toLowerCase() === EMPLOYEE) {
             navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
           } else {
             navigate(ROOT_ROUTE);

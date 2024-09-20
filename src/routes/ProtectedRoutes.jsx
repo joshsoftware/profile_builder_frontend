@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import PropTypes from "prop-types";
-import { EDITOR_PROFILE_ROUTE, ROOT_ROUTE } from "../Constants";
+import { EDITOR_PROFILE_ROUTE, EMPLOYEE, ROOT_ROUTE } from "../Constants";
 
 const ProtectedRoutes = ({ Component, allowedRoles }) => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const ProtectedRoutes = ({ Component, allowedRoles }) => {
     } else if (!allowedRoles.includes(role)) {
       navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
     } else if (
-      role === "employee" &&
+      role === EMPLOYEE &&
       urlProfileId &&
       urlProfileId !== String(profile_id)
     ) {

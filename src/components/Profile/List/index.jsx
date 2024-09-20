@@ -32,6 +32,7 @@ import {
 import {
   EDITOR_PROFILE_ROUTE,
   EDITOR_ROUTE,
+  LOADING_SPIN,
   SPIN_SIZE,
 } from "../../../Constants";
 import {
@@ -49,8 +50,10 @@ const ListProfiles = () => {
   const searchInput = useRef(null);
   const navigate = useNavigate();
   const { data, isFetching, refetch } = useGetProfileListQuery();
-  const [deleteProfileService] = useDeleteProfileMutation();
-  const [updateProfileStatusService] = useUpdateProfileStatusMutation();
+  const [deleteProfileService, { isLoading: deletingProfile }] =
+    useDeleteProfileMutation();
+  const [updateProfileStatusService, { isLoading: profileStatusUpdating }] =
+    useUpdateProfileStatusMutation();
   const [sendInvitationService, { isLoading }] = useUserEmailMutation();
 
   const showActiveInactiveModal = (profile_id, isActive) => {
@@ -374,7 +377,11 @@ const ListProfiles = () => {
 
   return (
     <>
-      <Spin spinning={isLoading} size={SPIN_SIZE} tip={"Just a moment.."}>
+      <Spin
+        spinning={isLoading || profileStatusUpdating || deletingProfile}
+        size={SPIN_SIZE}
+        tip={LOADING_SPIN}
+      >
         <Navbar />
         <Row className={styles.rowStyle}>
           <Typography.Title level={1} className={styles.profile_header}>

@@ -6,9 +6,11 @@ import Error from "../components/Error/Error";
 import Login from "../components/Login";
 import ListProfiles from "../components/Profile/List";
 import {
+  ADMIN,
   DASHBOARD_ROUTE,
   EDITOR_PROFILE_ROUTE,
   EDITOR_ROUTE,
+  EMPLOYEE,
   ERROR_ROUTE,
   PROFILE_LIST_ROUTE,
   ROOT_ROUTE,
@@ -23,22 +25,19 @@ const Router = () => {
         <Route
           path={PROFILE_LIST_ROUTE}
           element={
-            <ProtectedRoutes
-              Component={ListProfiles}
-              allowedRoles={["admin"]}
-            />
+            <ProtectedRoutes Component={ListProfiles} allowedRoles={[ADMIN]} />
           }
         />
         <Route
           path={DASHBOARD_ROUTE}
           element={
-            <ProtectedRoutes Component={Dashboard} allowedRoles={["admin"]} />
+            <ProtectedRoutes Component={Dashboard} allowedRoles={[ADMIN]} />
           }
         />
         <Route
           path={EDITOR_ROUTE}
           element={
-            <ProtectedRoutes Component={Editor} allowedRoles={["admin"]} />
+            <ProtectedRoutes Component={Editor} allowedRoles={[ADMIN]} />
           }
         />
         <Route
@@ -46,14 +45,14 @@ const Router = () => {
           element={
             <ProtectedRoutes
               Component={Editor}
-              allowedRoles={["admin", "employee"]}
+              allowedRoles={[ADMIN, EMPLOYEE]}
             />
           }
         />
         <Route
           path={EDITOR_PROFILE_ROUTE}
           element={
-            <ProtectedRoutes Component={Editor} allowedRoles={["admin"]} />
+            <ProtectedRoutes Component={Editor} allowedRoles={[ADMIN]} />
           }
         />
         <Route path={ERROR_ROUTE} element={<Error />} />
