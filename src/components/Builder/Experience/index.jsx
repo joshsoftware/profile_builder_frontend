@@ -361,11 +361,7 @@ const Experience = ({ experienceData }) => {
                             },
                           ]}
                         >
-                          <Select
-                            placeholder="Select designation"
-                            options={DESIGNATION}
-                            allowClear
-                          />
+                          <Input placeholder="Software Engineer, etc." />
                         </Form.Item>
                       </Col>
                       <Col span={11} offset={2}>
