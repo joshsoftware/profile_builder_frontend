@@ -144,17 +144,6 @@ export const WARNING_TOASTER = {
   },
 };
 
-export const DESIGNATION = [
-  { lable: "intern", value: "Intern" },
-  { lable: "software_engineer", value: "Software Engineer" },
-  { lable: "sr_software_engineer", value: "Senior Software Engineer" },
-  { lable: "tech_lead", value: "Technical Lead" },
-  { lable: "project_manager", value: "Project Manager" },
-  { lable: "product_manager", value: "Product Manager" },
-  { lable: "qa", value: "Quality Assurance (QA) Engineer" },
-  { lable: "devOps", value: "DevOps Engineer" },
-];
-
 export const SKILLS = [
   { label: ".NET", value: ".NET" },
   { label: "Android", value: "Android" },

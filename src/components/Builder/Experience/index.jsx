@@ -10,7 +10,6 @@ import {
   Form,
   Input,
   Row,
-  Select,
   Space,
   Spin,
   Tabs,
@@ -34,7 +33,6 @@ import { useUpdateSequenceMutation } from "../../../api/profileApi";
 import { DraggableTabNode } from "../../../common-components/DraggbleTabs";
 import {
   DELETING_SPIN,
-  DESIGNATION,
   INVALID_ID_ERROR,
   PRESENT_VALUE,
   SPIN_SIZE,
