@@ -165,6 +165,51 @@ export const SKILLS = [
   { label: "React-Native", value: "React-Native" },
   { label: "UI/UX", value: "UI/UX" },
   { label: "VueJs", value: "VueJs" },
+  {
+    label: "Requirement Gathering and Analysis",
+    value: "Requirement Gathering and Analysis",
+  },
+  {
+    label: "Business Process Improvement",
+    value: "Business Process Improvement",
+  },
+  { label: "Stakeholder Management", value: "Stakeholder Management" },
+  {
+    label: "Risk Assessment and Mitigation",
+    value: "Risk Assessment and Mitigation",
+  },
+  {
+    label: "Documentation and Management",
+    value: "Documentation and Management",
+  },
+  {
+    label: "Agile Methodologies(Scrum, Kanban,Lean)",
+    value: "Agile Methodologies(Scrum, Kanban,Lean)",
+  },
+  {
+    label: "Data Analysis and Reporting",
+    value: "Data Analysis and Reporting",
+  },
+  {
+    label: "Communication and Collaboration",
+    value: "Communication and Collaboration",
+  },
+  {
+    label: "Problem-Solving and Decision-Making",
+    value: "Problem-Solving and Decision-Making",
+  },
+  { label: "Leadership and Coaching", value: "Leadership and Coaching" },
+  {
+    label: "Adaptability and Continuous Learning",
+    value: "Adaptability and Continuous Learning",
+  },
+  { label: "Project Management", value: "Project Management" },
+  {
+    label: "User Experience Optimization",
+    value: "User Experience Optimization",
+  },
+  { label: "Vendor Management", value: "Vendor Management" },
+  { label: "Strategic Thinking", value: "Strategic Thinking" },
 ];
 
 // TODO : Remove once refactor
