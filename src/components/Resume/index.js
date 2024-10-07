@@ -456,7 +456,8 @@ const Resume = forwardRef(({ data }, ref) => {
                   )}
                 </div>
                 <div>
-                  {profile?.years_of_experience && (
+                  {(profile?.years_of_experience ||
+                    profile?.josh_joining_date?.String) && (
                     <div className={styles.iconTextWrapper}>
                       <CheckSquareOutlined />{" "}
                       <span>
