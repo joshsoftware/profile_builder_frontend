@@ -261,7 +261,7 @@ const ListProfiles = () => {
       key: "total_experience",
       sorter: (a, b) => a.total_experience - b.total_experience,
       sortDirections: ["descend", "ascend"],
-      render: (text) => text + "+",
+      render: (text) => text,
     },
     {
       title: "Primary Skills",

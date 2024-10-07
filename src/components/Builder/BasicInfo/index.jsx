@@ -14,7 +14,6 @@ import {
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
-  WHOLE_NO_VALIDATOR,
 } from "../../../Constants";
 
 const BasicInfo = ({ profileData }) => {
@@ -148,19 +147,14 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Past Years Of Experience(In months)"
-            rules={[
-              { required: true, message: "Experience required" },
-              {
-                pattern: WHOLE_NO_VALIDATOR,
-                message: "Experience must be a whole number",
-              },
-            ]}
+            label="Past Years Of Experience(In Years)"
+            rules={[{ required: true, message: "Experience required" }]}
           >
             <Input
               type="number"
-              placeholder="Enter experience (e.g., 24, 36)"
-              min={1}
+              placeholder="Enter experience (e.g., 1, 2 , 0.2 etc.)"
+              min={0}
+              step={0.1}
             />
           </Form.Item>
         </Col>
