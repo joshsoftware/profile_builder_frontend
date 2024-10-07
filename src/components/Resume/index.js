@@ -463,8 +463,8 @@ const Resume = forwardRef(({ data }, ref) => {
                         {calculateTotalExperience(
                           profile?.years_of_experience,
                           profile?.josh_joining_date?.String,
-                        )}
-                        + Years of Experience
+                        )}{" "}
+                        Years of Experience
                       </span>
                     </div>
                   )}
