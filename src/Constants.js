@@ -165,6 +165,7 @@ export const SKILLS = [
   { label: "React-Native", value: "React-Native" },
   { label: "UI/UX", value: "UI/UX" },
   { label: "VueJs", value: "VueJs" },
+  { label: "PostgreSQL", value: "PostgreSQL" },
   {
     label: "Requirement Gathering and Analysis",
     value: "Requirement Gathering and Analysis",
