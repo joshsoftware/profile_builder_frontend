@@ -224,7 +224,16 @@ const Resume = forwardRef(({ data }, ref) => {
                   {item.name}
                 </p>
               )}
-              {item?.description && <p>{item.description}</p>}
+              {item?.description && (
+                <div className={styles.avoidBreak}>
+                  <b className={styles.overview}>Description: </b>
+                  <ul>
+                    {item?.description.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -341,7 +350,16 @@ const Resume = forwardRef(({ data }, ref) => {
                   <b>Issued On: </b> {item.issued_date}
                 </div>
               )}
-              {item?.description && <div>{item.description}</div>}
+              {item?.description && (
+                <div className={styles.avoidBreak}>
+                  <b className={styles.overview}>Description: </b>
+                  <ul>
+                    {item?.description.split("\n").map((line, index) => (
+                      <li key={index}>{line}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
         </div>
