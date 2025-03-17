@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import { InfoCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import {
@@ -147,8 +148,12 @@ const BasicInfo = ({ profileData }) => {
         <Col span={12}>
           <Form.Item
             name="years_of_experience"
-            label="Past Years Of Experience(In Years)"
+            label="Past Years Of Experience (Before Josh) "
             rules={[{ required: true, message: "Experience required" }]}
+            tooltip={{
+              title: "If the Josh is your first organization, enter 0",
+              icon: <InfoCircleOutlined />,
+            }}
           >
             <Input
               type="number"
@@ -175,7 +180,16 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item name="linkedin_link" label="LinkedIn Profile Link">
+          <Form.Item
+            name="linkedin_link"
+            label="LinkedIn Profile Link"
+            rules={[
+              {
+                max: 100,
+                message: "LinkedIn profile link cannot exceed 100 characters",
+              },
+            ]}
+          >
             <Input placeholder="Enter LinkedIn profile link" />
           </Form.Item>
         </Col>
@@ -187,7 +201,16 @@ const BasicInfo = ({ profileData }) => {
           </Form.Item>
         </Col>
         <Col span={12}>
-          <Form.Item name="github_link" label="Github Profile Link">
+          <Form.Item
+            name="github_link"
+            label="Github Profile Link"
+            rules={[
+              {
+                max: 100,
+                message: "GitHub profile link cannot exceed 100 characters",
+              },
+            ]}
+          >
             <Input placeholder="Enter GitHub profile link" />
           </Form.Item>
         </Col>
