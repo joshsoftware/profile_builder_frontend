@@ -40,6 +40,7 @@ import {
 import {
   filterSection,
   formatProjectsFields,
+  parseDate,
   showConfirm,
   validateId,
 } from "../../../helpers";
@@ -95,12 +96,8 @@ const Project = ({ projectData }) => {
             acc[`project_${index}`] = {
               ...project,
               id: project?.id,
-              working_start_date: project.working_start_date
-                ? dayjs(project.working_start_date)
-                : null,
-              working_end_date: project.working_end_date
-                ? dayjs(project.working_end_date)
-                : null,
+              working_start_date: parseDate(project.working_start_date),
+              working_end_date: parseDate(project.working_end_date),
             };
             return acc;
           }, {}),

@@ -29,6 +29,7 @@ import {
 import {
   filterSection,
   formatCertificationFields,
+  parseDate,
   showConfirm,
   validateId,
 } from "../../../helpers";
@@ -81,13 +82,9 @@ const Certification = ({ certificationData }) => {
             acc[`certificate_${index}`] = {
               ...certificate,
               id: certificate?.id,
-              // issued_date: certificate.issued_date
-              //   ? dayjs(certificate.issued_date)
-              //   : null,
-              from_date: certificate.from_date
-                ? dayjs(certificate.from_date)
-                : null,
-              to_date: certificate.to_date ? dayjs(certificate.to_date) : null,
+              issued_date: parseDate(certificate.issued_date),
+              from_date: parseDate(certificate.from_date),
+              to_date: parseDate(certificate.to_date),
             };
             return acc;
           }, {}),

@@ -16,6 +16,7 @@ import {
   SKILLS,
   SUCCESS_TOASTER,
 } from "../../../Constants";
+import { parseDate } from "../../../helpers";
 
 const BasicInfo = ({ profileData }) => {
   const [createProfileService, { isLoading: isCreating }] =
@@ -29,17 +30,9 @@ const BasicInfo = ({ profileData }) => {
   useEffect(() => {
     if (profileData) {
       const profileDataCopy = { ...profileData };
-      if (
-        profileDataCopy.josh_joining_date &&
-        profileDataCopy.josh_joining_date.Valid &&
-        profileDataCopy.josh_joining_date.String !== ""
-      ) {
-        profileDataCopy.josh_joining_date = dayjs(
-          profileDataCopy?.josh_joining_date?.String,
-        );
-      } else {
-        profileDataCopy.josh_joining_date = null;
-      }
+      profileDataCopy.josh_joining_date = parseDate(
+        profileDataCopy.josh_joining_date,
+      );
       form.setFieldsValue(profileDataCopy);
     }
   }, [profileData, form]);
@@ -92,9 +85,7 @@ const BasicInfo = ({ profileData }) => {
       name="basic-info"
       onFinish={onFinish}
       onValuesChange={() => setFormChange(true)}
-      initialValues={
-        profileData?.profile || { profileDetails: PROFILE_DETAILS }
-      }
+      initialValues={profileData || { description: PROFILE_DETAILS }}
     >
       <Row gutter={16}>
         <Col span={12}>

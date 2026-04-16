@@ -41,6 +41,7 @@ import {
 import {
   filterSection,
   formatExperienceFields,
+  parseDate,
   showConfirm,
   validateId,
 } from "../../../helpers";
@@ -97,12 +98,10 @@ const Experience = ({ experienceData }) => {
             acc[`experience_${key}`] = {
               ...experience,
               id: experience?.id,
-              from_date: experience.from_date
-                ? dayjs(experience.from_date)
-                : null,
+              from_date: parseDate(experience.from_date),
               to_date:
                 experience.to_date && experience.to_date !== PRESENT_VALUE
-                  ? dayjs(experience.to_date)
+                  ? parseDate(experience.to_date)
                   : "",
             };
             setIsCurrentCompany((prevState) => ({
