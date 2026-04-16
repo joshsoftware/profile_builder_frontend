@@ -63,9 +63,9 @@ export const formatCertificationFields = (certifications) => {
     name: certificate?.name,
     organization_name: certificate?.organization_name,
     description: certificate?.description,
-    issued_date: certificate?.issued_date,
-    from_date: certificate?.from_date?.format("MMM-YYYY"),
-    to_date: certificate?.to_date?.format("MMM-YYYY"),
+    issued_date: parseDate(certificate.issued_date),
+    from_date: parseDate(certificate.from_date),
+    to_date: parseDate(certificate.to_date),
   }));
 };
 
@@ -103,28 +103,25 @@ export const showConfirm = ({ onOk, onCancel, message }) => {
   });
 };
 
+export const parseDate = (date) => {
+  if (!date) return null;
+  if (dayjs.isDayjs(date)) return date;
+  if (typeof date === "string") return dayjs(date);
+  if (typeof date === "object" && date.String && date.Valid)
+    return dayjs(date.String);
+  if (date instanceof Date) return dayjs(date);
+  return null;
+};
+
 export const calculateTotalExperience = (pastExp, joinDate) => {
   const pastExperienceInYears = pastExp || 0;
   const pastExperienceInMonths = pastExperienceInYears * 12;
 
-  let joiningDate;
-  if (typeof joinDate === "string" && joinDate) {
-    joiningDate = new Date(joinDate);
-  } else if (joinDate && joinDate.String) {
-    joiningDate = new Date(joinDate.String);
-  } else if (!joinDate) {
-    joiningDate = new Date();
-  } else {
-    joiningDate = new Date();
-  }
-  const currentDate = new Date();
-
-  const diffYears = currentDate.getFullYear() - joiningDate.getFullYear();
-  const diffMonths = currentDate.getMonth() - joiningDate.getMonth();
-  const monthsSinceJoining = diffYears * 12 + diffMonths;
+  const joiningDate = parseDate(joinDate) || dayjs();
+  const currentDate = dayjs();
 
   const totalExperienceInMonths =
-    Number(pastExperienceInMonths) + Number(monthsSinceJoining);
+    Number(pastExperienceInMonths) + currentDate.diff(joiningDate, "month");
 
   const years = Math.floor(totalExperienceInMonths / 12);
   const months = totalExperienceInMonths % 12;
@@ -137,7 +134,8 @@ export const calculateTotalExperience = (pastExp, joinDate) => {
 };
 
 export const formatDate = (date) => {
-  return dayjs(date).format("MMM D, YYYY");
+  const parsed = parseDate(date);
+  return parsed ? parsed.format("MMM D, YYYY") : "";
 };
 
 export const setLocalStorage = (profile_id, name, email, role, token) => {

@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,7 +28,12 @@ import {
   ROOT_ROUTE,
   SUCCESS_TOASTER,
 } from "../../Constants";
-import { calculateTotalExperience, showConfirm } from "../../helpers";
+import {
+  calculateTotalExperience,
+  formatDate,
+  parseDate,
+  showConfirm,
+} from "../../helpers";
 import styles from "./Resume.module.css";
 
 const Resume = forwardRef(({ data }, ref) => {
@@ -59,18 +65,18 @@ const Resume = forwardRef(({ data }, ref) => {
   });
 
   const getMonthYear = (value) => {
-    if (!value) {
+    const date = parseDate(value);
+    if (!date || !date.isValid()) {
       return;
     }
-    const date = new Date(value);
-    const currDate = new Date();
+    const currDate = dayjs();
 
-    const givenYear = date.getFullYear();
-    const givenMonth = date.getMonth();
+    const givenYear = date.year();
+    const givenMonth = date.month();
 
     if (
-      givenYear === currDate.getFullYear() &&
-      givenMonth === currDate.getMonth()
+      givenYear === currDate.year() &&
+      givenMonth === currDate.month()
     ) {
       return "Present";
     }
@@ -347,7 +353,7 @@ const Resume = forwardRef(({ data }, ref) => {
               )}
               {item?.issued_date && (
                 <div className={styles.passingDate}>
-                  <b>Issued On: </b> {item.issued_date}
+                  <b>Issued On: </b> {formatDate(item.issued_date)}
                 </div>
               )}
               {item?.description && (
@@ -481,7 +487,7 @@ const Resume = forwardRef(({ data }, ref) => {
                       <span>
                         {calculateTotalExperience(
                           profile?.years_of_experience,
-                          profile?.josh_joining_date?.String,
+                          profile?.josh_joining_date,
                         )}{" "}
                         Years of Experience
                       </span>

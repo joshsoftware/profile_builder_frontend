@@ -16,6 +16,7 @@
     "antd": "^5.17.2",
     "axios": "^1.7.2",
     "bootstrap": "^5.3.3",
+    "dayjs": "^1.11.20",
     "docx": "^8.5.0",
     "file-saver": "^2.0.5",
     "http": "^0.0.1-security",
