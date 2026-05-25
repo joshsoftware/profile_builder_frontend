@@ -249,6 +249,13 @@ const ListProfiles = () => {
       ),
     },
     {
+      title: "Employee ID",
+      dataIndex: "employee_id",
+      key: "employee_id",
+      width: "6%",
+      ...getColumnSearchProps("employee_id"),
+    },
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",
