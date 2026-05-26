@@ -88,7 +88,7 @@ const BasicInfo = ({ profileData }) => {
       initialValues={profileData || { description: PROFILE_DETAILS }}
     >
       <Row gutter={16}>
-        <Col span={12}>
+        <Col span={8}>
           <Form.Item
             name="name"
             label="Full Name"
@@ -97,7 +97,7 @@ const BasicInfo = ({ profileData }) => {
             <Input placeholder="First Middle Last" />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col span={8}>
           <Form.Item
             name="email"
             label="Email"
@@ -110,6 +110,14 @@ const BasicInfo = ({ profileData }) => {
             ]}
           >
             <Input placeholder="example@joshsoftware.com" />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            name="employee_id"
+            label="Employee ID"
+          >
+            <Input placeholder="e.g. 101 or JIN1001" />
           </Form.Item>
         </Col>
       </Row>
@@ -302,6 +310,10 @@ BasicInfo.propTypes = {
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
       career_objectives: PropTypes.string,
+      employee_id: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+      ]),
     }),
     josh_joining_date: PropTypes.oneOfType([
       PropTypes.string,
