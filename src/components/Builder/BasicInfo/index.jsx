@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
@@ -10,6 +11,7 @@ import {
   useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
+  ADMIN,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
@@ -19,6 +21,7 @@ import {
 import { parseDate } from "../../../helpers";
 
 const BasicInfo = ({ profileData }) => {
+  const role = useSelector((state) => state.auth.role);
   const [createProfileService, { isLoading: isCreating }] =
     useCreateProfileMutation();
   const [updateProfileService, { isLoading: isUpdating }] =
@@ -184,7 +187,10 @@ const BasicInfo = ({ profileData }) => {
             name="employee_id"
             label="Employee ID"
           >
-            <Input placeholder="e.g. 101 or JIN1001" />
+            <Input
+              placeholder="e.g. 101 or JIN1001"
+              disabled={role?.toLowerCase() !== ADMIN}
+            />
           </Form.Item>
         </Col>
       </Row>
