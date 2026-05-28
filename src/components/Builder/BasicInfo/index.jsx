@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
@@ -24,8 +24,11 @@ const BasicInfo = ({ profileData }) => {
   const [updateProfileService, { isLoading: isUpdating }] =
     useUpdateProfileMutation();
   const [formChange, setFormChange] = useState(false);
+  const [showIntranetBanner, setShowIntranetBanner] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
+  const intranetData = location.state?.intranetData;
 
   useEffect(() => {
     if (profileData) {
@@ -36,6 +39,30 @@ const BasicInfo = ({ profileData }) => {
       form.setFieldsValue(profileDataCopy);
     }
   }, [profileData, form]);
+
+  // Pre-fill from Intranet data when coming from the sync flow
+  useEffect(() => {
+    if (intranetData && !profileData) {
+      form.setFieldsValue({
+        name:                intranetData.name,
+        email:               intranetData.email,
+        employee_id:         intranetData.employeeId,
+        mobile:              intranetData.mobileNumber,
+        gender:              intranetData.gender,
+        years_of_experience: intranetData.yearsOfExperience,
+        designation:         intranetData.designation,
+        linkedin_link:       intranetData.linkedinUrl,
+        github_link:         intranetData.githubUrl,
+        primary_skills:      intranetData.primarySkills ?? [],
+        secondary_skills:    intranetData.secondarySkills ?? [],
+        josh_joining_date:   intranetData.joshJoiningDate
+                               ? dayjs(intranetData.joshJoiningDate)
+                               : undefined,
+      });
+      setShowIntranetBanner(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intranetData]);
 
   const onFinish = async (values) => {
     try {
@@ -87,6 +114,46 @@ const BasicInfo = ({ profileData }) => {
       onValuesChange={() => setFormChange(true)}
       initialValues={profileData || { description: PROFILE_DETAILS }}
     >
+      {/* Intranet pre-fill info banner */}
+      {showIntranetBanner && (
+        <div
+          style={{
+            display: "flex",
+            alignItems: "flex-start",
+            gap: "10px",
+            background: "#eff6ff",
+            border: "1px solid #bfdbfe",
+            borderRadius: "10px",
+            padding: "12px 14px",
+            marginBottom: "20px",
+            fontSize: "13px",
+            color: "#1e40af",
+          }}
+        >
+          <span style={{ fontSize: "16px" }}>ℹ️</span>
+          <span style={{ flex: 1 }}>
+            Form pre-filled from Intranet data. Please review and complete the
+            remaining fields.
+          </span>
+          <button
+            type="button"
+            onClick={() => setShowIntranetBanner(false)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              color: "#3b82f6",
+              fontSize: "16px",
+              lineHeight: 1,
+              padding: 0,
+              flexShrink: 0,
+            }}
+            aria-label="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
       <Row gutter={16}>
         <Col span={8}>
           <Form.Item

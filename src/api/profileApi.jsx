@@ -3,6 +3,7 @@ import {
   CREATE_PROFILE_ENDPOINT,
   DELETE_PROFILE_ENDPOINT,
   HTTP_METHODS,
+  INTRANET_EMPLOYEE_ENDPOINT,
   PROFILE_COMPLETE_ENDPOINT,
   PROFILE_GET_ENDPOINT,
   PROFILE_LIST_ENDPOINT,
@@ -86,6 +87,12 @@ export const profileApi = createApi({
       invalidatesTags: ["profile"],
       transformResponse: (response) => response.data,
     }),
+    getIntranetEmployee: builder.query({
+      query: (employeeId) => ({
+        url: INTRANET_EMPLOYEE_ENDPOINT.replace(":employee_id", employeeId),
+      }),
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
@@ -98,4 +105,5 @@ export const {
   useUpdateSequenceMutation,
   useUpdateProfileStatusMutation,
   useCompleteProfileMutation,
+  useLazyGetIntranetEmployeeQuery,
 } = profileApi;

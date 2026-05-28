@@ -1,7 +1,7 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Input,
@@ -41,12 +41,14 @@ import {
   showConfirm,
 } from "../../../helpers";
 import Navbar from "../../Navbar";
+import IntranetSyncModal from "../IntranetSyncModal";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [activeStatus, setActiveStatus] = useState(true);
+  const [showIntranetModal, setShowIntranetModal] = useState(false);
   const searchInput = useRef(null);
   const navigate = useNavigate();
   const { data, isFetching, refetch } = useGetProfileListQuery();
@@ -402,13 +404,24 @@ const ListProfiles = () => {
             <Radio.Button value="active">Active</Radio.Button>
             <Radio.Button value="inactive">Inactive</Radio.Button>
           </Radio.Group>
-          <Link to={EDITOR_ROUTE}>
-            <Button type="primary" className={styles.button}>
-              {" "}
-              + New{" "}
+          <Button
+              type="primary"
+              className={styles.button}
+              onClick={() => setShowIntranetModal(true)}
+              id="btn-new-profile"
+            >
+              + New
             </Button>
-          </Link>
-        </Row>
+          </Row>
+
+          <IntranetSyncModal
+            open={showIntranetModal}
+            onClose={() => setShowIntranetModal(false)}
+            onManualCreate={() => {
+              setShowIntranetModal(false);
+              navigate(EDITOR_ROUTE);
+            }}
+          />
 
         <Table
           tableLayout="fixed"
