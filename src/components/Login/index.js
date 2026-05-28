@@ -58,6 +58,32 @@ const Login = () => {
     },
   });
 
+  const handleMockLogin = async (mockToken) => {
+    try {
+      const response = await loginService(mockToken);
+      if (response?.data) {
+        const { token, role, profile_id, name, email, message } = response.data;
+        toast.success(message || "Mock Login Successful!");
+        if (token && role) {
+          dispatch(loginAction({ token, role, profile_id, name, email }));
+          setLocalStorage(profile_id, name, email, role, token);
+
+          if (role.toLowerCase() === ADMIN) {
+            navigate(PROFILE_LIST_ROUTE);
+          } else if (role.toLowerCase() === EMPLOYEE) {
+            navigate(EDITOR_PROFILE_ROUTE.replace(":profile_id", profile_id));
+          } else {
+            navigate(ROOT_ROUTE);
+          }
+        }
+      } else if (response?.error) {
+        console.error("Mock login error:", response.error);
+      }
+    } catch (error) {
+      toast.error("Mock Login failed.");
+    }
+  };
+
   return (
     <>
       <div className={styles.logoContainer}>
@@ -79,6 +105,20 @@ const Login = () => {
           />
           Sign in With Google
         </Button>
+        <div className={styles.mockButtonsContainer}>
+          <button
+            className={styles.mockButtonAdmin}
+            onClick={() => handleMockLogin("admin")}
+          >
+            Mock Login (Admin)
+          </button>
+          <button
+            className={styles.mockButtonEmployee}
+            onClick={() => handleMockLogin("employee")}
+          >
+            Mock Login (Employee)
+          </button>
+        </div>
       </div>
     </>
   );
