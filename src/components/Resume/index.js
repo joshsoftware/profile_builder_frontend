@@ -1,4 +1,3 @@
-import dayjs from "dayjs";
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,6 +14,7 @@ import {
   MailOutlined,
   MobileOutlined,
 } from "@ant-design/icons";
+import dayjs from "dayjs";
 import PropTypes from "prop-types";
 import { useLogoutMutation } from "../../api/loginApi";
 import { useCompleteProfileMutation } from "../../api/profileApi";
