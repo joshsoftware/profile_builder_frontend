@@ -33,8 +33,10 @@ axiosInstance.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       store.dispatch(logout());
       window.localStorage.clear();
-      toast.error("Unauthorized Access");
-      history.push(ROOT_ROUTE);
+      toast.error("Unauthorized Access", { id: "unauthorized" });
+      setTimeout(() => {
+        window.location.href = ROOT_ROUTE;
+      }, 500);
       return Promise.reject(error);
     }
     error.response?.data?.error_code
