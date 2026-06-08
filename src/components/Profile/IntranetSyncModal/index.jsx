@@ -64,14 +64,12 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
       );
       setFetchedEmployee(response.data?.data);
     } catch (error) {
-      if (error.response?.status === 404) {
-        setErrorMsg(
-          "No employee found with this ID. Please check the ID or create manually.",
-        );
+      if (error.response?.status === 409) {
+        setErrorMsg("Profile already exists for this Employee ID.");
+      } else if (error.response?.status === 404) {
+        setErrorMsg("No employee found with this ID. Please check the ID or create manually.");
       } else {
-        setErrorMsg(
-          "Could not reach the Intranet service. Please try again or create manually.",
-        );
+        setErrorMsg("Could not reach the Intranet service. Please try again or create manually.");
       }
     } finally {
       setIsFetching(false);
