@@ -39,6 +39,10 @@ axiosInstance.interceptors.response.use(
       }, 500);
       return Promise.reject(error);
     }
+    const suppressFor = error.config?._suppressToastForStatuses;
+    if (Array.isArray(suppressFor) && suppressFor.includes(error.response?.status)) {
+      return Promise.reject(error);
+    }
     error.response?.data?.error_code
       ? toast.error(error.response?.data?.error_message)
       : toast.error(NETWORK_ERROR);

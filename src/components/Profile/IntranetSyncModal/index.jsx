@@ -61,11 +61,15 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
     try {
       const response = await axiosInstance.get(
         INTRANET_EMPLOYEE_ENDPOINT.replace(":employee_id", employeeId.trim()),
+        { _suppressToastForStatuses: [409] },
       );
       setFetchedEmployee(response.data?.data);
     } catch (error) {
       if (error.response?.status === 409) {
-        setErrorMsg("Profile already exists for this Employee ID.");
+        setErrorMsg(
+          error.response?.data?.error_message ||
+            "Profile already exists for this Employee ID."
+        );
       } else if (error.response?.status === 404) {
         setErrorMsg("No employee found with this ID. Please check the ID or create manually.");
       } else {
