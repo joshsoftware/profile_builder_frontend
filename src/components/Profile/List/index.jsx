@@ -287,7 +287,7 @@ const ListProfiles = () => {
       title: "Employee ID",
       dataIndex: "employee_id",
       key: "employee_id",
-      width: "6%",
+      width: "8%",
       ...getColumnSearchProps("employee_id"),
     },
     {
@@ -347,7 +347,7 @@ const ListProfiles = () => {
       render: (date) => formatDate(date),
     },
     {
-      title: "Is Josh Employee",
+      title: "Active Status",
       dataIndex: "is_josh_employee",
       key: "is_josh_employee",
       render: (_, record) => (
