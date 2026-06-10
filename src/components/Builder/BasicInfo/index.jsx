@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import { Alert, Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -119,43 +119,14 @@ const BasicInfo = ({ profileData }) => {
     >
       {/* Intranet pre-fill info banner */}
       {showIntranetBanner && (
-        <div
-          style={{
-            display: "flex",
-            alignItems: "flex-start",
-            gap: "10px",
-            background: "#eff6ff",
-            border: "1px solid #bfdbfe",
-            borderRadius: "10px",
-            padding: "12px 14px",
-            marginBottom: "20px",
-            fontSize: "13px",
-            color: "#1e40af",
-          }}
-        >
-          <span style={{ fontSize: "16px" }}>ℹ️</span>
-          <span style={{ flex: 1 }}>
-            Form pre-filled from Intranet data. Please review and complete the
-            remaining fields.
-          </span>
-          <button
-            type="button"
-            onClick={() => setShowIntranetBanner(false)}
-            style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              color: "#3b82f6",
-              fontSize: "16px",
-              lineHeight: 1,
-              padding: 0,
-              flexShrink: 0,
-            }}
-            aria-label="Dismiss"
-          >
-            ✕
-          </button>
-        </div>
+        <Alert
+          message="Form pre-filled from Intranet data. Please review and complete the remaining fields."
+          type="info"
+          showIcon
+          closable
+          onClose={() => setShowIntranetBanner(false)}
+          style={{ marginBottom: "20px" }}
+        />
       )}
       <Row gutter={16}>
         <Col span={8}>

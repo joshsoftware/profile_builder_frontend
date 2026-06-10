@@ -42,6 +42,7 @@ import {
   EDITOR_ROUTE,
   LOADING_SPIN,
   SPIN_SIZE,
+  SUCCESS_TOASTER,
 } from "../../../Constants";
 import {
   calculateTotalExperience,
@@ -159,7 +160,7 @@ const ListProfiles = () => {
       const values = await adminInviteForm.validateFields();
       const response = await adminInviteService(values);
       if (response?.data) {
-        toast.success("Admin invited successfully!");
+        toast.success("Admin invited successfully!", SUCCESS_TOASTER);
         setInviteAdminModalOpen(false);
         adminInviteForm.resetFields();
       }

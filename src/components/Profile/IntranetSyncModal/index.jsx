@@ -17,8 +17,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
-import { EDITOR_ROUTE, INTRANET_EMPLOYEE_ENDPOINT } from "../../../Constants";
-import axiosInstance from "../../../services/axios";
+import { EDITOR_ROUTE } from "../../../Constants";
+import { useLazyGetIntranetEmployeeQuery } from "../../../api/profileApi";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -31,7 +31,7 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
   const [employeeId, setEmployeeId] = useState("");
   const [fetchedEmployee, setFetchedEmployee] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
-  const [isFetching, setIsFetching] = useState(false);
+  const [fetchIntranetEmployee, { isFetching }] = useLazyGetIntranetEmployeeQuery();
 
   const resetState = () => {
     setStep(STEP_SELECT);
@@ -57,26 +57,20 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
     }
     setErrorMsg("");
     setFetchedEmployee(null);
-    setIsFetching(true);
     try {
-      const response = await axiosInstance.get(
-        INTRANET_EMPLOYEE_ENDPOINT.replace(":employee_id", employeeId.trim()),
-        { _suppressToastForStatuses: [409] },
-      );
-      setFetchedEmployee(response.data?.data);
+      const employee = await fetchIntranetEmployee(employeeId.trim()).unwrap();
+      setFetchedEmployee(employee);
     } catch (error) {
-      if (error.response?.status === 409) {
+      if (error.status === 409) {
         setErrorMsg(
-          error.response?.data?.error_message ||
+          error.data?.error_message ||
             "Profile already exists for this Employee ID."
         );
-      } else if (error.response?.status === 404) {
+      } else if (error.status === 404) {
         setErrorMsg("No employee found with this ID. Please check the ID or create manually.");
       } else {
         setErrorMsg("Could not reach the Intranet service. Please try again or create manually.");
       }
-    } finally {
-      setIsFetching(false);
     }
   };
 
@@ -156,7 +150,7 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
         </div>
         <Input.Search
           id="intranet-employee-id-input"
-          placeholder="e.g. 1001 or JIN0198"
+          placeholder="e.g. 1001 or JIN1001"
           value={employeeId}
           onChange={(e) => {
           setEmployeeId(e.target.value);

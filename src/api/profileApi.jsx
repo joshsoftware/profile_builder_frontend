@@ -90,6 +90,8 @@ export const profileApi = createApi({
     getIntranetEmployee: builder.query({
       query: (employeeId) => ({
         url: INTRANET_EMPLOYEE_ENDPOINT.replace(":employee_id", employeeId),
+        method: HTTP_METHODS.GET,
+        _suppressToastForStatuses: [409],
       }),
       transformResponse: (response) => response.data,
     }),
