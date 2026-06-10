@@ -153,7 +153,7 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
           placeholder="e.g. 1001 or JIN1001"
           value={employeeId}
           onChange={(e) => {
-          setEmployeeId(e.target.value);
+          setEmployeeId(e.target.value.trim());
           setErrorMsg("");
           setFetchedEmployee(null);
         }}

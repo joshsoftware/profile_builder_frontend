@@ -79,6 +79,11 @@ const BasicInfo = ({ profileData }) => {
             values.josh_joining_date.format("MMM-YYYY");
         }
       }
+
+      if (values.employee_id && typeof values.employee_id === "string") {
+        values.employee_id = values.employee_id.trim();
+      }
+
       let response;
       if (profileData) {
         if (formChange) {
