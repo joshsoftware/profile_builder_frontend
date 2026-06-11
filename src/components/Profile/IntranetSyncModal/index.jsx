@@ -17,8 +17,8 @@ import {
   UserOutlined,
 } from "@ant-design/icons";
 import PropTypes from "prop-types";
-import { EDITOR_ROUTE } from "../../../Constants";
 import { useLazyGetIntranetEmployeeQuery } from "../../../api/profileApi";
+import { EDITOR_ROUTE } from "../../../Constants";
 
 const { Title, Text, Paragraph } = Typography;
 
