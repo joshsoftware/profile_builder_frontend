@@ -109,9 +109,9 @@ const ListProfiles = () => {
         }
       },
       onCancel: () => {},
-      message: `Are you sure you want to ${
-        checked ? "active" : "inactive"
-      } this employee?`,
+      message: `Are you sure you want to mark this profile as an ${
+        checked ? "Internal Employee" : "External Candidate"
+      }?`,
     });
   };
 
@@ -347,7 +347,7 @@ const ListProfiles = () => {
       render: (date) => formatDate(date),
     },
     {
-      title: "Active Status",
+      title: "Internal Employee",
       dataIndex: "is_josh_employee",
       key: "is_josh_employee",
       render: (_, record) => (
