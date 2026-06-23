@@ -32,6 +32,7 @@ export const EMPLOYEE_INVITE_ENDPOINT =
   "/api/profiles/:profile_id/employee_invite";
 export const PROFILE_COMPLETE_ENDPOINT =
   "/api/profiles/:profile_id/profile_complete";
+export const ADMIN_INVITE_ENDPOINT = "/api/admin_invite";
 
 export const PROFILE_GET_ENDPOINT = "/api/profiles/:profile_id";
 export const PROJECT_LIST_ENDPOINT = "/api/profiles/:profile_id/projects";
@@ -54,6 +55,7 @@ export const UPDATE_EXPERIENCE_ENDPOINT =
 export const UPDATE_CERTIFICATE_ENDPOINT =
   "/api/profiles/:profile_id/certificates/:certificate_id";
 export const UPDATE_SEQUENCE_ENDPOINT = "/api/updateSequence";
+export const INTRANET_EMPLOYEE_ENDPOINT = "/api/intranet/employees/:employee_id";
 
 export const DELETE_PROFILE_ENDPOINT = "/api/profiles/:profile_id";
 export const DELETE_ACHIEVEMENT_ENDPOINT =

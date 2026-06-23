@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
-import { Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
+import { useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router-dom";
+import { Alert, Button, Col, DatePicker, Form, Input, Row, Select, Space } from "antd";
 import { InfoCircleOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import PropTypes from "prop-types";
@@ -10,6 +11,7 @@ import {
   useUpdateProfileMutation,
 } from "../../../api/profileApi";
 import {
+  ADMIN,
   EDITOR_PROFILE_ROUTE,
   GENDER,
   PROFILE_DETAILS,
@@ -19,13 +21,17 @@ import {
 import { parseDate } from "../../../helpers";
 
 const BasicInfo = ({ profileData }) => {
+  const role = useSelector((state) => state.auth.role);
   const [createProfileService, { isLoading: isCreating }] =
     useCreateProfileMutation();
   const [updateProfileService, { isLoading: isUpdating }] =
     useUpdateProfileMutation();
   const [formChange, setFormChange] = useState(false);
+  const [showIntranetBanner, setShowIntranetBanner] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
+  const intranetData = location.state?.intranetData;
 
   useEffect(() => {
     if (profileData) {
@@ -36,6 +42,30 @@ const BasicInfo = ({ profileData }) => {
       form.setFieldsValue(profileDataCopy);
     }
   }, [profileData, form]);
+
+  // Pre-fill from Intranet data when coming from the sync flow
+  useEffect(() => {
+    if (intranetData && !profileData) {
+      form.setFieldsValue({
+        name:                intranetData.name,
+        email:               intranetData.email,
+        employee_id:         intranetData.employeeId,
+        mobile:              intranetData.mobileNumber,
+        gender:              intranetData.gender,
+        years_of_experience: intranetData.yearsOfExperience,
+        designation:         intranetData.designation,
+        linkedin_link:       intranetData.linkedinUrl,
+        github_link:         intranetData.githubUrl,
+        primary_skills:      intranetData.primarySkills ?? [],
+        secondary_skills:    intranetData.secondarySkills ?? [],
+        josh_joining_date:   intranetData.joshJoiningDate
+                               ? dayjs(intranetData.joshJoiningDate)
+                               : undefined,
+      });
+      setShowIntranetBanner(true);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [intranetData]);
 
   const onFinish = async (values) => {
     try {
@@ -49,6 +79,11 @@ const BasicInfo = ({ profileData }) => {
             values.josh_joining_date.format("MMM-YYYY");
         }
       }
+
+      if (values.employee_id && typeof values.employee_id === "string") {
+        values.employee_id = values.employee_id.trim();
+      }
+
       let response;
       if (profileData) {
         if (formChange) {
@@ -87,8 +122,19 @@ const BasicInfo = ({ profileData }) => {
       onValuesChange={() => setFormChange(true)}
       initialValues={profileData || { description: PROFILE_DETAILS }}
     >
+      {/* Intranet pre-fill info banner */}
+      {showIntranetBanner && (
+        <Alert
+          message="Form pre-filled from Intranet data. Please review and complete the remaining fields."
+          type="info"
+          showIcon
+          closable
+          onClose={() => setShowIntranetBanner(false)}
+          style={{ marginBottom: "20px" }}
+        />
+      )}
       <Row gutter={16}>
-        <Col span={12}>
+        <Col span={8}>
           <Form.Item
             name="name"
             label="Full Name"
@@ -97,7 +143,7 @@ const BasicInfo = ({ profileData }) => {
             <Input placeholder="First Middle Last" />
           </Form.Item>
         </Col>
-        <Col span={12}>
+        <Col span={8}>
           <Form.Item
             name="email"
             label="Email"
@@ -110,6 +156,17 @@ const BasicInfo = ({ profileData }) => {
             ]}
           >
             <Input placeholder="example@joshsoftware.com" />
+          </Form.Item>
+        </Col>
+        <Col span={8}>
+          <Form.Item
+            name="employee_id"
+            label="Employee ID"
+          >
+            <Input
+              placeholder="e.g. 101 or JIN1001"
+              disabled={role?.toLowerCase() !== ADMIN}
+            />
           </Form.Item>
         </Col>
       </Row>
@@ -302,6 +359,10 @@ BasicInfo.propTypes = {
       primary_skills: PropTypes.array,
       secondary_skills: PropTypes.array,
       career_objectives: PropTypes.string,
+      employee_id: PropTypes.oneOfType([
+        PropTypes.string,
+        PropTypes.number,
+      ]),
     }),
     josh_joining_date: PropTypes.oneOfType([
       PropTypes.string,

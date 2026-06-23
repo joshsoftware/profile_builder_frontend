@@ -104,12 +104,21 @@ export const showConfirm = ({ onOk, onCancel, message }) => {
 };
 
 export const parseDate = (date) => {
-  if (!date) return null;
-  if (dayjs.isDayjs(date)) return date;
-  if (typeof date === "string") return dayjs(date);
-  if (typeof date === "object" && date.String && date.Valid)
+  if (!date) {
+    return null;
+  }
+  if (dayjs.isDayjs(date)) {
+    return date;
+  }
+  if (typeof date === "string") {
+    return dayjs(date);
+  }
+  if (typeof date === "object" && date.String && date.Valid) {
     return dayjs(date.String);
-  if (date instanceof Date) return dayjs(date);
+  }
+  if (date instanceof Date) {
+    return dayjs(date);
+  }
   return null;
 };
 

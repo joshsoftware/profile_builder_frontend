@@ -2,7 +2,7 @@ import axiosInstance from "../../services/axios";
 
 const axiosBaseQuery =
   () =>
-  async ({ url, method, data, params, headers, body }) => {
+  async ({ url, method, data, params, headers, body, ...rest }) => {
     try {
       const result = await axiosInstance({
         url: url,
@@ -11,10 +11,17 @@ const axiosBaseQuery =
         params,
         headers,
         body,
+        ...rest,
       });
-      return Promise.resolve(result);
+      return { data: result.data };
     } catch (axiosError) {
-      return Promise.reject(axiosError?.response?.data);
+      return {
+        error: {
+          status: axiosError?.response?.status,
+          data: axiosError?.response?.data,
+          message: axiosError?.message,
+        },
+      };
     }
   };
 

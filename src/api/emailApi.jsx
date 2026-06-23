@@ -1,5 +1,6 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
+  ADMIN_INVITE_ENDPOINT,
   EMPLOYEE_INVITE_ENDPOINT,
   HTTP_METHODS,
   USER_EMAIL_REDUCER_PATH,
@@ -18,7 +19,15 @@ export const userEmailApi = createApi({
       invalidatesTags: ["user_email"],
       transformResponse: (response) => response.data,
     }),
+    adminInvite: builder.mutation({
+      query: ({ name, email }) => ({
+        url: ADMIN_INVITE_ENDPOINT,
+        method: HTTP_METHODS.POST,
+        data: { name, email },
+      }),
+      transformResponse: (response) => response.data,
+    }),
   }),
 });
 
-export const { useUserEmailMutation } = userEmailApi;
+export const { useUserEmailMutation, useAdminInviteMutation } = userEmailApi;

@@ -1,10 +1,12 @@
 import React, { useRef, useState } from "react";
 import Highlighter from "react-highlight-words";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
+  Form,
   Input,
+  Modal,
   Radio,
   Row,
   Space,
@@ -20,10 +22,16 @@ import {
   CloseOutlined,
   DeleteOutlined,
   EditOutlined,
+  MailOutlined,
   SearchOutlined,
+  UserAddOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
-import { useUserEmailMutation } from "../../../api/emailApi";
+import {
+  useAdminInviteMutation,
+  useUserEmailMutation,
+} from "../../../api/emailApi";
 import {
   useDeleteProfileMutation,
   useGetProfileListQuery,
@@ -34,6 +42,7 @@ import {
   EDITOR_ROUTE,
   LOADING_SPIN,
   SPIN_SIZE,
+  SUCCESS_TOASTER,
 } from "../../../Constants";
 import {
   calculateTotalExperience,
@@ -41,12 +50,16 @@ import {
   showConfirm,
 } from "../../../helpers";
 import Navbar from "../../Navbar";
+import IntranetSyncModal from "../IntranetSyncModal";
 import styles from "./ListProfiles.module.css";
 
 const ListProfiles = () => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const [activeStatus, setActiveStatus] = useState(true);
+  const [showIntranetModal, setShowIntranetModal] = useState(false);
+  const [inviteAdminModalOpen, setInviteAdminModalOpen] = useState(false);
+  const [adminInviteForm] = Form.useForm();
   const searchInput = useRef(null);
   const navigate = useNavigate();
   const { data, isFetching, refetch } = useGetProfileListQuery();
@@ -55,6 +68,8 @@ const ListProfiles = () => {
   const [updateProfileStatusService, { isLoading: profileStatusUpdating }] =
     useUpdateProfileStatusMutation();
   const [sendInvitationService, { isLoading }] = useUserEmailMutation();
+  const [adminInviteService, { isLoading: invitingAdmin }] =
+    useAdminInviteMutation();
 
   const showActiveInactiveModal = (profile_id, isActive) => {
     showConfirm({
@@ -138,6 +153,26 @@ const ListProfiles = () => {
       onCancel: () => {},
       message: "Are you sure you want to send invitation?",
     });
+  };
+
+  const handleAdminInviteSubmit = async () => {
+    try {
+      const values = await adminInviteForm.validateFields();
+      const response = await adminInviteService(values);
+      if (response?.data) {
+        toast.success("Admin invited successfully!", SUCCESS_TOASTER);
+        setInviteAdminModalOpen(false);
+        adminInviteForm.resetFields();
+      }
+    } catch (validationError) {
+      // adminInviteForm.validateFields() rejects when fields are empty/invalid.
+      // Ant Design automatically shows inline errors on the fields — nothing extra needed here.
+    }
+  };
+
+  const handleAdminInviteCancel = () => {
+    setInviteAdminModalOpen(false);
+    adminInviteForm.resetFields();
   };
 
   const handleClick = (id, is_josh_employee) => {
@@ -249,6 +284,13 @@ const ListProfiles = () => {
       ),
     },
     {
+      title: "Employee ID",
+      dataIndex: "employee_id",
+      key: "employee_id",
+      width: "8%",
+      ...getColumnSearchProps("employee_id"),
+    },
+    {
       title: "Email",
       dataIndex: "email",
       key: "email",
@@ -305,7 +347,7 @@ const ListProfiles = () => {
       render: (date) => formatDate(date),
     },
     {
-      title: "Is Josh Employee",
+      title: "Active Status",
       dataIndex: "is_josh_employee",
       key: "is_josh_employee",
       render: (_, record) => (
@@ -391,17 +433,37 @@ const ListProfiles = () => {
           <Radio.Group
             value={activeStatus ? "active" : "inactive"}
             onChange={(e) => setActiveStatus(e.target.value === "active")}
+            style={{ margin: "0 auto" }}
           >
             <Radio.Button value="active">Active</Radio.Button>
             <Radio.Button value="inactive">Inactive</Radio.Button>
           </Radio.Group>
-          <Link to={EDITOR_ROUTE}>
-            <Button type="primary" className={styles.button}>
-              {" "}
-              + New{" "}
+          <Space>
+            <Button
+              icon={<UserAddOutlined />}
+              onClick={() => setInviteAdminModalOpen(true)}
+            >
+              Invite Admin
             </Button>
-          </Link>
+            <Button
+              type="primary"
+              className={styles.button}
+              onClick={() => setShowIntranetModal(true)}
+              id="btn-new-profile"
+            >
+              + New
+            </Button>
+          </Space>
         </Row>
+
+        <IntranetSyncModal
+          open={showIntranetModal}
+          onClose={() => setShowIntranetModal(false)}
+          onManualCreate={() => {
+            setShowIntranetModal(false);
+            navigate(EDITOR_ROUTE);
+          }}
+        />
 
         <Table
           tableLayout="fixed"
@@ -413,6 +475,60 @@ const ListProfiles = () => {
           loading={isFetching}
         />
       </Spin>
+
+      <Modal
+        title={
+          <Space>
+            <UserAddOutlined />
+            Invite Admin
+          </Space>
+        }
+        open={inviteAdminModalOpen}
+        onCancel={handleAdminInviteCancel}
+        onOk={handleAdminInviteSubmit}
+        okText="Send Invitation"
+        cancelText="Cancel"
+        confirmLoading={invitingAdmin}
+        destroyOnClose
+        width={440}
+      >
+        <Form
+          form={adminInviteForm}
+          layout="vertical"
+          style={{ marginTop: 16 }}
+        >
+          <Form.Item
+            name="name"
+            label="Full Name"
+            rules={[
+              { required: true, message: "Please enter the admin's full name" },
+              { min: 2, message: "Name must be at least 2 characters" },
+            ]}
+          >
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="e.g. John Doe"
+              size="large"
+              autoComplete="off"
+            />
+          </Form.Item>
+          <Form.Item
+            name="email"
+            label="Email Address"
+            rules={[
+              { required: true, message: "Please enter an email address" },
+              { type: "email", message: "Please enter a valid email address" },
+            ]}
+          >
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="e.g. john@example.com"
+              size="large"
+              autoComplete="off"
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
     </>
   );
 };
