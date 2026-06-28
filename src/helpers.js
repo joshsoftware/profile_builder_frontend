@@ -78,7 +78,7 @@ export const formatAchievementFields = (achievements) => {
 };
 
 export const validateId = (id) => {
-  return id && typeof id === "string" && id.trim() !== "";
+  return id && typeof id === "string" && id.trim() !== "" && !isNaN(Number(id));
 };
 
 export const disabledDate = (current) => {

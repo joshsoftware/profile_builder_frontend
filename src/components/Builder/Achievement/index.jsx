@@ -33,7 +33,7 @@ import {
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Achievement = ({ achievementData }) => {
+const Achievement = ({ achievementData, onLiveChange }) => {
   const { profile_id } = useParams();
   const [createAchievementService, { isLoading: isCreating }] =
     useCreateAchievementMutation();
@@ -307,7 +307,14 @@ const Achievement = ({ achievementData }) => {
                     form={form}
                     name={`achievement_${item.key}`}
                     onFinish={onFinish}
-                    onValuesChange={() => setFormChange(true)}
+                    onValuesChange={(_, allValues) => {
+                      setFormChange(true);
+                      if (onLiveChange) {
+                        const filteredAchievements = filterSection(allValues);
+                        const achievements = formatAchievementFields(filteredAchievements);
+                        onLiveChange(achievements);
+                      }
+                    }}
                     key={item.key}
                   >
                     <Form.Item name={[`achievement_${index}`, "id"]} hidden>
@@ -390,6 +397,7 @@ const Achievement = ({ achievementData }) => {
 
 Achievement.propTypes = {
   achievementData: PropTypes.array,
+  onLiveChange: PropTypes.func,
 };
 
 export default Achievement;

@@ -33,7 +33,7 @@ import {
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Education = ({ educationData }) => {
+const Education = ({ educationData, onLiveChange }) => {
   const [action, setAction] = useState("create");
   const [createEducationService, { isLoading: isCreating }] =
     useCreateEducationMutation();
@@ -301,7 +301,14 @@ const Education = ({ educationData }) => {
                     form={form}
                     name={`education_${item.key}`}
                     onFinish={onFinish}
-                    onValuesChange={() => setFormChange(true)}
+                    onValuesChange={(_, allValues) => {
+                      setFormChange(true);
+                      if (onLiveChange) {
+                        const filteredEducation = filterSection(allValues);
+                        const educations = formatEducationFields(filteredEducation);
+                        onLiveChange(educations);
+                      }
+                    }}
                     key={item.key}
                   >
                     <Form.Item name={[`education_${index}`, "id"]} hidden>
@@ -410,6 +417,7 @@ const Education = ({ educationData }) => {
 
 Education.propTypes = {
   educationData: PropTypes.array,
+  onLiveChange: PropTypes.func,
 };
 
 export default Education;

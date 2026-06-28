@@ -46,7 +46,7 @@ import {
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Project = ({ projectData }) => {
+const Project = ({ projectData, onLiveChange }) => {
   const [action, setAction] = useState("create");
   const [createProjectService, { isLoading: isCreating }] =
     useCreateProjectMutation();
@@ -319,7 +319,14 @@ const Project = ({ projectData }) => {
                     form={form}
                     name={`project_${item.key}`}
                     onFinish={onFinish}
-                    onValuesChange={() => setFormChange(true)}
+                    onValuesChange={(_, allValues) => {
+                      setFormChange(true);
+                      if (onLiveChange) {
+                        const filteredProjects = filterSection(allValues);
+                        const projects = formatProjectsFields(filteredProjects);
+                        onLiveChange(projects);
+                      }
+                    }}
                     key={item.key}
                   >
                     <Form.Item name={[`project_${index}`, "id"]} hidden>
@@ -523,5 +530,6 @@ const Project = ({ projectData }) => {
 };
 Project.propTypes = {
   projectData: PropTypes.array,
+  onLiveChange: PropTypes.func,
 };
 export default Project;

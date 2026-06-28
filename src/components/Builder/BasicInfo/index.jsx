@@ -20,7 +20,7 @@ import {
 } from "../../../Constants";
 import { parseDate } from "../../../helpers";
 
-const BasicInfo = ({ profileData }) => {
+const BasicInfo = ({ profileData, onLiveChange }) => {
   const role = useSelector((state) => state.auth.role);
   const [createProfileService, { isLoading: isCreating }] =
     useCreateProfileMutation();
@@ -40,13 +40,20 @@ const BasicInfo = ({ profileData }) => {
         profileDataCopy.josh_joining_date,
       );
       form.setFieldsValue(profileDataCopy);
+      if (onLiveChange) {
+        onLiveChange({ ...profileDataCopy });
+      }
+    } else if (!intranetData) {
+      if (onLiveChange) {
+        onLiveChange({ description: PROFILE_DETAILS });
+      }
     }
-  }, [profileData, form]);
+  }, [profileData, form, intranetData, onLiveChange]);
 
   // Pre-fill from Intranet data when coming from the sync flow
   useEffect(() => {
     if (intranetData && !profileData) {
-      form.setFieldsValue({
+      const initialValues = {
         name:                intranetData.name,
         email:               intranetData.email,
         employee_id:         intranetData.employeeId,
@@ -61,8 +68,12 @@ const BasicInfo = ({ profileData }) => {
         josh_joining_date:   intranetData.joshJoiningDate
                                ? dayjs(intranetData.joshJoiningDate)
                                : undefined,
-      });
+      };
+      form.setFieldsValue(initialValues);
       setShowIntranetBanner(true);
+      if (onLiveChange) {
+        onLiveChange({ description: PROFILE_DETAILS, ...initialValues });
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [intranetData]);
@@ -119,7 +130,12 @@ const BasicInfo = ({ profileData }) => {
       form={form}
       name="basic-info"
       onFinish={onFinish}
-      onValuesChange={() => setFormChange(true)}
+      onValuesChange={(_, allValues) => {
+        setFormChange(true);
+        if (onLiveChange) {
+          onLiveChange({ ...profileData, ...allValues });
+        }
+      }}
       initialValues={profileData || { description: PROFILE_DETAILS }}
     >
       {/* Intranet pre-fill info banner */}
@@ -369,6 +385,7 @@ BasicInfo.propTypes = {
       PropTypes.object,
     ]),
   }),
+  onLiveChange: PropTypes.func,
 };
 
 export default BasicInfo;
