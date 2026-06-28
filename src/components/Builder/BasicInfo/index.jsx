@@ -213,7 +213,17 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
           <Form.Item
             name="years_of_experience"
             label="Past Years Of Experience (Before Josh) "
-            rules={[{ required: true, message: "Experience required" }]}
+            rules={[
+              { required: true, message: "Experience required" },
+              {
+                validator: async (_, value) => {
+                  if (value !== undefined && value !== null && Number(value) < 0) {
+                    return Promise.reject(new Error("Experience cannot be negative"));
+                  }
+                  return Promise.resolve();
+                },
+              }
+            ]}
             tooltip={{
               title: "If the Josh is your first organization, enter 0",
               icon: <InfoCircleOutlined />,
@@ -224,6 +234,11 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
               placeholder="Enter experience (e.g., 1, 2 , 0.2 etc.)"
               min={0}
               step={0.1}
+              onKeyDown={(e) => {
+                if (e.key === "-") {
+                  e.preventDefault();
+                }
+              }}
             />
           </Form.Item>
         </Col>
