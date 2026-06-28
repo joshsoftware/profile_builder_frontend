@@ -35,6 +35,7 @@ import Experience from "./Experience";
 import Project from "./Project";
 
 const createPanes = (
+  profile_id,
   profileData,
   projectData,
   experienceData,
@@ -52,29 +53,34 @@ const createPanes = (
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
+    disabled: !profile_id,
     children: <Project projectData={projectData} onLiveChange={setLiveProjectData} />,
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
+    disabled: !profile_id,
     children: <Education educationData={educationData} onLiveChange={setLiveEducationData} />,
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
+    disabled: !profile_id,
     children: <Experience experienceData={experienceData} onLiveChange={setLiveExperienceData} />,
   },
 ];
 
-const achievement = (achievementData, setLiveAchievementData) => ({
+const achievement = (profile_id, achievementData, setLiveAchievementData) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
+  disabled: !profile_id,
   children: <Achievement achievementData={achievementData} onLiveChange={setLiveAchievementData} />,
 });
 
-const certification = (certificationData, setLiveCertificationData) => ({
+const certification = (profile_id, certificationData, setLiveCertificationData) => ({
   key: CERTIFICATION_KEY,
   label: CERTIFICATION_LABEL,
+  disabled: !profile_id,
   children: <Certification certificationData={certificationData} onLiveChange={setLiveCertificationData} />,
 });
 
@@ -89,7 +95,7 @@ export const Editor = () => {
   const [liveAchievementData, setLiveAchievementData] = useState(null);
   const [liveCertificationData, setLiveCertificationData] = useState(null);
 
-  const [items, setItems] = useState(createPanes(null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
+  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
@@ -116,6 +122,7 @@ export const Editor = () => {
       setLiveCertificationData(certificationData);
       setItems(
         createPanes(
+          profile_id,
           profileData,
           projectData,
           experienceData,
@@ -127,7 +134,7 @@ export const Editor = () => {
         ),
       );
     } else {
-      setItems(createPanes(null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
+      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
     }
   }, [profile_id, profileData, projectData, experienceData, educationData, achievementData, certificationData]);
 
@@ -137,12 +144,12 @@ export const Editor = () => {
     if (tabName === ACHIEVEMENT_KEY) {
       setShowAchievement(event);
       updatedItems = event
-        ? [...items, achievement(achievementData, setLiveAchievementData)]
+        ? [...items, achievement(profile_id, achievementData, setLiveAchievementData)]
         : items.filter((item) => item.key !== ACHIEVEMENT_KEY);
     } else if (tabName === CERTIFICATION_KEY) {
       setShowCertification(event);
       updatedItems = event
-        ? [...items, certification(certificationData, setLiveCertificationData)]
+        ? [...items, certification(profile_id, certificationData, setLiveCertificationData)]
         : items.filter((item) => item.key !== CERTIFICATION_KEY);
     }
 
@@ -202,13 +209,13 @@ export const Editor = () => {
 
             <Space direction="vertical">
               <Space>
-                <Switch size="small" onChange={handleAchievement} />
+                <Switch size="small" onChange={handleAchievement} disabled={!profile_id} />
                 <Typography.Text>
                   Do you want to include achievements?
                 </Typography.Text>
               </Space>
               <Space>
-                <Switch size="small" onChange={handleCertification} />
+                <Switch size="small" onChange={handleCertification} disabled={!profile_id} />
                 <Typography.Text>
                   Do you want to include certifications?
                 </Typography.Text>
