@@ -88,7 +88,7 @@ export const PROJECT_REDUCER_PATH = "projectApi";
 export const USER_EMAIL_REDUCER_PATH = "userEmailApi";
 
 // ERRORS
-export const INVALID_ID_ERROR = "Invalid or missing ID";
+export const INVALID_ID_ERROR = "Please save Basic Info first before adding this section";
 export const NETWORK_ERROR = "Network Error";
 
 // Keywords

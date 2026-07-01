@@ -35,55 +35,67 @@ import Experience from "./Experience";
 import Project from "./Project";
 
 const createPanes = (
+  profile_id,
   profileData,
   projectData,
   experienceData,
   educationData,
-  disableTabs,
+  setLiveProfileData,
+  setLiveProjectData,
+  setLiveExperienceData,
+  setLiveEducationData
 ) => [
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
-    children: <BasicInfo profileData={profileData} />,
+    children: <BasicInfo profileData={profileData} onLiveChange={setLiveProfileData} />,
   },
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
-    children: <Project projectData={projectData} />,
-    disabled: disableTabs,
+    disabled: !profile_id,
+    children: <Project projectData={projectData} onLiveChange={setLiveProjectData} />,
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
-    children: <Education educationData={educationData} />,
-    disabled: disableTabs,
+    disabled: !profile_id,
+    children: <Education educationData={educationData} onLiveChange={setLiveEducationData} />,
   },
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
-    children: <Experience experienceData={experienceData} />,
-    disabled: disableTabs,
+    disabled: !profile_id,
+    children: <Experience experienceData={experienceData} onLiveChange={setLiveExperienceData} />,
   },
 ];
 
-const achievement = (achievementData, disableTabs) => ({
+const achievement = (profile_id, achievementData, setLiveAchievementData) => ({
   key: ACHIEVEMENT_KEY,
   label: ACHIEVEMENT_LABEL,
-  children: <Achievement achievementData={achievementData} />,
-  disabled: disableTabs,
+  disabled: !profile_id,
+  children: <Achievement achievementData={achievementData} onLiveChange={setLiveAchievementData} />,
 });
 
-const certification = (certificationData, disableTabs) => ({
+const certification = (profile_id, certificationData, setLiveCertificationData) => ({
   key: CERTIFICATION_KEY,
   label: CERTIFICATION_LABEL,
-  children: <Certification certificationData={certificationData} />,
-  disabled: disableTabs,
+  disabled: !profile_id,
+  children: <Certification certificationData={certificationData} onLiveChange={setLiveCertificationData} />,
 });
 
 export const Editor = () => {
   const resumeRef = useRef();
   const { profile_id } = useParams();
-  const [items, setItems] = useState(createPanes(null, null, null, null, true));
+  
+  const [liveProfileData, setLiveProfileData] = useState(null);
+  const [liveProjectData, setLiveProjectData] = useState(null);
+  const [liveExperienceData, setLiveExperienceData] = useState(null);
+  const [liveEducationData, setLiveEducationData] = useState(null);
+  const [liveAchievementData, setLiveAchievementData] = useState(null);
+  const [liveCertificationData, setLiveCertificationData] = useState(null);
+
+  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
@@ -102,19 +114,29 @@ export const Editor = () => {
 
   useEffect(() => {
     if (profile_id) {
+      setLiveProfileData(profileData);
+      setLiveProjectData(projectData);
+      setLiveExperienceData(experienceData);
+      setLiveEducationData(educationData);
+      setLiveAchievementData(achievementData);
+      setLiveCertificationData(certificationData);
       setItems(
         createPanes(
+          profile_id,
           profileData,
           projectData,
           experienceData,
           educationData,
-          false,
+          setLiveProfileData,
+          setLiveProjectData,
+          setLiveExperienceData,
+          setLiveEducationData
         ),
       );
     } else {
-      setItems(createPanes(null, null, null, null, true));
+      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
     }
-  }, [profile_id, profileData, projectData, experienceData, educationData]);
+  }, [profile_id, profileData, projectData, experienceData, educationData, achievementData, certificationData]);
 
   const handleTabs = (event, tabName) => {
     let updatedItems;
@@ -122,12 +144,12 @@ export const Editor = () => {
     if (tabName === ACHIEVEMENT_KEY) {
       setShowAchievement(event);
       updatedItems = event
-        ? [...items, achievement(achievementData, !profile_id)]
+        ? [...items, achievement(profile_id, achievementData, setLiveAchievementData)]
         : items.filter((item) => item.key !== ACHIEVEMENT_KEY);
     } else if (tabName === CERTIFICATION_KEY) {
       setShowCertification(event);
       updatedItems = event
-        ? [...items, certification(certificationData, !profile_id)]
+        ? [...items, certification(profile_id, certificationData, setLiveCertificationData)]
         : items.filter((item) => item.key !== CERTIFICATION_KEY);
     }
 
@@ -187,13 +209,13 @@ export const Editor = () => {
 
             <Space direction="vertical">
               <Space>
-                <Switch size="small" onChange={handleAchievement} />
+                <Switch size="small" onChange={handleAchievement} disabled={!profile_id} />
                 <Typography.Text>
                   Do you want to include achievements?
                 </Typography.Text>
               </Space>
               <Space>
-                <Switch size="small" onChange={handleCertification} />
+                <Switch size="small" onChange={handleCertification} disabled={!profile_id} />
                 <Typography.Text>
                   Do you want to include certifications?
                 </Typography.Text>
@@ -218,12 +240,12 @@ export const Editor = () => {
           >
             <Resume
               data={{
-                profileData,
-                projectData,
-                experienceData,
-                educationData,
-                achievementData: showAchievement ? achievementData : null,
-                certificationData: showCertification ? certificationData : null,
+                profileData: liveProfileData,
+                projectData: liveProjectData,
+                experienceData: liveExperienceData,
+                educationData: liveEducationData,
+                achievementData: showAchievement ? liveAchievementData : null,
+                certificationData: showCertification ? liveCertificationData : null,
               }}
               ref={resumeRef}
             />

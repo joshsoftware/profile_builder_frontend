@@ -47,7 +47,7 @@ import {
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Experience = ({ experienceData }) => {
+const Experience = ({ experienceData, onLiveChange }) => {
   const [action, setAction] = useState("create");
   const [createExperienceService, { isLoading: isCreating }] =
     useCreateExperienceMutation();
@@ -340,7 +340,14 @@ const Experience = ({ experienceData }) => {
                     form={form}
                     name={`experience_${item.key}`}
                     onFinish={onFinish}
-                    onValuesChange={() => setFormChange(true)}
+                    onValuesChange={(_, allValues) => {
+                      setFormChange(true);
+                      if (onLiveChange) {
+                        const filteredExperiences = filterSection(allValues);
+                        const experiences = formatExperienceFields(filteredExperiences);
+                        onLiveChange(experiences);
+                      }
+                    }}
                     key={item.key}
                   >
                     <Row>
@@ -504,6 +511,7 @@ const Experience = ({ experienceData }) => {
 
 Experience.propTypes = {
   experienceData: PropTypes.array,
+  onLiveChange: PropTypes.func,
 };
 
 export default Experience;

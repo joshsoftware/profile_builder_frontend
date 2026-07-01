@@ -4,7 +4,10 @@ import { ExclamationCircleFilled } from "@ant-design/icons";
 const { confirm } = Modal;
 
 import dayjs from "dayjs";
+import customParseFormat from "dayjs/plugin/customParseFormat";
 import { PRESENT_VALUE } from "./Constants";
+
+dayjs.extend(customParseFormat);
 
 export const filterSection = (values) => {
   return Object.entries(values).reduce((acc, [, section]) => {
@@ -78,7 +81,7 @@ export const formatAchievementFields = (achievements) => {
 };
 
 export const validateId = (id) => {
-  return id && typeof id === "string" && id.trim() !== "";
+  return id && typeof id === "string" && id.trim() !== "" && !isNaN(Number(id));
 };
 
 export const disabledDate = (current) => {
@@ -108,13 +111,22 @@ export const parseDate = (date) => {
     return null;
   }
   if (dayjs.isDayjs(date)) {
-    return date;
+    return date.isValid() ? date : null;
   }
+
+  const tryParse = (str) => {
+    let d = dayjs(str);
+    if (!d.isValid()) {
+      d = dayjs(str, "MMM-YYYY");
+    }
+    return d.isValid() ? d : null;
+  };
+
   if (typeof date === "string") {
-    return dayjs(date);
+    return tryParse(date);
   }
   if (typeof date === "object" && date.String && date.Valid) {
-    return dayjs(date.String);
+    return tryParse(date.String);
   }
   if (date instanceof Date) {
     return dayjs(date);

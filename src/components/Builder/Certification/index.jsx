@@ -35,7 +35,7 @@ import {
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Certification = ({ certificationData }) => {
+const Certification = ({ certificationData, onLiveChange }) => {
   const [action, setAction] = useState("create");
   const [createCertificateService, { isLoading: isCreating }] =
     useCreateCertificateMutation();
@@ -305,7 +305,14 @@ const Certification = ({ certificationData }) => {
                     form={form}
                     name={`certification_${item.key}`}
                     onFinish={onFinish}
-                    onValuesChange={() => setFormChange(true)}
+                    onValuesChange={(_, allValues) => {
+                      setFormChange(true);
+                      if (onLiveChange) {
+                        const filteredCertificates = filterSection(allValues);
+                        const certificates = formatCertificationFields(filteredCertificates);
+                        onLiveChange(certificates);
+                      }
+                    }}
                     key={item.key}
                   >
                     <Row>
@@ -478,6 +485,7 @@ const Certification = ({ certificationData }) => {
 
 Certification.propTypes = {
   certificationData: PropTypes.object,
+  onLiveChange: PropTypes.func,
 };
 
 export default Certification;
