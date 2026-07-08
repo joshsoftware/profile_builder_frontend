@@ -1,6 +1,7 @@
 import { createApi } from "@reduxjs/toolkit/query/react";
 import {
   CREATE_PROFILE_ENDPOINT,
+  CREATE_FULL_PROFILE_ENDPOINT,
   DELETE_PROFILE_ENDPOINT,
   HTTP_METHODS,
   INTRANET_EMPLOYEE_ENDPOINT,
@@ -25,6 +26,16 @@ export const profileApi = createApi({
         data: {
           profile: values,
         },
+      }),
+      invalidatesTags: ["profile"],
+      providesTags: ["profile"],
+      transformResponse: (response) => response.data,
+    }),
+    createFullProfile: builder.mutation({
+      query: (values) => ({
+        url: CREATE_FULL_PROFILE_ENDPOINT,
+        method: HTTP_METHODS.POST,
+        data: values,
       }),
       invalidatesTags: ["profile"],
       providesTags: ["profile"],
@@ -101,6 +112,7 @@ export const profileApi = createApi({
 export const {
   useGetProfileListQuery,
   useCreateProfileMutation,
+  useCreateFullProfileMutation,
   useGetBasicInfoQuery,
   useUpdateProfileMutation,
   useDeleteProfileMutation,

@@ -1,12 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 import { Col, Row, Space, Spin, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetAchievementsQuery } from "../../api/achievementApi";
 import { useGetCertificatesQuery } from "../../api/certificationApi";
 import { useGetEducationsQuery } from "../../api/educationApi";
 import { useGetExperiencesQuery } from "../../api/experienceApi";
-import { useGetBasicInfoQuery } from "../../api/profileApi";
+import { useGetBasicInfoQuery, useCreateFullProfileMutation } from "../../api/profileApi";
 import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
@@ -23,7 +24,10 @@ import {
   PROJECTS_KEY,
   PROJECTS_LABEL,
   SPIN_SIZE,
+  SUCCESS_TOASTER,
+  EDITOR_PROFILE_ROUTE,
 } from "../../Constants";
+import { filterSection, formatEducationFields, formatProjectsFields } from "../../helpers";
 import Navbar from "../Navbar";
 import Resume from "../Resume";
 import Achievement from "./Achievement";
@@ -43,24 +47,31 @@ const createPanes = (
   setLiveProfileData,
   setLiveProjectData,
   setLiveExperienceData,
-  setLiveEducationData
+  setLiveEducationData,
+  intranetData,
+  isIntranetSync,
+  handleFullProfileCreate,
+  projectFormRef,
+  educationFormRef
 ) => [
   {
     key: BASIC_INFO_KEY,
     label: BASIC_INFO_LABEL,
-    children: <BasicInfo profileData={profileData} onLiveChange={setLiveProfileData} />,
+    children: <BasicInfo profileData={profileData} onLiveChange={setLiveProfileData} onCreateFullProfile={handleFullProfileCreate} />,
   },
   {
     key: PROJECTS_KEY,
     label: PROJECTS_LABEL,
-    disabled: !profile_id,
-    children: <Project projectData={projectData} onLiveChange={setLiveProjectData} />,
+    disabled: !profile_id && !(intranetData?.projects?.length > 0),
+    forceRender: isIntranetSync,
+    children: <Project projectData={projectData} onLiveChange={setLiveProjectData} intranetData={intranetData} isIntranetSync={isIntranetSync} ref={projectFormRef} />,
   },
   {
     key: EDUCATION_KEY,
     label: EDUCATION_LABEL,
-    disabled: !profile_id,
-    children: <Education educationData={educationData} onLiveChange={setLiveEducationData} />,
+    disabled: !profile_id && !intranetData?.qualification,
+    forceRender: isIntranetSync,
+    children: <Education educationData={educationData} onLiveChange={setLiveEducationData} intranetData={intranetData} ref={educationFormRef} />,
   },
   {
     key: EXPERIENCE_KEY,
@@ -86,7 +97,14 @@ const certification = (profile_id, certificationData, setLiveCertificationData) 
 
 export const Editor = () => {
   const resumeRef = useRef();
+  const projectFormRef = useRef();
+  const educationFormRef = useRef();
   const { profile_id } = useParams();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const intranetData = location.state?.intranetData;
+  const isIntranetSync = !!intranetData && !profile_id;
+  const [createFullProfile] = useCreateFullProfileMutation();
   
   const [liveProfileData, setLiveProfileData] = useState(null);
   const [liveProjectData, setLiveProjectData] = useState(null);
@@ -95,7 +113,47 @@ export const Editor = () => {
   const [liveAchievementData, setLiveAchievementData] = useState(null);
   const [liveCertificationData, setLiveCertificationData] = useState(null);
 
-  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
+  const handleFullProfileCreate = async (basicInfoValues) => {
+    const payload = {
+        profile: basicInfoValues,
+    };
+
+    if (intranetData?.qualification && educationFormRef.current) {
+        try {
+            const eduValues = educationFormRef.current.getFieldsValue();
+            const filteredEdu = filterSection(eduValues);
+            const educations = formatEducationFields(filteredEdu);
+            if (educations.length > 0) {
+                payload.educations = educations;
+            }
+        } catch (e) { /* Education is optional */ }
+    }
+
+    if (intranetData?.projects?.length > 0 && projectFormRef.current) {
+        try {
+            const projValues = projectFormRef.current.getFieldsValue();
+            const filteredProj = filterSection(projValues);
+            const projects = formatProjectsFields(filteredProj);
+            if (projects.length > 0) {
+                payload.projects = projects;
+            }
+        } catch (e) { /* Projects are optional */ }
+    }
+
+    try {
+        const response = await createFullProfile(payload).unwrap();
+        if (response?.message) {
+            toast.success(response.message, SUCCESS_TOASTER);
+            navigate(
+                EDITOR_PROFILE_ROUTE.replace(":profile_id", response.profile_id)
+            );
+        }
+    } catch (error) {
+        toast.error(error?.data?.error_message || "Failed to create profile");
+    }
+  };
+
+  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef));
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
@@ -130,13 +188,18 @@ export const Editor = () => {
           setLiveProfileData,
           setLiveProjectData,
           setLiveExperienceData,
-          setLiveEducationData
+          setLiveEducationData,
+          intranetData,
+          isIntranetSync,
+          handleFullProfileCreate,
+          projectFormRef,
+          educationFormRef
         ),
       );
     } else {
-      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData));
+      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef));
     }
-  }, [profile_id, profileData, projectData, experienceData, educationData, achievementData, certificationData]);
+  }, [profile_id, profileData, projectData, experienceData, educationData, achievementData, certificationData, intranetData, isIntranetSync]);
 
   const handleTabs = (event, tabName) => {
     let updatedItems;

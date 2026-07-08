@@ -20,7 +20,7 @@ import {
 } from "../../../Constants";
 import { parseDate } from "../../../helpers";
 
-const BasicInfo = ({ profileData, onLiveChange }) => {
+const BasicInfo = ({ profileData, onLiveChange, onCreateFullProfile }) => {
   const role = useSelector((state) => state.auth.role);
   const [createProfileService, { isLoading: isCreating }] =
     useCreateProfileMutation();
@@ -68,6 +68,8 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
         josh_joining_date:   intranetData.joshJoiningDate
                                ? dayjs(intranetData.joshJoiningDate)
                                : undefined,
+        description:         PROFILE_DETAILS,
+        title:               intranetData.designation || "Employee",
       };
       form.setFieldsValue(initialValues);
       setShowIntranetBanner(true);
@@ -105,6 +107,8 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
         } else {
           toast.success("No new changes detected.");
         }
+      } else if (onCreateFullProfile) {
+        return onCreateFullProfile(values);
       } else {
         response = await createProfileService(values);
       }
@@ -401,6 +405,7 @@ BasicInfo.propTypes = {
     ]),
   }),
   onLiveChange: PropTypes.func,
+  onCreateFullProfile: PropTypes.func,
 };
 
 export default BasicInfo;
