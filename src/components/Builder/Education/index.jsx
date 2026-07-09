@@ -28,6 +28,7 @@ import {
 import {
   filterSection,
   formatEducationFields,
+  getAllSections,
   showConfirm,
   validateId,
 } from "../../../helpers";
@@ -104,7 +105,7 @@ const Education = forwardRef(({ educationData, onLiveChange, intranetData }, ref
         },
       });
       if (onLiveChange) {
-        const filteredEducation = filterSection(form.getFieldsValue());
+        const filteredEducation = getAllSections(form.getFieldsValue());
         const educations = formatEducationFields(filteredEducation);
         onLiveChange(educations);
       }
@@ -321,7 +322,7 @@ const Education = forwardRef(({ educationData, onLiveChange, intranetData }, ref
                     onValuesChange={(_, allValues) => {
                       setFormChange(true);
                       if (onLiveChange) {
-                        const filteredEducation = filterSection(allValues);
+                        const filteredEducation = getAllSections(allValues);
                         const educations = formatEducationFields(filteredEducation);
                         onLiveChange(educations);
                       }

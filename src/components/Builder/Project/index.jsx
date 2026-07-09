@@ -40,6 +40,7 @@ import {
 import {
   filterSection,
   formatProjectsFields,
+  getAllSections,
   parseDate,
   showConfirm,
   validateId,
@@ -135,7 +136,7 @@ const Project = forwardRef(({ projectData, onLiveChange, intranetData, isIntrane
       form.setFieldsValue(formValues);
 
       if (onLiveChange) {
-        const filteredProjects = filterSection(formValues);
+        const filteredProjects = getAllSections(formValues);
         const projects = formatProjectsFields(filteredProjects);
         onLiveChange(projects);
       }
@@ -354,7 +355,7 @@ const Project = forwardRef(({ projectData, onLiveChange, intranetData, isIntrane
                     onValuesChange={(_, allValues) => {
                       setFormChange(true);
                       if (onLiveChange) {
-                        const filteredProjects = filterSection(allValues);
+                        const filteredProjects = getAllSections(allValues);
                         const projects = formatProjectsFields(filteredProjects);
                         onLiveChange(projects);
                       }
