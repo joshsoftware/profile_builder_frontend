@@ -13,7 +13,6 @@ import {
 import {
   ADMIN,
   EDITOR_PROFILE_ROUTE,
-  GENDER,
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
@@ -206,11 +205,7 @@ const BasicInfo = ({ profileData, onLiveChange, onCreateFullProfile }) => {
             <Input type="tel" placeholder="Enter mobile number" />
           </Form.Item>
         </Col>
-        <Col span={12}>
-          <Form.Item name="gender" label="Gender">
-            <Select placeholder="Select gender" options={GENDER} allowClear />
-          </Form.Item>
-        </Col>
+
       </Row>
       <Row gutter={16}>
         <Col span={12}>
@@ -384,7 +379,6 @@ BasicInfo.propTypes = {
       name: PropTypes.string,
       email: PropTypes.string,
       mobile: PropTypes.string,
-      gender: PropTypes.string,
       years_of_experience: PropTypes.number,
       designation: PropTypes.string,
       title: PropTypes.string,
