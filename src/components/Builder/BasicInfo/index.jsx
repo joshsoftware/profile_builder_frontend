@@ -13,14 +13,13 @@ import {
 import {
   ADMIN,
   EDITOR_PROFILE_ROUTE,
-  GENDER,
   PROFILE_DETAILS,
   SKILLS,
   SUCCESS_TOASTER,
 } from "../../../Constants";
 import { parseDate } from "../../../helpers";
 
-const BasicInfo = ({ profileData, onLiveChange }) => {
+const BasicInfo = ({ profileData, onLiveChange, onCreateFullProfile }) => {
   const role = useSelector((state) => state.auth.role);
   const [createProfileService, { isLoading: isCreating }] =
     useCreateProfileMutation();
@@ -68,6 +67,8 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
         josh_joining_date:   intranetData.joshJoiningDate
                                ? dayjs(intranetData.joshJoiningDate)
                                : undefined,
+        description:         PROFILE_DETAILS,
+        title:               intranetData.designation || "Employee",
       };
       form.setFieldsValue(initialValues);
       setShowIntranetBanner(true);
@@ -105,6 +106,8 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
         } else {
           toast.success("No new changes detected.");
         }
+      } else if (onCreateFullProfile) {
+        return onCreateFullProfile(values);
       } else {
         response = await createProfileService(values);
       }
@@ -202,11 +205,7 @@ const BasicInfo = ({ profileData, onLiveChange }) => {
             <Input type="tel" placeholder="Enter mobile number" />
           </Form.Item>
         </Col>
-        <Col span={12}>
-          <Form.Item name="gender" label="Gender">
-            <Select placeholder="Select gender" options={GENDER} allowClear />
-          </Form.Item>
-        </Col>
+
       </Row>
       <Row gutter={16}>
         <Col span={12}>
@@ -380,7 +379,6 @@ BasicInfo.propTypes = {
       name: PropTypes.string,
       email: PropTypes.string,
       mobile: PropTypes.string,
-      gender: PropTypes.string,
       years_of_experience: PropTypes.number,
       designation: PropTypes.string,
       title: PropTypes.string,
@@ -401,6 +399,7 @@ BasicInfo.propTypes = {
     ]),
   }),
   onLiveChange: PropTypes.func,
+  onCreateFullProfile: PropTypes.func,
 };
 
 export default BasicInfo;

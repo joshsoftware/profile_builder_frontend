@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle,useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -28,12 +28,13 @@ import {
 import {
   filterSection,
   formatEducationFields,
+  getAllSections,
   showConfirm,
   validateId,
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Education = ({ educationData, onLiveChange }) => {
+const Education = forwardRef(({ educationData, onLiveChange, intranetData }, ref) => {
   const [action, setAction] = useState("create");
   const [createEducationService, { isLoading: isCreating }] =
     useCreateEducationMutation();
@@ -45,6 +46,11 @@ const Education = ({ educationData, onLiveChange }) => {
     useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+
+  useImperativeHandle(ref, () => ({
+    getFieldsValue: () => form.getFieldsValue(),
+  }));
+
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     {
@@ -92,8 +98,19 @@ const Education = ({ educationData, onLiveChange }) => {
         newTabIndex.current = 1;
         form.setFieldsValue({});
       }
+    } else if (intranetData?.qualification && !profile_id && !educationData) {
+      form.setFieldsValue({
+        education_0: {
+          degree: intranetData.qualification,
+        },
+      });
+      if (onLiveChange) {
+        const filteredEducation = getAllSections(form.getFieldsValue());
+        const educations = formatEducationFields(filteredEducation);
+        onLiveChange(educations);
+      }
     }
-  }, [profile_id, educationData, form]);
+  }, [profile_id, educationData, intranetData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -294,6 +311,7 @@ const Education = ({ educationData, onLiveChange }) => {
               onEdit={onEdit}
               items={items.map((item, index) => ({
                 ...item,
+                forceRender: true,
                 icon: <DragOutlined />,
                 children: (
                   <Form
@@ -304,7 +322,7 @@ const Education = ({ educationData, onLiveChange }) => {
                     onValuesChange={(_, allValues) => {
                       setFormChange(true);
                       if (onLiveChange) {
-                        const filteredEducation = filterSection(allValues);
+                        const filteredEducation = getAllSections(allValues);
                         const educations = formatEducationFields(filteredEducation);
                         onLiveChange(educations);
                       }
@@ -413,11 +431,14 @@ const Education = ({ educationData, onLiveChange }) => {
       </div>
     </Spin>
   );
-};
+});
 
 Education.propTypes = {
   educationData: PropTypes.array,
   onLiveChange: PropTypes.func,
+  intranetData: PropTypes.object,
 };
+
+Education.displayName = "Education";
 
 export default Education;

@@ -19,6 +19,7 @@ export const LOGIN_ENDPOINT = "/login";
 export const LOGOUT_ENDPOINT = "/api/logout";
 export const PROFILE_LIST_ENDPOINT = "/api/profiles";
 export const CREATE_PROFILE_ENDPOINT = "/api/profiles";
+export const CREATE_FULL_PROFILE_ENDPOINT = "/api/profiles/full";
 export const CREATE_ACHIEVEMENT_ENDPOINTS =
   "/api/profiles/:profile_id/achievements";
 export const CREATE_CERTIFICATE_ENDPOINTS =

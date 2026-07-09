@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { forwardRef, useEffect, useImperativeHandle,useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -40,13 +40,14 @@ import {
 import {
   filterSection,
   formatProjectsFields,
+  getAllSections,
   parseDate,
   showConfirm,
   validateId,
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Project = ({ projectData, onLiveChange }) => {
+const Project = forwardRef(({ projectData, onLiveChange, intranetData, isIntranetSync }, ref) => {
   const [action, setAction] = useState("create");
   const [createProjectService, { isLoading: isCreating }] =
     useCreateProjectMutation();
@@ -58,6 +59,11 @@ const Project = ({ projectData, onLiveChange }) => {
     useUpdateSequenceMutation();
   const [form] = Form.useForm();
   const dispatch = useDispatch();
+
+  useImperativeHandle(ref, () => ({
+    getFieldsValue: () => form.getFieldsValue(),
+  }));
+
   const [activeKey, setActiveKey] = useState("0");
   const [items, setItems] = useState([
     {
@@ -108,8 +114,34 @@ const Project = ({ projectData, onLiveChange }) => {
         newTabIndex.current = 1;
         form.setFieldsValue({});
       }
+    } else if (intranetData?.projects?.length > 0 && !profile_id && !projectData) {
+      const tabs = intranetData.projects.map((_, index) => ({
+        label: `Project ${index + 1}`,
+        children: null,
+        key: `${index}`,
+        isExisting: false,
+      }));
+      setItems(tabs);
+      newTabIndex.current = intranetData.projects.length;
+
+      const formValues = intranetData.projects.reduce((acc, proj, index) => {
+        acc[`project_${index}`] = {
+          name: proj.name,
+          description: proj.description || "",
+          working_start_date: proj.startDate ? dayjs(proj.startDate) : undefined,
+          working_end_date: proj.endDate ? dayjs(proj.endDate) : undefined,
+        };
+        return acc;
+      }, {});
+      form.setFieldsValue(formValues);
+
+      if (onLiveChange) {
+        const filteredProjects = getAllSections(formValues);
+        const projects = formatProjectsFields(filteredProjects);
+        onLiveChange(projects);
+      }
     }
-  }, [profile_id, projectData, form]);
+  }, [profile_id, projectData, intranetData, form]);
 
   const handleCreate = async (values) => {
     try {
@@ -312,6 +344,7 @@ const Project = ({ projectData, onLiveChange }) => {
               onEdit={onEdit}
               items={items.map((item, index) => ({
                 ...item,
+                forceRender: true,
                 icon: <DragOutlined />,
                 children: (
                   <Form
@@ -322,7 +355,7 @@ const Project = ({ projectData, onLiveChange }) => {
                     onValuesChange={(_, allValues) => {
                       setFormChange(true);
                       if (onLiveChange) {
-                        const filteredProjects = filterSection(allValues);
+                        const filteredProjects = getAllSections(allValues);
                         const projects = formatProjectsFields(filteredProjects);
                         onLiveChange(projects);
                       }
@@ -371,7 +404,7 @@ const Project = ({ projectData, onLiveChange }) => {
                       label="Responsibilities"
                       rules={[
                         {
-                          required: true,
+                          required: !isIntranetSync,
                           message: "Responsibilities required",
                         },
                       ]}
@@ -387,7 +420,7 @@ const Project = ({ projectData, onLiveChange }) => {
                       label="Description of Project"
                       rules={[
                         {
-                          required: true,
+                          required: !isIntranetSync,
                           message: "Description required",
                         },
                       ]}
@@ -415,7 +448,7 @@ const Project = ({ projectData, onLiveChange }) => {
                       label="Technology You Worked On"
                       rules={[
                         {
-                          required: true,
+                          required: !isIntranetSync,
                           message: "Worked technology is required",
                         },
                       ]}
@@ -527,9 +560,14 @@ const Project = ({ projectData, onLiveChange }) => {
       </div>
     </Spin>
   );
-};
+});
 Project.propTypes = {
   projectData: PropTypes.array,
   onLiveChange: PropTypes.func,
+  intranetData: PropTypes.object,
+  isIntranetSync: PropTypes.bool,
 };
+
+Project.displayName = "Project";
+
 export default Project;

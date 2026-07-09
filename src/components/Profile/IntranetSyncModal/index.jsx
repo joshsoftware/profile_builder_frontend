@@ -178,13 +178,20 @@ const IntranetSyncModal = ({ open, onClose, onManualCreate }) => {
       {fetchedEmployee && !errorMsg && (
         <Alert
           message={
-            <Space>
-              <UserOutlined style={{ color: "#16a34a" }} />
-              <Text strong>{fetchedEmployee.name}</Text>
-              <Text type="secondary">
-                &nbsp;·&nbsp; {fetchedEmployee.designation} &nbsp;·&nbsp;{" "}
-                {fetchedEmployee.employeeId}
-              </Text>
+            <Space direction="vertical" size={2}>
+              <Space>
+                <UserOutlined style={{ color: "#16a34a" }} />
+                <Text strong>{fetchedEmployee.name}</Text>
+                <Text type="secondary">
+                  &nbsp;·&nbsp; {fetchedEmployee.designation} &nbsp;·&nbsp;{" "}
+                  {fetchedEmployee.employeeId}
+                </Text>
+              </Space>
+              <Space style={{ marginLeft: 22 }}>
+                <Text type="secondary" style={{ fontSize: 13 }}>
+                  📚 {fetchedEmployee.projects?.length || 0} project{(fetchedEmployee.projects?.length === 1) ? "" : "s"} &nbsp;·&nbsp; 🎓 {fetchedEmployee.qualification || "Education not specified"}
+                </Text>
+              </Space>
             </Space>
           }
           type="success"

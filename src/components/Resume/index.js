@@ -475,9 +475,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 <p className={styles.nameStyle}>{profile?.name}</p>
                 <div className={styles.designation}>
                   {profile?.designation && <span>{profile?.designation}</span>}
-                  {profile?.gender && (
-                    <span className="px-1">({profile?.gender})</span>
-                  )}
+
                 </div>
                 <div>
                   {((profile?.years_of_experience !== undefined && profile?.years_of_experience !== null && profile?.years_of_experience !== "") ||

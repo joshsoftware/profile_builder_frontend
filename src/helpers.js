@@ -18,6 +18,15 @@ export const filterSection = (values) => {
   }, []);
 };
 
+export const getAllSections = (values) => {
+  return Object.entries(values).reduce((acc, [, section]) => {
+    if (section) {
+      acc.push(section);
+    }
+    return acc;
+  }, []);
+};
+
 // Format the project data
 export const formatProjectsFields = (projects) => {
   return projects.map((project) => ({
