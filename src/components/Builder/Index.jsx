@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { Col, Row, Space, Spin, Switch, Tabs, Typography } from "antd";
 import { skipToken } from "@reduxjs/toolkit/query";
 import { useGetAchievementsQuery } from "../../api/achievementApi";
 import { useGetCertificatesQuery } from "../../api/certificationApi";
 import { useGetEducationsQuery } from "../../api/educationApi";
 import { useGetExperiencesQuery } from "../../api/experienceApi";
-import { useGetBasicInfoQuery, useCreateFullProfileMutation } from "../../api/profileApi";
+import { useCreateFullProfileMutation,useGetBasicInfoQuery } from "../../api/profileApi";
 import { useGetProjectQuery } from "../../api/projectApi";
 import {
   ACHIEVEMENT_KEY,
@@ -16,6 +16,7 @@ import {
   BASIC_INFO_LABEL,
   CERTIFICATION_KEY,
   CERTIFICATION_LABEL,
+  EDITOR_PROFILE_ROUTE,
   EDUCATION_KEY,
   EDUCATION_LABEL,
   EXPERIENCE_KEY,
@@ -25,7 +26,6 @@ import {
   PROJECTS_LABEL,
   SPIN_SIZE,
   SUCCESS_TOASTER,
-  EDITOR_PROFILE_ROUTE,
 } from "../../Constants";
 import { filterSection, formatEducationFields, formatProjectsFields } from "../../helpers";
 import Navbar from "../Navbar";
