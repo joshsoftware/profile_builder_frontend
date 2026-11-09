@@ -388,13 +388,17 @@ const ListProfiles = () => {
               {record.is_active === "YES" ? "Inactive" : "Active"}
             </Button>
           </Tooltip>
-          <Tooltip title={record?.is_profile_complete === "YES" ? "Resend invitation to employee" : "Send invitation to employee"}>
+          <Tooltip title={
+            record?.last_invitation_at
+              ? `Last invited: ${record.last_invitation_at} IST`
+              : "Send invitation to employee"
+          }>
             <Button
               type={"primary"}
               size="small"
               onClick={() => handleSendInvite(record?.id)}
             >
-              {record?.is_profile_complete === "YES" ? "Resend Invite" : "Send Invite"}
+              {record?.last_invitation_at ? "Resend Invite" : "Send Invite"}
             </Button>
           </Tooltip>
         </Space>
