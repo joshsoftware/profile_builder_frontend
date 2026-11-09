@@ -388,14 +388,13 @@ const ListProfiles = () => {
               {record.is_active === "YES" ? "Inactive" : "Active"}
             </Button>
           </Tooltip>
-          <Tooltip title="Send invite. Disabled button indicates that invitation has been already sent.">
+          <Tooltip title={record?.is_profile_complete === "YES" ? "Resend invitation to employee" : "Send invitation to employee"}>
             <Button
               type={"primary"}
               size="small"
-              disabled={record?.is_profile_complete === "YES"}
               onClick={() => handleSendInvite(record?.id)}
             >
-              Send Invite
+              {record?.is_profile_complete === "YES" ? "Resend Invite" : "Send Invite"}
             </Button>
           </Tooltip>
         </Space>
