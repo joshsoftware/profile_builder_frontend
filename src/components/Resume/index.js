@@ -440,7 +440,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 style={{ background: "#e34435", color: "white" }}
                 onClick={handleCompleteProfile}
               >
-                Complete Profile
+                Finalize & Submit Profile
               </Button>
             )}
             <Button
@@ -462,7 +462,7 @@ const Resume = forwardRef(({ data }, ref) => {
             style={{ background: "#e34435", color: "white" }}
             onClick={handleCompleteProfile}
           >
-            Complete Profile
+            Finalize & Submit Profile
           </Button>
         )}
       </div>

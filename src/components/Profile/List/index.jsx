@@ -276,11 +276,48 @@ const ListProfiles = () => {
       width: "13%",
       ...getColumnSearchProps("name"),
       render: (_, record) => (
-        <Typography.Link
-          onClick={() => handleClick(record?.id, record?.is_current_employee)}
-        >
-          {record.name}
-        </Typography.Link>
+        <div>
+          <Typography.Link
+            onClick={() => handleClick(record?.id, record?.is_current_employee)}
+          >
+            {record.name}
+          </Typography.Link>
+          <div style={{ marginTop: 4 }}>
+            {record?.is_profile_complete === "YES" ? (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 11,
+                  color: "#389e0d",
+                  backgroundColor: "#f6ffed",
+                  border: "1px solid #b7eb8f",
+                  borderRadius: 9999,
+                  padding: "1px 8px",
+                }}
+              >
+                <span style={{ fontSize: 8 }}>●</span> Completed
+              </span>
+            ) : (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                  fontSize: 11,
+                  color: "#8c8c8c",
+                  backgroundColor: "#fafafa",
+                  border: "1px solid #d9d9d9",
+                  borderRadius: 9999,
+                  padding: "1px 8px",
+                }}
+              >
+                <span style={{ fontSize: 8 }}>●</span> Draft
+              </span>
+            )}
+          </div>
+        </div>
       ),
     },
     {
