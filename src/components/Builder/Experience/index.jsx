@@ -1,4 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  forwardRef,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from "react";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { useParams } from "react-router-dom";
@@ -41,13 +47,14 @@ import {
 import {
   filterSection,
   formatExperienceFields,
+  getAllSections,
   parseDate,
   showConfirm,
   validateId,
 } from "../../../helpers";
 import styles from "../Builder.module.css";
 
-const Experience = ({ experienceData, onLiveChange }) => {
+const Experience = forwardRef(({ experienceData, profileData, intranetData, onLiveChange }, ref) => {
   const [action, setAction] = useState("create");
   const [createExperienceService, { isLoading: isCreating }] =
     useCreateExperienceMutation();
@@ -59,6 +66,11 @@ const Experience = ({ experienceData, onLiveChange }) => {
     useUpdateSequenceMutation();
   const dispatch = useDispatch();
   const [form] = Form.useForm();
+
+  useImperativeHandle(ref, () => ({
+    getFieldsValue: () => form.getFieldsValue(),
+  }));
+
   const [activeKey, setActiveKey] = useState("0");
   const [isCurrentCompany, setIsCurrentCompany] = useState({});
   const [items, setItems] = useState([
@@ -115,10 +127,40 @@ const Experience = ({ experienceData, onLiveChange }) => {
       } else {
         setItems([{ label: "Experience 1", children: null, key: "0" }]);
         newTabIndex.current = 1;
-        form.setFieldsValue({});
+        if (profileData?.employee_id) {
+          const joshExperience = {
+            designation: "Software Engineer",
+            company_name: "Josh Software",
+            isCurrentCompany: true,
+            from_date: parseDate(profileData?.josh_joining_date),
+            to_date: "",
+          };
+          setIsCurrentCompany({ 0: true });
+          form.setFieldsValue({ experience_0: joshExperience });
+          if (onLiveChange) {
+            onLiveChange(formatExperienceFields([joshExperience]));
+          }
+        } else {
+          form.setFieldsValue({});
+        }
+      }
+    } else if (intranetData?.employeeId && !profile_id && !experienceData) {
+      const joshExperience = {
+        designation: "Software Engineer",
+        company_name: "Josh Software",
+        isCurrentCompany: true,
+        from_date: parseDate(intranetData?.joshJoiningDate),
+        to_date: "",
+      };
+      setItems([{ label: "Experience 1", children: null, key: "0" }]);
+      newTabIndex.current = 1;
+      setIsCurrentCompany({ 0: true });
+      form.setFieldsValue({ experience_0: joshExperience });
+      if (onLiveChange) {
+        onLiveChange(formatExperienceFields([joshExperience]));
       }
     }
-  }, [profile_id, experienceData, form]);
+  }, [profile_id, experienceData, profileData, intranetData, form, onLiveChange]);
 
   const handleCreate = async (values) => {
     try {
@@ -343,8 +385,8 @@ const Experience = ({ experienceData, onLiveChange }) => {
                     onValuesChange={(_, allValues) => {
                       setFormChange(true);
                       if (onLiveChange) {
-                        const filteredExperiences = filterSection(allValues);
-                        const experiences = formatExperienceFields(filteredExperiences);
+                        const allExperiences = getAllSections(allValues);
+                        const experiences = formatExperienceFields(allExperiences);
                         onLiveChange(experiences);
                       }
                     }}
@@ -507,10 +549,14 @@ const Experience = ({ experienceData, onLiveChange }) => {
       </div>
     </Spin>
   );
-};
+});
+
+Experience.displayName = "Experience";
 
 Experience.propTypes = {
   experienceData: PropTypes.array,
+  profileData: PropTypes.object,
+  intranetData: PropTypes.object,
   onLiveChange: PropTypes.func,
 };
 

@@ -27,7 +27,7 @@ import {
   SPIN_SIZE,
   SUCCESS_TOASTER,
 } from "../../Constants";
-import { filterSection, formatEducationFields, formatProjectsFields } from "../../helpers";
+import { filterSection, formatEducationFields, formatExperienceFields, formatProjectsFields } from "../../helpers";
 import Navbar from "../Navbar";
 import Resume from "../Resume";
 import Achievement from "./Achievement";
@@ -52,7 +52,8 @@ const createPanes = (
   isIntranetSync,
   handleFullProfileCreate,
   projectFormRef,
-  educationFormRef
+  educationFormRef,
+  experienceFormRef
 ) => [
   {
     key: BASIC_INFO_KEY,
@@ -76,8 +77,9 @@ const createPanes = (
   {
     key: EXPERIENCE_KEY,
     label: EXPERIENCE_LABEL,
-    disabled: !profile_id,
-    children: <Experience experienceData={experienceData} onLiveChange={setLiveExperienceData} />,
+    disabled: !profile_id && !intranetData?.employeeId,
+    forceRender: isIntranetSync,
+    children: <Experience experienceData={experienceData} profileData={profileData} onLiveChange={setLiveExperienceData} intranetData={intranetData} ref={experienceFormRef} />,
   },
 ];
 
@@ -99,6 +101,7 @@ export const Editor = () => {
   const resumeRef = useRef();
   const projectFormRef = useRef();
   const educationFormRef = useRef();
+  const experienceFormRef = useRef();
   const { profile_id } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
@@ -140,6 +143,17 @@ export const Editor = () => {
         } catch (e) { /* Projects are optional */ }
     }
 
+    if (intranetData?.employeeId && experienceFormRef.current) {
+        try {
+            const expValues = experienceFormRef.current.getFieldsValue();
+            const filteredExp = filterSection(expValues);
+            const experiences = formatExperienceFields(filteredExp);
+            if (experiences.length > 0) {
+                payload.experiences = experiences;
+            }
+        } catch (e) { /* Experience is optional */ }
+    }
+
     try {
         const response = await createFullProfile(payload).unwrap();
         if (response?.message) {
@@ -153,7 +167,7 @@ export const Editor = () => {
     }
   };
 
-  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef));
+  const [items, setItems] = useState(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef, experienceFormRef));
   const [showCertification, setShowCertification] = useState(false);
   const [showAchievement, setShowAchievement] = useState(false);
 
@@ -193,11 +207,12 @@ export const Editor = () => {
           isIntranetSync,
           handleFullProfileCreate,
           projectFormRef,
-          educationFormRef
+          educationFormRef,
+          experienceFormRef
         ),
       );
     } else {
-      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef));
+      setItems(createPanes(profile_id, null, null, null, null, setLiveProfileData, setLiveProjectData, setLiveExperienceData, setLiveEducationData, intranetData, isIntranetSync, handleFullProfileCreate, projectFormRef, educationFormRef, experienceFormRef));
     }
   }, [profile_id, profileData, projectData, experienceData, educationData, achievementData, certificationData, intranetData, isIntranetSync]);
 
