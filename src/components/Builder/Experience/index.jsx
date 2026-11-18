@@ -187,7 +187,7 @@ const Experience = forwardRef(({ experienceData, profileData, intranetData, onLi
               experience_id: experience.id,
               values: {
                 ...experience,
-                from_date: experience.from_date.format("MMM-YYYY"),
+                from_date: experience.from_date.format("DD-MMM-YYYY"),
                 to_date: isCurrentCompany[activeKey]
                   ? PRESENT_VALUE
                   : experience.to_date.format("MMM-YYYY"),
@@ -463,7 +463,7 @@ const Experience = forwardRef(({ experienceData, profileData, intranetData, onLi
                         >
                           <DatePicker
                             style={{ width: "100%" }}
-                            picker="month"
+                            format="DD-MMM-YYYY"
                           />
                         </Form.Item>
                       </Col>

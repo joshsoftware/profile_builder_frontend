@@ -88,7 +88,7 @@ const BasicInfo = ({ profileData, onLiveChange, onCreateFullProfile }) => {
             values.josh_joining_date = dayjs(values.josh_joining_date);
           }
           values.josh_joining_date =
-            values.josh_joining_date.format("MMM-YYYY");
+            values.josh_joining_date.format("DD-MMM-YYYY");
         }
       }
 
@@ -275,7 +275,7 @@ const BasicInfo = ({ profileData, onLiveChange, onCreateFullProfile }) => {
       <Row gutter={16}>
         <Col span={12}>
           <Form.Item name="josh_joining_date" label="JOSH Joining Date">
-            <DatePicker style={{ width: "100%" }} picker="month" />
+            <DatePicker style={{ width: "100%" }} format="DD-MMM-YYYY" />
           </Form.Item>
         </Col>
         <Col span={12}>
