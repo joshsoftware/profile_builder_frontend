@@ -83,6 +83,14 @@ const Resume = forwardRef(({ data }, ref) => {
     return `${getMonthString(givenMonth)} ${givenYear}`;
   };
 
+  const getDayMonthYear = (value) => {
+    const date = parseDate(value);
+    if (!date || !date.isValid()) {
+      return;
+    }
+    return `${date.date()} ${getMonthString(date.month())} ${date.year()}`;
+  };
+
   const sectionDiv = {
     experiences: (
       <div
@@ -111,7 +119,7 @@ const Resume = forwardRef(({ data }, ref) => {
                     <span className={styles.subtitle}>{item.company_name}</span>
                     <div className={styles.date}>
                       <CalendarOutlined />
-                      {getMonthYear(item.from_date)} -{" "}
+                      {getDayMonthYear(item.from_date)} -{" "}
                       {item.to_date === PRESENT_VALUE
                         ? "Present"
                         : getMonthYear(item.to_date)}
@@ -440,7 +448,7 @@ const Resume = forwardRef(({ data }, ref) => {
                 style={{ background: "#e34435", color: "white" }}
                 onClick={handleCompleteProfile}
               >
-                Complete Profile
+                Finalize & Submit Profile
               </Button>
             )}
             <Button
@@ -462,7 +470,7 @@ const Resume = forwardRef(({ data }, ref) => {
             style={{ background: "#e34435", color: "white" }}
             onClick={handleCompleteProfile}
           >
-            Complete Profile
+            Finalize & Submit Profile
           </Button>
         )}
       </div>

@@ -51,7 +51,7 @@ export const formatExperienceFields = (experiences) => {
   return experiences.map((experience) => ({
     designation: experience?.designation,
     company_name: experience?.company_name,
-    from_date: experience?.from_date?.format("MMM-YYYY"),
+    from_date: experience?.from_date?.format("DD-MMM-YYYY"),
     to_date: experience?.to_date
       ? experience?.to_date?.format("MMM-YYYY")
       : PRESENT_VALUE,
@@ -126,7 +126,7 @@ export const parseDate = (date) => {
   const tryParse = (str) => {
     let d = dayjs(str);
     if (!d.isValid()) {
-      d = dayjs(str, "MMM-YYYY");
+      d = dayjs(str, ["DD-MMM-YYYY", "MMM-YYYY"]);
     }
     return d.isValid() ? d : null;
   };
